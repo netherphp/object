@@ -1,10 +1,12 @@
 {
 	"name":"netherphp/object",
 	"description":"A little object builder.",
-	"keywords":["php","globals"],
+	"keywords":["php","object"],
 	"licence":"BSD 2-Clause",
 	"authors":[
-		{ "name":"Bob Majdak Jr","email":"bob@majdak.net","homepage":"http://majdak.net","role":"developer" }
+		{
+			"name":"Bob Majdak Jr","email":"bob@majdak.net","homepage":"http://majdak.net","role":"developer"
+		}
 	],
 	"require":{ "php":">=5.4.0" },
 	"require-dev":{ },
