@@ -63,8 +63,15 @@ not get populated by the database and will default to false.
 	////////////////
 	////////////////
 
-	public function __construct($input=null,$defaults=null) {
+	public function __construct($input=null,$defaults=null,$opt=null) {
 		if(is_array($input)) $input = (object)$input;
+		if(is_array($defaults)) $defaults = (object)$defaults;
+
+		// we can't use our self here to make this cleanlike or else we will
+		// recurisve forever. ^_^
+		if(!is_array($opt) && !is_object($opt)) $opt = [];
+		if(!array_key_exists('DefaultKeysOnly',$opt)) $opt['DefaultKeysOnly'] = false;
+		if(!array_key_exists('ApplyDefaultTypes',$opt)) $opt['ApplyDefaultTypes'] = true;
 
 		// initialize the object with the input data, running the input
 		// by the property map first if need be.
@@ -80,9 +87,19 @@ not get populated by the database and will default to false.
 
 		// set any default properties that may have been missing from
 		// the original input data.
-		if(is_array($defaults)) $defaults = (object)$defaults;
+
 		if(is_object($defaults)) {
 			$this->__apply_property_defaults($defaults,false);
+
+			// optionally stripping out any properties not defined by the
+			// default map.
+			if($opt['DefaultKeysOnly'])
+			$this->__apply_property_defaults_stripping($defaults);
+
+			// optionally forcing any types defined by the defaults onto any
+			// data that exists in the properties.
+			if($opt['ApplyDefaultTypes'])
+			$this->__apply_property_defaults_types($defaults);
 		}
 
 		// an experimental idea, allow this object to self-ready itself if
@@ -104,49 +121,7 @@ not get populated by the database and will default to false.
 	//*/
 
 		foreach(static::$PropertyMap as $old => $new) {
-
-			// allow typecasting by means of new:type in the PropertyMap
-			// value for that property.
-			if(strpos($new,':')) {
-				list($new,$typecast) = explode(':',$new);
-			} else {
-				$typecast = 'none';
-			}
-
-			if(property_exists($input,$old)) {
-				switch($typecast) {
-					case 'bool': { }
-					case 'boolean': {
-						$this->{$new} = (bool)$input->{$old};
-						break;
-					}
-
-					case 'int': { }
-					case 'integer': {
-						$this->{$new} = (int)$input->{$old};
-						break;
-					}
-
-					case 'double': { }
-					case 'float': {
-						$this->{$new} = (double)$input->{$old};
-						break;
-					}
-
-					case 'str': { }
-					case 'string': {
-						$this->{$new} = (string)$input->{$old};
-						break;
-					}
-
-					default: {
-						$this->{$new} = $input->{$old};
-						break;
-					}
-				}
-
-//				unset($input->{$old});
-			}
+			$this->__apply_typecasted_property($new,$input->{$old});
 		}
 
 		return;
@@ -160,11 +135,113 @@ not get populated by the database and will default to false.
 	//*/
 
 		foreach($source as $property => $value) {
-			if(property_exists($this,$property) && !$overwrite) continue;
-			$this->{$property} = $value;
+			if(property_exists($this,self::__get_typecasted_property_name($property)) && $overwrite)
+				$this->__apply_typecasted_property($property,$value);
+			elseif(!property_exists($this,self::__get_typecasted_property_name($property)))
+				$this->__apply_typecasted_property($property,$value);
 		}
 
 		return;
+	}
+
+	protected function __apply_property_defaults_types($source) {
+	/*//
+	@argv array Source
+	using any typecast notations in the source array, apply those typecasts
+	to the properties currently set.
+	//*/
+
+		foreach($source as $property => $value) {
+			if(property_exists($this,$prop = self::__get_typecasted_property_name($property)))
+			$this->__apply_typecasted_property($property,$this->{$prop});
+		}
+
+		return;
+	}
+
+	protected function __apply_property_defaults_stripping($source) {
+	/*//
+	@argv array Source
+	remove any properties from this object which are not defined by the defaults
+	source array.
+	//*/
+
+		$keepers = [];
+
+		foreach($source as $property => $value)
+		$keepers[] = self::__get_typecasted_property_name($property);
+
+		foreach($this as $property => $value)
+		if(!in_array($property,$keepers))
+		unset($this->{$property});
+
+		return;
+	}
+
+	protected function __apply_typecasted_property($property,$value) {
+	/*//
+	@argv string Property, mixed Value
+	given a property name which may contain typecast notation, apply that value
+	to this object with any typecasting.
+	//*/
+
+		if(strpos($property,':') !== false) {
+			list($property,$typecast) = explode(':',$property);
+		} else {
+			$typecast = 'none';
+		}
+
+		//echo "<pre>";
+		//var_dump($property,$typecast,$value);
+		//echo "</pre>";
+
+		switch($typecast) {
+			case 'none': {
+				$this->{$property} = $value;
+				break;
+			}
+
+			case 'bool': { }
+			case 'boolean': {
+				$this->{$property} = (bool)$value;
+				break;
+			}
+
+			case 'int': { }
+			case 'integer': {
+				$this->{$property} = (int)$value;
+				break;
+			}
+
+			case 'double': { }
+			case 'float': {
+				$this->{$property} = (double)$value;
+				break;
+			}
+
+			case 'str': { }
+			case 'string': {
+				$this->{$property} = (string)$value;
+				break;
+			}
+
+			default: {
+				$this->{$property} = $value;
+				break;
+			}
+		}
+
+		return;
+	}
+
+	static function __get_typecasted_property_name($property) {
+	/*//
+	@argv string Property
+	given a property name which may contain typecasting, return only the valid
+	property name portion of the property definition.
+	//*/
+
+		return ((strstr($property,':',true))?:($property));
 	}
 
 }
