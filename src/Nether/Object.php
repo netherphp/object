@@ -121,6 +121,7 @@ not get populated by the database and will default to false.
 	//*/
 
 		foreach(static::$PropertyMap as $old => $new) {
+			if(property_exists($input,$old))
 			$this->__apply_typecasted_property($new,$input->{$old});
 		}
 
