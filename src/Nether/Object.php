@@ -70,6 +70,7 @@ not get populated by the database and will default to false.
 		// we can't use our self here to make this cleanlike or else we will
 		// recurisve forever. ^_^
 		if(!is_array($opt) && !is_object($opt)) $opt = [];
+		if(!array_key_exists('MappedKeysOnly',$opt)) $opt['MappedKeysOnly'] = true;
 		if(!array_key_exists('DefaultKeysOnly',$opt)) $opt['DefaultKeysOnly'] = false;
 		if(!array_key_exists('ApplyDefaultTypes',$opt)) $opt['ApplyDefaultTypes'] = true;
 
@@ -78,7 +79,7 @@ not get populated by the database and will default to false.
 		if(is_object($input)) {
 			if(is_array(static::$PropertyMap) && count(static::$PropertyMap)) {
 				// if we have an input map then we will only map what it says.
-				$this->__apply_property_map($input);
+				$this->__apply_property_map($input,$opt['MappedKeysOnly']);
 			} else {
 				// if we do not have an input map then we will one-for-one it.
 				$this->__apply_property_defaults($input,true);
@@ -112,7 +113,7 @@ not get populated by the database and will default to false.
 	////////////////
 	////////////////
 
-	protected function __apply_property_map($input) {
+	protected function __apply_property_map($input,$onlymapped=false) {
 	/*//
 	@argv array Input
 	uses the PropertyMap to remap the input data to the specified properties
@@ -120,9 +121,24 @@ not get populated by the database and will default to false.
 	:type to the right half of the map.
 	//*/
 
-		foreach(static::$PropertyMap as $old => $new) {
-			if(property_exists($input,$old))
-			$this->__apply_typecasted_property($new,$input->{$old});
+		if($onlymapped) {
+		// only maintain keys which were in the map.
+			foreach(static::$PropertyMap as $old => $new) {
+				if(property_exists($input,$old))
+				$this->__apply_typecasted_property($new,$input->{$old});
+			}
+		} else {
+		// also maintain keys which were not in the map.
+			foreach($input as $old => $val) {
+				if(array_key_exists($old,static::$PropertyMap)) {
+					$this->__apply_typecasted_property(
+						static::$PropertyMap[$old],
+						$val
+					);
+				} else {
+					$this->{$old} = $val;
+				}
+			}
 		}
 
 		return;
