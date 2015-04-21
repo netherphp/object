@@ -6,6 +6,7 @@ php:
     - 7.0
     - hhvm
 install:
+    - composer self-update
     - composer install
 script:
     - php vendor/bin/codecept run unit -q
