@@ -1,6 +1,6 @@
 Nether Object
 =====================================
-[![Code Climate](https://codeclimate.com/github/netherphp/object/badges/gpa.svg)](https://codeclimate.com/github/netherphp/object)
+[![Code Climate](https://codeclimate.com/github/netherphp/object/badges/gpa.svg)](https://codeclimate.com/github/netherphp/object) [![Build Status](https://travis-ci.org/netherphp/object.svg?branch=master)](https://travis-ci.org/netherphp/object)  [![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Packagist](https://img.shields.io/packagist/dt/netherphp/object.svg)](https://packagist.org/packages/netherphp/object)
 
 This package provides a self-constructing object translation matrix capacitor.
 
