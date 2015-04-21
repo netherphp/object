@@ -29,3 +29,35 @@ To use it stand alone, Composer yourself a netherphp/object with a version of 1.
 
 If you are using any other Nether components you'll most likely already have this.
 
+Running Tests
+-------------------------------------
+This library uses Codeception from Composer to Unit Test. I think this will install it how I had it.
+
+	$ composer install
+	$ php composer.phar install
+
+After that you should be able to run it.
+
+	$ php vendor/bin/codecept run unit
+	$ vendor\bin\codecept run unit
+
+That should yield something like this.
+	
+	Unit Tests (10) --------------------------------------------------------------------------------------------
+	Test empty (Nether\Object_Construct_Test::testEmpty) Ok
+	Test input (Nether\Object_Construct_Test::testInput) Ok
+	Test input defaults (Nether\Object_Construct_Test::testInputDefaults) Ok
+	Test input defaults with default culling (Nether\Object_Construct_Test::testInputDefaultsWithDefaultCulling) Ok
+	Test input typecasting (Nether\Object_Construct_Test::testInputTypecasting) Ok
+	Test input default typecasting (Nether\Object_Construct_Test::testInputDefaultTypecasting) Ok
+	Test mapping (Nether\Object_PropertyMapping_Test::testMapping) Ok
+	Test mapping drop unmapped (Nether\Object_PropertyMapping_Test::testMappingDropUnmapped) Ok
+	Test mapping include unmapped (Nether\Object_PropertyMapping_Test::testMappingIncludeUnmapped) Ok
+	Test mapping with typecasting (Nether\Object_PropertyMapping_Test::testMappingWithTypecasting) Ok
+	------------------------------------------------------------------------------------------------------------
+	Time: 279 ms, Memory: 7.75Mb
+	OK (10 tests, 36 assertions)
+
+
+
+

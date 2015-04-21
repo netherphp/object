@@ -77,8 +77,7 @@ class Object_PropertyMapping_Test extends \Codeception\TestCase\Test {
 
 	public function testMappingIncludeUnmapped() {
 	/*//
-	test that the object dropped any unmapped properties, which is the default
-	behaviour.
+	test that the object can include all unmapped properties if requested.
 	//*/
 
 		$obj = new Nether\RegionTest($this->Input,null,[
