@@ -9,4 +9,4 @@ install:
     - composer self-update
     - composer install
 script:
-    - php vendor/bin/codecept run unit -q
+    - phpunit --bootstrap vendor/autoload.php tests
