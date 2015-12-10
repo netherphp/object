@@ -148,12 +148,12 @@ implements Iterator {
 	appended to the set.
 	//*/
 
-		$this->Data = array_merge(
-			$this->Data,
-			$Input
+		$this->Count = count(
+			$this->Data = array_merge(
+				$this->Data,
+				$Input
+			)
 		);
-
-		$this->Count = count($this->Data);
 
 		return $this;
 	}
@@ -226,6 +226,23 @@ implements Iterator {
 			unset($this->Data[$Key]);
 			$this->Count--;
 		}
+
+		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	// item manipulation api for the data.
+
+	public function
+	Each(callable $Function) {
+	/*//
+	@argv
+	//*/
+
+		foreach($this->Data as $Key => &$Value)
+		$Function($Value,$Key);
 
 		return $this;
 	}
