@@ -238,7 +238,10 @@ implements Iterator {
 	public function
 	Each(callable $Function) {
 	/*//
-	@argv
+	@argv callable Func
+	run the specified function against every single thing in the list. it is
+	is slower than running a direct foreach() on the property but it sure makes
+	for some nice looking shit sometimes.
 	//*/
 
 		foreach($this->Data as $Key => &$Value)
