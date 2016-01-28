@@ -23,6 +23,38 @@ required, and other various intregrity reasons.
 
 Obviously, not fully documented yet.
 
+Use Case (Basic Function)
+-------------------------------------
+
+Here is some ass code that is also ugly...
+
+	if(!$opt || (!is_array($opt) && !is_object($opt))) $opt = [];
+
+	$opt = (object)array_merge(
+		[
+			'ObjectType' => 'model:',
+			'ParentID'   => $this->ID,
+			'Limit'      => 1
+		],
+		(array)$opt
+	);
+
+... that we can clean up a little bit.
+
+	$opt = new Nether\Object($opt,[
+		'ObjectType' => 'model:',
+		'ParentID'   => $this->ID,
+		'Limit'      => 1
+	]);
+
+It can be a bit more involved. Like if we know ParentID has to be an integer.
+
+	$opt = new Nether\Object($opt,[
+		'ObjectType'   => 'model:',
+		'ParentID:int' => $this->ID,
+		'Limit'        => 1
+	]);
+
 Install
 -------------------------------------
 To use it stand alone, Composer yourself a netherphp/object with a version of 1.*
