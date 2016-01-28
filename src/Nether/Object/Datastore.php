@@ -139,6 +139,30 @@ implements Iterator {
 	}
 
 	public function
+	HasKey($Key) {
+	/*//
+	@argv Mixed KeyName
+	@return Bool
+	returns if this datastore has the requested key.
+	//*/
+
+		return array_key_exists($Key,$this->Data);
+	}
+
+	public function
+	HasValue($Val,$Strict=false) {
+	/*//
+	@argv Mixed KeyName
+	@return Mixed
+	returns if this datastore has the requested value. if the value is found
+	it will return the key that contains it. if not found it will return a
+	boolean false.
+	//*/
+
+		return array_search($Val,$this->Data,$Strict);
+	}
+
+	public function
 	Merge($Input) {
 	/*//
 	@argv Array InputData
