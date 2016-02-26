@@ -48,6 +48,32 @@ implements Iterator {
 	////////////////////////////////
 	////////////////////////////////
 
+	protected
+	$Sorter = null;
+	/*//
+	@type Callable
+	holds a callable method for sorting.
+	//*/
+
+	public function
+	GetSorter() {
+	/*//
+	@todo strict type this when php 7 has nullable types.
+	//*/
+
+		return $this->Sorter;
+	}
+
+	public function
+	SetSorter(Callable $Function):
+	Self {
+		$this->Sorter = $Function;
+		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
 	// implementation of the iterator interface.
 	// these allow the object to be used in things such as foreach loops.
 
@@ -270,6 +296,30 @@ implements Iterator {
 
 		foreach($this->Data as $Key => &$Value)
 		$Function($Value,$Key);
+
+		return $this;
+	}
+
+	public function
+	Sort(Callable $Function=null, Bool $Presort=false):
+	Self {
+	/*//
+	sort the dataset by the function defined in this datastore's
+	sorter property. if a function is defined as an argument here
+	then we will use that instead of the sorter property. if presort
+	is enabled then the specified sort function will be used before
+	the defined sorter.
+	//*/
+
+		if(is_callable($Function)) {
+			usort($this->Data,$Function);
+			if(!$Presort) return $this;
+		}
+
+		if(is_callable($this->Sorter)) {
+			usort($this->Data,$this->Sorter);
+			return $this;
+		}
 
 		return $this;
 	}
