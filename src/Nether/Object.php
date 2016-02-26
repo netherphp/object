@@ -73,6 +73,7 @@ not get populated by the database and will default to false.
 		if(!array_key_exists('MappedKeysOnly',$opt)) $opt['MappedKeysOnly'] = true;
 		if(!array_key_exists('DefaultKeysOnly',$opt)) $opt['DefaultKeysOnly'] = false;
 		if(!array_key_exists('ApplyDefaultTypes',$opt)) $opt['ApplyDefaultTypes'] = true;
+		if(!array_key_exists('ForceDefaultValues',$opt)) $opt['ForceDefaultValues'] = false;
 
 		// initialize the object with the input data, running the input
 		// by the property map first if need be.
@@ -90,7 +91,7 @@ not get populated by the database and will default to false.
 		// the original input data.
 
 		if(is_object($defaults)) {
-			$this->__apply_property_defaults($defaults,false);
+			$this->__apply_property_defaults($defaults,$opt['ForceDefaultValues']);
 
 			// optionally stripping out any properties not defined by the
 			// default map.
