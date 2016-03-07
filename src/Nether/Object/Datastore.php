@@ -15,6 +15,9 @@ implements Iterator {
 	a loop without the time spent counting lots of things.
 	//*/
 
+	////////////////////////////////
+	////////////////////////////////
+
 	protected $Data = [];
 	/*//
 	@type Array
@@ -68,6 +71,31 @@ implements Iterator {
 	SetSorter(Callable $Function):
 	Self {
 		$this->Sorter = $Function;
+		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	protected
+	$Title = '';
+	/*//
+	@type String
+	holds a title for this list for whatever purposes you wish to use it for.
+	we mainly use it for grouped widgets which contain multiple of these
+	datastores.
+	//*/
+
+	public function
+	GetTitle():
+	String {
+		return $this->Title;
+	}
+
+	public function
+	SetTitle(String $Title=''):
+	Self {
+		$this->Title = $Title;
 		return $this;
 	}
 
