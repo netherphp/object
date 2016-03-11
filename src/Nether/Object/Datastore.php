@@ -162,6 +162,18 @@ implements Iterator {
 	// item management api for the datastore.
 
 	public function
+	Clear() {
+	/*//
+	dump the old dataset to start fresh. syntaxual sugar instead of having to
+	use $Store->SetData([]);
+	//*/
+
+		$this->Data = [];
+
+		return $this;
+	}
+
+	public function
 	Count($Recount=false) {
 	/*//
 	@return Int
