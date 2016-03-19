@@ -169,7 +169,7 @@ implements Iterator {
 	//*/
 
 		$this->Data = [];
-
+		$this->Count = 0;
 		return $this;
 	}
 
@@ -226,26 +226,6 @@ implements Iterator {
 	//*/
 
 		return array_search($Val,$this->Data,$Strict);
-	}
-
-	public function
-	Merge($Input) {
-	/*//
-	@argv Array InputData
-	@return self
-	merges the specified array into the dataset. if it has associative keys
-	then what you get is the newer version. numeric keys however will be
-	appended to the set.
-	//*/
-
-		$this->Count = count(
-			$this->Data = array_merge(
-				$this->Data,
-				$Input
-			)
-		);
-
-		return $this;
 	}
 
 	public function
@@ -317,6 +297,144 @@ implements Iterator {
 			$this->Count--;
 		}
 
+		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	public function
+	Shift() {
+	/*//
+	@return mixed
+	performs a standard array shifting operation returning whatever slide off
+	the front of the dataset.
+	//*/
+
+		return array_shift($this->Data);
+	}
+
+	public function
+	Unshift($Val) {
+	/*//
+	@return self
+	performs a standard array unshifting operation, shoving the specified value
+	onto the front of the array.
+	//*/
+
+		array_unshift($this->Data,$Val);
+		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	public function
+	BlendRight(Array $Input) {
+	/*//
+	@return self
+	works the same as MergeRight, only instead of your input overwriting the
+	original data will be kept. your new data will appear at the end of the
+	array, and the original data will maintain its original location. numeric
+	keys will flat out be appended with the next numeric in the sequence just
+	like array_merge.
+	//*/
+
+		foreach($Input as $Key => $Val) {
+			if(is_int($Key)) {
+				$this->Data[] = $Val;
+				$this->Count++;
+				continue;
+			}
+
+			if(!array_key_exists($Key,$this->Data)) {
+				$this->Data[$Key] = $Val;
+				$this->Count++;
+				continue;
+			}
+		}
+
+		return $this;
+	}
+
+	public function
+	BlendLeft(Array $Input) {
+	/*//
+	@return self
+	works the same as MergeLeft, only instead of your input overwriting the
+	original data will be kept. your new data will appear at the beginning
+	of the array pushing the original data down.
+
+	as with MergeLeft, this function is much less performant.
+	//*/
+
+		$this->Data = array_reverse($this->Data);
+
+		foreach(array_reverse($Input) as $Key => $Val) {
+			if(is_int($Key)) {
+				$this->Data[] = $Val;
+				$this->Count++;
+				continue;
+			}
+
+			if(!array_key_exists($Key,$this->Data)) {
+				$this->Data[$Key] = $Val;
+				$this->Count++;
+				continue;
+			}
+		}
+
+		$this->Data = array_reverse($this->Data);
+		return $this;
+	}
+
+	public function
+	MergeRight(Array $Input) {
+	/*//
+	@return self
+	appends the input to the dataset. if there are conflicting assoc keys, the
+	input data here will override whatever already existed. numeric keys will
+	be appended no matter what.
+
+	all new data will appear at the end of the array. any data that had
+	conflicting assoc keys will remain in the sequence position that it was
+	already in.
+	//*/
+
+		$this->Data = array_merge(
+			$this->Data,
+			$Input
+		);
+
+		$this->Count = count($this->Data);
+		return $this;
+	}
+
+	public function
+	MergeLeft(Array $Input) {
+	/*//
+	@return self
+	appends the input to the dataset. same as MergeRight but will appear to add
+	your data to the start of the array, and still overwriting. the union
+	operator is not good for this instance because it doesnt behave as a proper
+	merge, allowing numerical keys to cause collisions, and this needs to
+	accurately mirror standard array_merge behaviour.
+
+	all new data will appear at the beginning of the array. any data that had
+	conflicting assoc keys will remain in the sequence position that it was
+	already in.
+
+	this is not performant. use sparingly. it is suggested you attempt to
+	structure your data such that order doesnt really matter, or your code
+	such that data can always be appended in the most cheap way possible.
+	//*/
+
+		$this->Data = array_reverse(array_merge(
+			array_reverse($this->Data),
+			array_reverse($Input)
+		));
+
+		$this->Count = count($this->Data);
 		return $this;
 	}
 

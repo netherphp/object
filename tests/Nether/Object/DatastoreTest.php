@@ -151,37 +151,6 @@ extends \PHPUnit_Framework_TestCase {
 
 	/** @test */
 	public function
-	TestDataStorageMerge() {
-
-		$Store = new Nether\Object\Datastore;
-
-		// test that numeric keys get appended.
-
-		$Store->SetData([1,2,3]);
-		$Store->Merge([4,5,6]);
-		$this->AssertTrue($Store->Count() === 6);
-
-		// test that assoc keys get overwritten.
-
-		$Store->SetData(['One'=>1,'Two'=>2,'Three'=>3]);
-		$Store->Merge(['One'=>4,'Two'=>5,'Three'=>6]);
-		$this->AssertTrue($Store->Count() === 3);
-		$this->AssertTrue($Store->Get('One') === 4);
-		$this->AssertTrue($Store->Get('Two') === 5);
-		$this->AssertTrue($Store->Get('Three') === 6);
-
-		// test that it works mixed.
-		
-		$Store->SetData([1,2,3,'Donkey'=>'Kong']);
-		$Store->Merge([4,5,6,'Donkey'=>'Long']);
-		$this->AssertTrue($Store->Count() === 7);
-		$this->AssertTrue($Store->Get('Donkey') === 'Long');
-
-		return;
-	}
-
-	/** @test */
-	public function
 	TestDataIteration() {
 	/*//
 	this tests that the implememented Iterator interface appears to be
@@ -206,6 +175,268 @@ extends \PHPUnit_Framework_TestCase {
 
 			$Loop++;
 		}
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestDataMergeRight() {
+	/*//
+	testing that we implemented merging new data onto the end of the array
+	correctly. (array_merge behaviour)
+	//*/
+
+		/*
+		this is what we want to see.
+		Array
+		(
+			[0] => 1
+			[1] => 2
+			[2] => 3
+			[one] => one
+			[two] => two    // old data here and up.
+			[three] => tres // overwrite
+			[3] => 4        // new data here and down.
+			[4] => 5
+			[5] => 6
+			[four] => four
+			[five] => five
+		)
+		*/
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
+
+		$Store->MergeRight([
+			4, 5, 6,
+			'three' => 'tres',
+			'four'  => 'four',
+			'five'  => 'five'
+		]);
+
+		$Data = $Store->GetData();
+
+		$this->AssertTrue($Data[0] === 1);
+		$this->AssertTrue($Data[3] === 4);
+		$this->AssertTrue($Data['three'] === 'tres');
+		$this->AssertTrue($Data['five'] === 'five');
+
+		reset($Data);
+		$this->AssertTrue(key($Data) === 0);
+		$this->AssertTrue(current($Data) === 1);
+
+		end($Data);
+		$this->AssertTrue(key($Data) === 'five');
+		$this->AssertTrue(current($Data) === 'five');
+
+		$Data = array_values($Data);
+		$this->AssertTrue($Data[5] === 'tres');
+		$this->AssertTrue($Data[6] === 4);
+
+		$this->AssertTrue(count($Data) === $Store->Count(false));
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestDataMergeLeft() {
+	/*//
+	testing that we implemented merging new data onto the start of the array
+	correctly. (array_merge behaviour)
+	//*/
+
+		/*
+		this is what we want to see.
+		Array
+		(
+			[0] => 4
+			[1] => 5
+			[2] => 6
+			[four] => four
+			[five] => five   // new data here and up
+			[3] => 1         // old data here and down
+			[4] => 2
+			[5] => 3
+			[one] => one
+			[two] => two
+			[three] => tres  // except for this overwrite
+		)
+		*/
+
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
+
+		$Store->MergeLeft([
+			4, 5, 6,
+			'three' => 'tres',
+			'four'  => 'four',
+			'five'  => 'five'
+		]);
+
+		$Data = $Store->GetData();
+
+		$this->AssertTrue($Data[0] === 4);
+		$this->AssertTrue($Data[3] === 1);
+		$this->AssertTrue($Data['three'] === 'tres');
+		$this->AssertTrue($Data['five'] === 'five');
+
+		reset($Data);
+		$this->AssertTrue(key($Data) === 0);
+		$this->AssertTrue(current($Data) === 4);
+
+		end($Data);
+		$this->AssertTrue(key($Data) === 'three');
+		$this->AssertTrue(current($Data) === 'tres');
+
+		$Data = array_values($Data);
+		$this->AssertTrue($Data[4] === 'five');
+		$this->AssertTrue($Data[5] === 1);
+
+		$this->AssertTrue(count($Data) === $Store->Count(false));
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestDataBlendRight() {
+	/*//
+	testing that we implemented blending new data into the end of the array,
+	where original data wins any assoc conflicts. (sorta array_merge)
+	//*/
+
+		/*
+		this is what we want to see.
+		Array
+		(
+			[0] => 1
+			[1] => 2
+			[2] => 3
+			[one] => one
+			[two] => two
+			[three] => three
+			[3] => 4
+			[4] => 5
+			[5] => 6
+			[four] => four
+			[five] => five
+		)
+		*/
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
+
+		$Store->BlendRight([
+			4, 5, 6,
+			'three' => 'tres',
+			'four'  => 'four',
+			'five'  => 'five'
+		]);
+
+		$Data = $Store->GetData();
+
+		$this->AssertTrue($Data[0] === 1);
+		$this->AssertTrue($Data[3] === 4);
+		$this->AssertTrue($Data['three'] === 'three');
+		$this->AssertTrue($Data['five'] === 'five');
+
+		reset($Data);
+		$this->AssertTrue(key($Data) === 0);
+		$this->AssertTrue(current($Data) === 1);
+
+		end($Data);
+		$this->AssertTrue(key($Data) === 'five');
+		$this->AssertTrue(current($Data) === 'five');
+
+		$Data = array_values($Data);
+		$this->AssertTrue($Data[5] === 'three');
+		$this->AssertTrue($Data[6] === 4);
+
+		$this->AssertTrue(count($Data) === $Store->Count(false));
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestDataBlendLeft() {
+	/*//
+	testing that we implemented blending new data into the the start of the
+	array, where original data wins any assoc conflicts. (sorta array_merge)
+	//*/
+
+		/*
+		this is what we want to see.
+		Array
+		(
+			[0] => 4
+			[1] => 5
+			[2] => 6
+			[four] => four
+			[five] => five
+			[3] => 1
+			[4] => 2
+			[5] => 3
+			[one] => one
+			[two] => two
+			[three] => three
+		)
+		*/
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
+
+		$Store->BlendLeft([
+			4, 5, 6,
+			'three' => 'tres',
+			'four'  => 'four',
+			'five'  => 'five'
+		]);
+
+		$Data = $Store->GetData();
+
+		$this->AssertTrue($Data[0] === 4);
+		$this->AssertTrue($Data[3] === 1);
+		$this->AssertTrue($Data['three'] === 'three');
+		$this->AssertTrue($Data['five'] === 'five');
+
+		reset($Data);
+		$this->AssertTrue(key($Data) === 0);
+		$this->AssertTrue(current($Data) === 4);
+
+		end($Data);
+		$this->AssertTrue(key($Data) === 'three');
+		$this->AssertTrue(current($Data) === 'three');
+
+		$Data = array_values($Data);
+		$this->AssertTrue($Data[4] === 'five');
+		$this->AssertTrue($Data[5] === 1);
+		$this->AssertTrue($Data[10] === 'three');
+
+		$this->AssertTrue(count($Data) === $Store->Count(false));
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestDataClear() {
+	/*//
+	testing that we implemented clearing the dataset properly.
+	//*/
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData([1,2,3]);
+
+		$this->AssertTrue($Store->Count(false) === 3);
+
+		$Store->Clear();
+
+		$this->AssertTrue($Store->Count(false) === 0);
+		$this->AssertTrue($Store->Count(false) === count($Store->GetData()));
 
 		return;
 	}
