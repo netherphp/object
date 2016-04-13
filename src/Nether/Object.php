@@ -53,7 +53,7 @@ not get populated by the database and will default to false.
 //*/
 
 
-	static $PropertyMap = array();
+	static $PropertyMap = null;
 	/*//
 	@type array
 	holds a mapping index that is used to convert objects or arrays into nice
@@ -213,7 +213,7 @@ not get populated by the database and will default to false.
 		//var_dump($property,$typecast,$value);
 		//echo "</pre>";
 
-		switch($typecast) {
+		switch(strtolower($typecast)) {
 			case 'none': {
 				$this->{$property} = $value;
 				break;
