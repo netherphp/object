@@ -1,6 +1,6 @@
 # Nether Object
 
-[![Code Climate](https://codeclimate.com/github/netherphp/object/badges/gpa.svg)](https://codeclimate.com/github/netherphp/object) [![Build Status](https://travis-ci.org/netherphp/object.svg?branch=master)](https://travis-ci.org/netherphp/object)  [![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Packagist](https://img.shields.io/packagist/dt/netherphp/object.svg)](https://packagist.org/packages/netherphp/object)
+[![Build Status](https://travis-ci.org/netherphp/object.svg?branch=master)](https://travis-ci.org/netherphp/object)  [![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Packagist](https://img.shields.io/packagist/dt/netherphp/object.svg)](https://packagist.org/packages/netherphp/object)
 
 This package provides a self-constructing object translation matrix capacitor.
 
@@ -92,7 +92,7 @@ not attempt to access undefined properties later on. The end result is we want
 to have an object that is promised to have the properties we need with default
 values if they had not yet been defined.
 
-Here is what you would have to write to kinda pull that off.
+Here is what you would have to write to kinda pull that off without Nether\Object.
 
 ```php
 <?php
