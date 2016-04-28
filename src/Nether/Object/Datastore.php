@@ -182,10 +182,16 @@ implements Iterator {
 	as expected.
 	//*/
 
+		// handle underflow attempts.
+		if($this->Count < 0)
+		$this->Count = 0;
+
+		// return local count by default.
 		if(!$Recount)
 		return $this->Count;
 
-		return count($this->Data);
+		// get actual count and cache.
+		return $this->Count = count($this->Data);
 	}
 
 	public function

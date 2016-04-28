@@ -151,6 +151,23 @@ extends \PHPUnit_Framework_TestCase {
 
 	/** @test */
 	public function
+	TestDataStorageShiftUnshift() {
+
+		$Store = (new Nether\Object\Datastore)
+		->Push(1)
+		->Push(2)
+		->Push(3);
+
+		$this->AssertTrue($Store->Count() === 3);
+
+		$this->AssertTrue($Store->Shift() === 1);
+		$this->AssertTrue($Store->Shift() === 2);
+		$this->AssertTrue($Store->Shift() === 3);
+		$this->AssertTrue($Store->Count() === 0);
+	}
+
+	/** @test */
+	public function
 	TestDataIteration() {
 	/*//
 	this tests that the implememented Iterator interface appears to be
