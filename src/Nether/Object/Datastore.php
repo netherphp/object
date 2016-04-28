@@ -311,6 +311,7 @@ implements Iterator {
 	the front of the dataset.
 	//*/
 
+		$this->Count--;
 		return array_shift($this->Data);
 	}
 
@@ -322,6 +323,7 @@ implements Iterator {
 	onto the front of the array.
 	//*/
 
+		$this->Count++;
 		array_unshift($this->Data,$Val);
 		return $this;
 	}
