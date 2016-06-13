@@ -211,6 +211,21 @@ implements Iterator {
 	}
 
 	public function
+	&Use($Key) {
+	/*//
+	@argv Mixed KeyName
+	@return &Mixed | NULL
+	works the same as Get but instead returns a reference to the data so you
+	can manipulate non-objects if needed.
+	//*/
+
+		if(array_key_exists($Key,$this->Data))
+		return $this->Data[$Key];
+
+		return null;
+	}
+
+	public function
 	HasKey($Key) {
 	/*//
 	@argv Mixed KeyName
