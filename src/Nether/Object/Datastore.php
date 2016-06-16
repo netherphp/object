@@ -493,12 +493,12 @@ implements Iterator {
 	//*/
 
 		if(is_callable($Function)) {
-			usort($this->Data,$Function);
+			uasort($this->Data,$Function);
 			if(!$Presort) return $this;
 		}
 
 		if(is_callable($this->Sorter)) {
-			usort($this->Data,$this->Sorter);
+			uasort($this->Data,$this->Sorter);
 			return $this;
 		}
 
