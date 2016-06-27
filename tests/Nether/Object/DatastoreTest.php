@@ -512,7 +512,7 @@ extends \PHPUnit_Framework_TestCase {
 		$Store->SetFormat($Store::FormatJSON);
 		$Store->Write($Filename);
 		$Data = file_get_contents($Filename);
-		$this->AssertEquals($Data,json_encode($Dataset));
+		$this->AssertEquals($Data,json_encode($Dataset,JSON_PRETTY_PRINT));
 
 		unlink($Filename);
 		return;
