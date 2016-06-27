@@ -458,4 +458,131 @@ extends \PHPUnit_Framework_TestCase {
 		return;
 	}
 
+	/** @test */
+	public function
+	TestWriteFormat() {
+	/*//
+	testing that we were able to tell it what format to write to disk as, and
+	that an invalid value resulted in a sane default.
+	//*/
+
+		$Store = new Nether\Object\Datastore;
+
+		$Store->SetFormat($Store::FormatJSON);
+		$this->AssertTrue($Store->GetFormat() === $Store::FormatJSON);
+
+		$Store->SetFormat($Store::FormatPHP);
+		$this->AssertTrue($Store->GetFormat() === $Store::FormatPHP);
+
+		$Store->SetFormat(-1);
+		$this->AssertTrue($Store->GetFormat() === $Store::FormatPHP);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestWriteToDisk() {
+
+		$Dataset = [1,2,3];
+		$Filename = sprintf(
+			'/tmp/nether-object-datastore-%s.phson',
+			md5(microtime(true))
+		);
+
+		// test that we could create a new file.
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData($Dataset);
+		$Store->Write($Filename);
+		$this->AssertTrue(file_exists($Filename));
+
+		// test that we could overwrite it.
+
+		$Dataset = [3,2,1];
+		$Store->SetData($Dataset);
+		$Store->Write($Filename);
+		$this->AssertTrue(file_exists($Filename));
+
+		$Data = file_get_contents($Filename);
+		$this->AssertEquals($Data,serialize($Dataset));
+
+		// test that we could write it in json.
+
+		$Store->SetFormat($Store::FormatJSON);
+		$Store->Write($Filename);
+		$Data = file_get_contents($Filename);
+		$this->AssertEquals($Data,json_encode($Dataset));
+
+		unlink($Filename);
+		return;
+	}
+
+	/** @test */
+	public function
+	TestReadFromDisk() {
+
+		$Dataset = [1,2,3];
+		$Filename = sprintf(
+			'/tmp/nether-object-datastore-%s.phson',
+			md5(microtime(true))
+		);
+
+		// write a file.
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData($Dataset);
+		$Store->Write($Filename);
+		$this->AssertTrue(file_exists($Filename));
+
+		// read a file.
+
+		unset($Store);
+		$Store = new Nether\Object\Datastore;
+		$Store->Read($Filename);
+
+		for($Iter = 0; $Iter < count($Dataset); $Iter++)
+		$this->AssertTrue($Store->Get($Iter) === $Dataset[$Iter]);
+
+		unset($Filename);
+		return;
+	}
+
+	/** @test */
+	public function
+	TestReadFromDisk_ThatOneFuckingPhpBugTheyRefuseToFix() {
+	/*//
+	serialise is the default for a reason but lets see if that one php bug
+	is going to fuck us. https://bugs.php.net/bug.php?id=45959
+	//*/
+
+		$Dataset = [1,'two'=>2,3];
+		$Filename = sprintf(
+			'/tmp/nether-object-datastore-%s.json',
+			md5(microtime(true))
+		);
+
+		// write a file.
+
+		$Store = new Nether\Object\Datastore;
+		$Store->SetData($Dataset);
+		$Store->Write($Filename);
+		$this->AssertTrue(file_exists($Filename));
+
+		// read a file.
+
+		unset($Store);
+		$Store = new Nether\Object\Datastore;
+		$Store->Read($Filename);
+
+		// these three asserts passing means yes, the bug is gonna fuck us.
+		// we are going to have to make the library warn you about mixing
+		// assoc and non-assoc keys when using json.
+		$this->AssertTrue($Store->Get(0) === NULL);
+		$this->AssertTrue($Store->Get(2) === NULL);
+		$this->AssertTrue($Store->Get('two') === 2);
+
+		return;
+	}
+
 }

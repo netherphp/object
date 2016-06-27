@@ -2,12 +2,15 @@
 
 namespace Nether\Object;
 use \Nether;
+
+use \Exception;
 use \Iterator;
 
 class Datastore
 implements Iterator {
 
-	protected $Count = 0;
+	protected
+	$Count = 0;
 	/*//
 	@type Int
 	maintains how many items are in this datastore so we can avoid doing a
@@ -18,7 +21,8 @@ implements Iterator {
 	////////////////////////////////
 	////////////////////////////////
 
-	protected $Data = [];
+	protected
+	$Data = [];
 	/*//
 	@type Array
 	holds the data that we will operate upon.
@@ -47,6 +51,70 @@ implements Iterator {
 
 		return $this;
 	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	protected
+	$Filename = '';
+	/*//
+	@type string
+	the filename that we loaded from and will write to.
+	//*/
+
+	public function
+	GetFilename():
+	String {
+		return $this->Filename;
+	}
+
+	public function
+	SetFilename(String $Filename):
+	Self {
+
+		$this->Filename = $Filename;
+		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	const FormatPHP  = 1;
+	const FormatJSON = 2;
+
+	protected
+	$Format = self::FormatPHP;
+	/*//
+	@type Int
+	defines the mode that will be used when serializing this object to write
+	it to disk. valid values are php or json.
+	//*/
+
+	public function
+	GetFormat():
+	Int {
+		return $this->Format;
+	}
+
+	public function
+	SetFormat(Int $Format):
+	Self {
+
+		switch($Format) {
+			case static::FormatPHP:
+			case static::FormatJSON: {
+				$this->Format = $Format;
+				break;
+			}
+			default: {
+				$this->Format = static::FormatPHP;
+				break;
+			}
+		}
+
+		return $this;
+	}
+
 
 	////////////////////////////////
 	////////////////////////////////
@@ -503,6 +571,113 @@ implements Iterator {
 		}
 
 		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	public function
+	Read(String $Filename=NULL) {
+
+		if($Filename === NULL) $Filename = $this->Filename;
+		else $this->Filename = $Filename;
+
+		if(!$Filename)
+		throw new Exception('No filename specified.');
+
+		$Basename = basename($Filename);
+		$Ext = NULL;
+
+		if(strpos($Basename,'.') !== FALSE)
+		$Ext = strtolower(explode('.',$Basename,2)[1]);
+
+		////////
+		////////
+
+		if(!file_exists($Filename))
+		throw new Exception("File {$Basename} not found.");
+
+		if(!is_readable($Filename))
+		throw new Exception("File {$Basename} is not readable.");
+
+		////////
+		////////
+
+		if($Ext === 'json' || $this->Format === static::FormatJSON)
+		$this->Data = json_decode(file_get_contents($Filename));
+
+		elseif($Ext === 'phson' || $this->Format === static::FormatPHP)
+		$this->Data = unserialize(file_get_contents($Filename));
+
+		////////
+		////////
+
+		if(is_object($this->Data))
+		$this->Data = (array)$this->Data;
+
+		return $this;
+	}
+
+	public function
+	Write(String $Filename=NULL) {
+	/*//
+	write this datastructure to disk.
+	//*/
+
+		if($Filename === NULL)
+		$Filename = $this->Filename;
+
+		$Error = NULL;
+		$Dirname = dirname($Filename);
+		$Basename = basename($Filename);
+		$Ext = NULL;
+
+		if(strpos($Basename,'.') !== FALSE)
+		$Ext = strtolower(explode('.',$Basename,2)[1]);
+
+		////////
+		////////
+
+		if(!file_exists($Filename)) {
+			if(!is_dir($Dirname) && !@mkdir($Dirname,0777,TRUE))
+			$Error = ["Unable to create directory ({$Dirname})",3];
+
+			elseif(!is_writable($Dirname))
+			$Error = ["Unable to create file ({$Dirname}) not writable.",1];
+		}
+
+		else {
+			if(!is_writable($Filename))
+			$Error = ["Unable to write to file ({$Basename}).",2];
+		}
+
+		if($Error)
+		throw new Exception(...$Error);
+
+		////////
+		////////
+
+		if($Ext === 'json' || $this->Format === static::FormatJSON)
+		$Data = json_encode($this->Data,JSON_PRETTY_PRINT);
+
+		else
+		$Data = serialize($this->Data);
+
+		////////
+		////////
+
+		file_put_contents($Filename,$Data);
+
+		////////
+		////////
+
+		return $this;
+	}
+
+	public static function
+	GetFromFile($Filename) {
+
+		return;
 	}
 
 }
