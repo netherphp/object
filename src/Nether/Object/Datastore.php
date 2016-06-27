@@ -677,7 +677,7 @@ implements Iterator {
 	public static function
 	GetFromFile($Filename) {
 
-		return;
+		return (new static)->Read($Filename);
 	}
 
 }
