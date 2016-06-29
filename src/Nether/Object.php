@@ -64,8 +64,8 @@ not get populated by the database and will default to false.
 	////////////////
 
 	public function __construct($input=null,$defaults=null,$opt=null) {
-		if(is_array($input)) $input = (object)$input;
-		if(is_array($defaults)) $defaults = (object)$defaults;
+		if(is_object($input)) $input = (array)$input;
+		if(is_object($defaults)) $defaults = (array)$defaults;
 
 		// we can't use our self here to make this cleanlike or else we will
 		// recurisve forever. ^_^
@@ -77,7 +77,7 @@ not get populated by the database and will default to false.
 
 		// initialize the object with the input data, running the input
 		// by the property map first if need be.
-		if(is_object($input)) {
+		if(is_array($input)) {
 			if(is_array(static::$PropertyMap) && count(static::$PropertyMap)) {
 				// if we have an input map then we will only map what it says.
 				$this->__apply_property_map($input,$opt['MappedKeysOnly']);
@@ -90,7 +90,7 @@ not get populated by the database and will default to false.
 		// set any default properties that may have been missing from
 		// the original input data.
 
-		if(is_object($defaults)) {
+		if(is_array($defaults)) {
 			$this->__apply_property_defaults($defaults,$opt['ForceDefaultValues']);
 
 			// optionally stripping out any properties not defined by the
@@ -125,8 +125,8 @@ not get populated by the database and will default to false.
 		if($onlymapped) {
 		// only maintain keys which were in the map.
 			foreach(static::$PropertyMap as $old => $new) {
-				if(property_exists($input,$old))
-				$this->__apply_typecasted_property($new,$input->{$old});
+				if(array_key_exists($old,$input))
+				$this->__apply_typecasted_property($new,$input[$old]);
 			}
 		} else {
 		// also maintain keys which were not in the map.
