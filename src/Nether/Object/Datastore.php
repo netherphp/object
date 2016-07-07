@@ -230,6 +230,26 @@ implements Iterator {
 	// item management api for the datastore.
 
 	public function
+	Append(Array $List, Bool $Keys=FALSE) {
+	/*//
+	goes through the given array and appends all the data to this dataset. by
+	default the array keys are completely ignored. if you need to preseve
+	the keys (and ergo overwrite any existing data) set the second argument
+	to true.
+	//*/
+
+		foreach($List as $Key => $Value) {
+			if(!$Keys)
+			$this->Push($Value);
+
+			else
+			$this->Shove($Key,$Value);
+		}
+
+		return;
+	}
+
+	public function
 	Clear() {
 	/*//
 	dump the old dataset to start fresh. syntaxual sugar instead of having to
@@ -369,6 +389,19 @@ implements Iterator {
 		}
 
 		$this->Data = $Data;
+		return $this;
+	}
+
+	public function
+	Shove($Key,$Value) {
+	/*//
+	append the specified item to the end of the dataset. if the key already
+	exists then the original data will be overwritten in the same place. same
+	principal as Push, but syntaxally makes more sense when dealing with
+	associative data.
+	//*/
+
+		$this->Data[$Key] = $Value;
 		return $this;
 	}
 
