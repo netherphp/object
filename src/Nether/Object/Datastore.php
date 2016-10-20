@@ -364,13 +364,15 @@ implements Iterator {
 	overwritten with the new data.
 	//*/
 
+		if($Key === NULL || !array_key_exists($Key,$this->Data))
+		$this->Count++;
+
 		if($Key === null)
 		$this->Data[] = $Value;
 
 		else
 		$this->Data[$Key] = $Value;
 
-		$this->Count++;
 		return $this;
 	}
 
@@ -400,6 +402,9 @@ implements Iterator {
 	principal as Push, but syntaxally makes more sense when dealing with
 	associative data.
 	//*/
+
+		if(!array_key_exists($Key,$this->Data))
+		$this->Count++;
 
 		$this->Data[$Key] = $Value;
 		return $this;
