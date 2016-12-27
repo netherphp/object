@@ -3,6 +3,7 @@
 namespace Nether\Object;
 use \Nether;
 
+use \Closure;
 use \Exception;
 use \Iterator;
 
@@ -573,7 +574,7 @@ implements Iterator {
 	// item manipulation api for the data.
 
 	public function
-	Each(callable $Function) {
+	Each(Callable $Function, ?Array $Argv=NULL) {
 	/*//
 	@argv callable Func
 	run the specified function against every single thing in the list. it is
@@ -582,7 +583,7 @@ implements Iterator {
 	//*/
 
 		foreach($this->Data as $Key => &$Value)
-		$Function($Value,$Key);
+		$Function($Value,$Key,$this,...$Argv);
 
 		return $this;
 	}
