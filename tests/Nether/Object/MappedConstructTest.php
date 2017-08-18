@@ -2,7 +2,7 @@
 
 namespace Nether;
 
-class ObjectConstructTest
+class MappedConstructTest
 extends \PHPUnit\Framework\TestCase {
 
 	/** @test */
