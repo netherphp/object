@@ -1,7 +1,7 @@
 <?php
 
 class DatastoreTest
-extends \PHPUnit_Framework_TestCase {
+extends \PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
@@ -555,6 +555,12 @@ extends \PHPUnit_Framework_TestCase {
 	serialise is the default for a reason but lets see if that one php bug
 	is going to fuck us. https://bugs.php.net/bug.php?id=45959
 	//*/
+
+		if(version_compare(phpversion(),'7.2.0alpha','>=')) {
+			// holy ballweasles this was fixed in 7.2.0.
+			$this->AssertTrue(TRUE);
+			return;
+		}
 
 		$Dataset = [1,'two'=>2,3];
 		$Filename = sprintf(
