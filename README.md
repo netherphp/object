@@ -10,7 +10,7 @@ translate database schemes that look like this:
 	obj_id int
 	obj_name string
 	obj_date string
-	
+
 Into stuff you actually want to type in your code, such as...
 
 	Object->ID
@@ -34,9 +34,9 @@ PropertyMapping ability we can transform results easiliy.
 <?php
 
 class User
-extends Nether\Object {
+extends Nether\Object\Mapped {
 
-	static public
+	static protected
 	$PropertyMap = [
 		'u_id'    => 'ID:int',
 		'u_email' => 'Email',
@@ -44,14 +44,14 @@ extends Nether\Object {
 		'u_fname' => 'FirstName',
 		'u_lname' => 'Surname'
 	];
-	
+
 	static public
 	GetByID(Int $UserID):
 	Self {
 	/*//
 	fetch a user from the database by the primary key aka user id.
 	//*/
-	
+
 		$Result = Nether\Database::Get()->Query(
 			'SELECT * FROM users WHERE u_id=:UserID LIMIT 1;',
 			[ 'UserID' => $UserID ]
@@ -59,13 +59,13 @@ extends Nether\Object {
 
 		if(!$Result->OK)
 		throw new Exception('DB Query Failure');
-		
+
 		if(!$Result->Count)
 		throw new UserNotFoundException($UserID);
 
-		return new self($Result->Next());	
+		return new self($Result->Next());
 	}
-	
+
 	protected function
 	__ready() {
 	/*//
@@ -74,12 +74,12 @@ extends Nether\Object {
 	then that will be called after Nether\Object has done its work and the
 	object is ready for use.
 	//*/
-				
+
 		$this->FullName = "{$this->FirstName} {$this->Surname}";
-		$this->EmailName = "{$this->FullName} <{$this->Email}>";			
+		$this->EmailName = "{$this->FullName} <{$this->Email}>";
 		return;
 	}
-	
+
 }
 ```
 
@@ -120,7 +120,7 @@ query the database for objects which are children of the specified object.
 	],(Array)$Opts);
 
 	////////
-	
+
 	if(!$Opts->ParentID)
 	throw new Exception('No ParentID specified');
 
@@ -128,10 +128,10 @@ query the database for objects which are children of the specified object.
 		'SELECT * FROM objects WHERE parent_id=:ParentID LIMIT :Limit;',
 		$Opts
 	);
-	
+
 	if(!$Result->OK)
 	throw new Exception('DB Query Failure');
-	
+
 	return $Result->Glomp();
 }
 ```
@@ -151,13 +151,13 @@ query the database for objects which are children of the specified object.
 - Limit - how many results you want.
 //*/
 
-	$Opts = new Nether\Object($Opts,[
+	$Opts = new Nether\Object\Mapped($Opts,[
 		'ParentID' => 0,
 		'Limit'    => 10
 	]);
 
 	////////
-	
+
 	if(!$Opts->ParentID)
 	throw new Exception('No ParentID specified');
 
@@ -165,10 +165,10 @@ query the database for objects which are children of the specified object.
 		'SELECT * FROM objects WHERE parent_id=:ParentID LIMIT :Limit;',
 		$Opts
 	);
-	
+
 	if(!$Result->OK)
 	throw new Exception('DB Query Failed');
-	
+
 	return $Result->Glomp();
 }
 ```
@@ -179,7 +179,7 @@ coerced into literal integers automatically.
 ```php
 <?php
 
-$Opts = new Nether\Object($Opts,[
+$Opts = new Nether\Object\Mapped($Opts,[
 	'ParentID:int' => 0,
 	'Limit:int'    => 10
 ]);
@@ -192,7 +192,7 @@ $Opts = new Nether\Object($Opts,[
 <?php
 
 // constructor prototype
-Nether\Object::__construct(
+Nether\Object\Mapped::__construct(
 	Object|Array $InputData,
 	Object|Array $DefaultData default NULL,
 	Object|Array $Options default NULL
@@ -205,28 +205,22 @@ $Options = [
 	// in the input which is not defined in the map will be ignored. setting
 	// this to FALSE will include any unmapped properties as they were given.
 	// this is mainly only for classes which extend Object.
-	
+
 	'DefaultKeysOnly' => FALSE,
 	// when using Object to ensure message objects contain all the properties
 	// they need to have and with default values, by default all properties
 	// from the input will be included. if this is set to TRUE then the
 	// properties must exist in both Input and Defaults to get included into
 	// the final object.
-	
-	'ForceDefaultValues' => TRUE
-	// in the event that for some reason you want the Defaults list to
-	// overwrite the Input data. perhaps you are only defaulting things you
-	// need for sure, and allowing input to fill in around it. probably only
-	// going to be useful in that way with DefaultKeysOnly left to FALSE.
 ];
 
 // as you would see it in userland:
-$Object = new Nether\Object($Inputs, $Defaults, $Options);
+$Object = new Nether\Object\Mapped($Inputs, $Defaults, $Options);
 ```
 
 # Install
 
-To use it stand alone, Composer yourself a netherphp/object with a version of 2.*
+To use it stand alone, Composer yourself a netherphp/object with a version of 3.*
 
 If you are using any other Nether components you'll most likely already have this.
 
@@ -243,9 +237,9 @@ After that you should be able to run it.
 	> phpunit tests --bootstrap vendor\autoload.php
 
 That should yield something like this.
-	
+
 	> phpunit tests --bootstrap vendor\autoload.php
-	
+
 	PHPUnit 5.3.2 by Sebastian Bergmann and contributors.
 	..................... 21 / 21 (100%)
 	Time: 157 ms, Memory: 8.00Mb
