@@ -129,10 +129,10 @@ Mapped {
 		////////////////
 
 		if(method_exists($this,'__ready'))
-		$this->__ready();
+		$this->__ready($Input,$Default,$Opt);
 
 		if(method_exists($this,'OnReady'))
-		$this->OnReady();
+		$this->OnReady($Input,$Default,$Opt);
 
 		return;
 	}
