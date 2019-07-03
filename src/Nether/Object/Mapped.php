@@ -33,6 +33,26 @@ Mapped {
 	}
 
 	static public function
+	GetMappedPropertyList():
+	Array {
+	/*//
+	@date 2019-07-03
+	read the property map, but return like the final results of the right
+	side of the map with the types stripped.
+	//*/
+
+		$Output = [];
+
+		if(!is_array(static::$PropertyMap))
+		return $Output;
+
+		foreach(static::$PropertyMap as $Old => $New)
+		$Output[] = static::__get_typecasted_property_name($New);
+
+		return $Output;
+	}
+
+	static public function
 	MergePropertyMap(Array $More, Bool $Create=FALSE):
 	Void {
 	/*//
