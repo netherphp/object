@@ -40,7 +40,7 @@ implements Iterator {
 	}
 
 	public function
-	SetData(array $Input) {
+	SetData(Array $Input) {
 	/*//
 	@argv Array InputData
 	@return self
@@ -66,6 +66,7 @@ implements Iterator {
 	public function
 	GetFilename():
 	String {
+
 		return $this->Filename;
 	}
 
@@ -80,8 +81,9 @@ implements Iterator {
 	////////////////////////////////
 	////////////////////////////////
 
-	const FormatPHP  = 1;
-	const FormatJSON = 2;
+	const
+	FormatPHP  = 1,
+	FormatJSON = 2;
 
 	protected
 	$Format = self::FormatPHP;
@@ -121,7 +123,7 @@ implements Iterator {
 	////////////////////////////////
 
 	protected
-	$Sorter = null;
+	$Sorter = NULL;
 	/*//
 	@type Callable
 	holds a callable method for sorting.
@@ -139,6 +141,7 @@ implements Iterator {
 	public function
 	SetSorter(Callable $Function):
 	Self {
+
 		$this->Sorter = $Function;
 		return $this;
 	}
@@ -158,12 +161,14 @@ implements Iterator {
 	public function
 	GetTitle():
 	String {
+
 		return $this->Title;
 	}
 
 	public function
 	SetTitle(String $Title=''):
 	Self {
+
 		$this->Title = $Title;
 		return $this;
 	}
@@ -222,7 +227,7 @@ implements Iterator {
 	allow the object to be queried if we are still within range of the data.
 	//*/
 
-		return (key($this->Data) !== null);
+		return (key($this->Data) !== NULL);
 	}
 
 	////////////////////////////////
@@ -238,6 +243,9 @@ implements Iterator {
 	the keys (and ergo overwrite any existing data) set the second argument
 	to true.
 	//*/
+
+		$Key = NULL;
+		$Value = NULL;
 
 		foreach($List as $Key => $Value) {
 			if(!$Keys)
@@ -263,7 +271,7 @@ implements Iterator {
 	}
 
 	public function
-	Count($Recount=false) {
+	Count($Recount=FALSE) {
 	/*//
 	@return Int
 	count how many items are in this datastore. only recount the actual
@@ -296,7 +304,7 @@ implements Iterator {
 		if(array_key_exists($Key,$this->Data))
 		return $this->Data[$Key];
 
-		return null;
+		return NULL;
 	}
 
 	public function
@@ -308,10 +316,10 @@ implements Iterator {
 	can manipulate non-objects if needed.
 	//*/
 
-		if(array_key_exists($Key,$this->Data))
+		if(Array_Key_Exists($Key,$this->Data))
 		return $this->Data[$Key];
 
-		return null;
+		return NULL;
 	}
 
 	public function
@@ -326,7 +334,7 @@ implements Iterator {
 	}
 
 	public function
-	HasValue($Val,$Strict=false) {
+	HasValue($Val,$Strict=FALSE) {
 	/*//
 	@argv Mixed KeyName
 	@return Mixed
@@ -352,11 +360,11 @@ implements Iterator {
 			return array_pop($this->Data);
 		}
 
-		return null;
+		return NULL;
 	}
 
 	public function
-	Push($Value,$Key=null) {
+	Push($Value,$Key=NULL) {
 	/*//
 	@argv Mixed Input
 	@return self
@@ -368,7 +376,7 @@ implements Iterator {
 		if($Key === NULL || !array_key_exists($Key,$this->Data))
 		$this->Count++;
 
-		if($Key === null)
+		if($Key === NULL)
 		$this->Data[] = $Value;
 
 		else
@@ -384,6 +392,9 @@ implements Iterator {
 	reindex the data array to remove gaps in the numeric keys while still
 	preserving any string keys that existed.
 	//*/
+
+		$Key = NULL;
+		$Value = NULL;
 
 		$Data = [];
 		foreach($this->Data as $Key => $Value) {
@@ -470,6 +481,9 @@ implements Iterator {
 	like array_merge.
 	//*/
 
+		$Key = NULL;
+		$Val = NULL;
+
 		foreach($Input as $Key => $Val) {
 			if(is_int($Key)) {
 				$this->Data[] = $Val;
@@ -497,6 +511,9 @@ implements Iterator {
 
 	as with MergeLeft, this function is much less performant.
 	//*/
+
+		$Key = NULL;
+		$Val = NULL;
 
 		$this->Data = array_reverse($this->Data);
 
@@ -582,6 +599,9 @@ implements Iterator {
 	for some nice looking shit sometimes.
 	//*/
 
+		$Key = NULL;
+		$Value = NULL;
+
 		foreach($this->Data as $Key => &$Value)
 		$Function($Value,$Key,$this,...$Argv);
 
@@ -589,7 +609,7 @@ implements Iterator {
 	}
 
 	public function
-	Sort(Callable $Function=null, Bool $Presort=false):
+	Sort(Callable $Function=NULL, Bool $Presort=FALSE):
 	Self {
 	/*//
 	sort the dataset by the function defined in this datastore's

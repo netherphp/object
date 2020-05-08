@@ -4,8 +4,104 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "712b8374ade026fe806a2d76f3db2457",
-    "packages": [],
+    "content-hash": "a6d62af9074251f1e4fd514d9358337d",
+    "packages": [
+        {
+            "name": "netherphp/standards",
+            "version": "v0.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/netherphp/standards.git",
+                "reference": "13ed78aa737ec6b0f30ed069a5294fc309a13577"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/netherphp/standards/zipball/13ed78aa737ec6b0f30ed069a5294fc309a13577",
+                "reference": "13ed78aa737ec6b0f30ed069a5294fc309a13577",
+                "shasum": ""
+            },
+            "require": {
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "bin": [
+                "bin/nethercs",
+                "bin/nethercbf"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Bob Majdak Jr",
+                    "email": "bmajdak@php.net",
+                    "homepage": "http://twitter.com/bobmagicii",
+                    "role": "developer"
+                }
+            ],
+            "description": "Documentation and PHPCS Standard for Nether Notation",
+            "keywords": [
+                "coding-standard",
+                "nether",
+                "phpcbf",
+                "phpcodesniffer-standard",
+                "phpcs"
+            ],
+            "time": "2020-05-08T00:28:10+00:00"
+        },
+        {
+            "name": "squizlabs/php_codesniffer",
+            "version": "3.5.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
+                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
+                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-simplexml": "*",
+                "ext-tokenizer": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+            },
+            "bin": [
+                "bin/phpcs",
+                "bin/phpcbf"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Greg Sherwood",
+                    "role": "lead"
+                }
+            ],
+            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
+            "keywords": [
+                "phpcs",
+                "standards"
+            ],
+            "time": "2020-04-17T01:09:41+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "doctrine/instantiator",

@@ -41,13 +41,16 @@ Mapped {
 	side of the map with the types stripped.
 	//*/
 
+		$Old = NULL;
+		$New = NULL;
+
 		$Output = [];
 
 		if(!is_array(static::$PropertyMap))
 		return $Output;
 
 		foreach(static::$PropertyMap as $Old => $New)
-		$Output[] = static::__get_typecasted_property_name($New);
+		$Output[] = static::__GetTypecastedPropertyName($New);
 
 		return $Output;
 	}
@@ -80,11 +83,14 @@ Mapped {
 	////////////////
 
 	public function
-	__construct($Input=NULL, $Default=NULL, $Opt=NULL) {
+	__Construct($Input=NULL, $Default=NULL, $Opt=NULL) {
 	/*//
 	@date 2014-03-14
 	@updated 2017-08-17
 	//*/
+
+		$Key = NULL;
+		$Val = NULL;
 
 		if(is_object($Input))
 		$Input = (Array)$Input;
@@ -119,7 +125,7 @@ Mapped {
 
 		if(is_array($Default)) {
 			foreach($Default as $Key => $Val)
-			$this->__apply_typecasted_property($Key,$Val);
+			$this->__ApplyTypecastedProperty($Key,$Val);
 		}
 
 		// map and apply input values.
@@ -137,11 +143,11 @@ Mapped {
 				}
 
 				if($Opt['DefaultKeysOnly'] && $Default) {
-					if(!array_key_exists($this->__get_typecasted_property_name($Key),$Default))
+					if(!array_key_exists($this->__GetTypecastedPropertyName($Key),$Default))
 					continue;
 				}
 
-				$this->__apply_typecasted_property($Key,$Val);
+				$this->__ApplyTypecastedProperty($Key,$Val);
 			}
 		}
 
@@ -161,7 +167,7 @@ Mapped {
 	////////////////
 
 	protected function
-	__apply_typecasted_property(String $Property, $Value) {
+	__ApplyTypecastedProperty(String $Property, $Value) {
 	/*//
 	@date 2014-12-16
 	@updated 2017-08-17
@@ -227,7 +233,7 @@ Mapped {
 	////////////////
 
 	static public function
-	__get_typecasted_property_name(String $Property) {
+	__GetTypecastedPropertyName(String $Property) {
 	/*//
 	@date 2014-12-16
 	@updated 2017-08-17

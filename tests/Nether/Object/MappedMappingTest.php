@@ -57,7 +57,7 @@ extends PHPUnit\Framework\TestCase {
 			$this->AssertFalse(property_exists($Object,$Old));
 			$this->AssertTrue(property_exists(
 				$Object,
-				Object\Mapped::__get_typecasted_property_name($New)
+				Object\Mapped::__GetTypecastedPropertyName($New)
 			));
 		}
 

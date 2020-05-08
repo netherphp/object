@@ -5,12 +5,13 @@
 	"license":"BSD-2-Clause",
 	"authors":[
 		{ "name":"Bob Majdak Jr",
-		  "email":"bob@nether.io",
-		  "homepage":"http://nether.io",
+		  "email":"bmajdak@php.net",
+		  "homepage":"http://twitter.com/bobmagicii",
 		  "role":"developer" }
 	],
 	"require":{
-		"php":">=7.1.0"
+		"php":">=7.1.0",
+		"netherphp/standards": "~0.0.7"
 	},
 	"autoload":{
 		"psr-0": {
