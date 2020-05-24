@@ -1,11 +1,11 @@
 <?php
 
 namespace Nether\Object;
-use \Nether;
+use \Nether as Nether;
 
-use \Closure;
-use \Exception;
-use \Iterator;
+use \Closure as Closure;
+use \Exception as Exception;
+use \Iterator as Iterator;
 
 class Datastore
 implements Iterator {
@@ -591,7 +591,7 @@ implements Iterator {
 	// item manipulation api for the data.
 
 	public function
-	Each(Callable $Function, ?Array $Argv=NULL) {
+	Each(Callable $Function, ?Array $Argv=[]) {
 	/*//
 	@argv callable Func
 	run the specified function against every single thing in the list. it is
