@@ -3,13 +3,15 @@
 namespace Nether\Object;
 use \Nether as Nether;
 
-use \Closure as Closure;
-use \Exception as Exception;
-use \Iterator as Iterator;
+use
+\Closure as Closure,
+\Exception as Exception,
+\Iterator as Iterator,
+\ArrayAccess as ArrayAccess,
+\Countable   as Countable;
 
 class Datastore
-implements Iterator {
-
+implements Iterator, ArrayAccess, Countable {
 
 	public function
 	__Construct(?Array $Input=NULL) {
@@ -170,6 +172,42 @@ implements Iterator {
 
 		$this->Title = $Title;
 		return $this;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
+	// implementation of the array access interface.
+	// these allow access like an array.
+
+	public function
+	OffsetExists($Key):
+	Bool {
+
+		return array_key_exists($Key,$this->Data);
+	}
+
+	public function
+	OffsetGet($Key) {
+
+		// php 7 is automatically calling our OffsetExists for us now.
+		return $this->Data[$Key];
+	}
+
+	public function
+	OffsetSet($Key,$Value):
+	Void {
+
+		$this->Data[$Key] = $Value;
+		return;
+	}
+
+	public function
+	OffsetUnset($Key):
+	VOid {
+
+		unset($this->Data[$Key]);
+		return;
 	}
 
 	////////////////////////////////
