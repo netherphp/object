@@ -19,7 +19,7 @@ jobs:
           coverage: none
           extensions: mbstring, intl
           tools: phpunit:7.5.20
-      - name: Setup PHP 7.1
+      - name: Setup PHP 7.2
         if: ${{ matrix.php-versions == '7.2' }}
         uses: shivammathur/setup-php@v2
         with:
@@ -27,7 +27,7 @@ jobs:
           coverage: none
           extensions: mbstring, intl
           tools: phpunit:8.5.5
-      - name: Setup PHP 7.1
+      - name: Setup PHP 7.4
         if: ${{ matrix.php-versions == '7.4' }}
         uses: shivammathur/setup-php@v2
         with:
