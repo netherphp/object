@@ -11,18 +11,6 @@ class Datastore
 implements Iterator {
 
 	protected
-	$Count = 0;
-	/*//
-	@type Int
-	maintains how many items are in this datastore so we can avoid doing a
-	recount when the dataset gets large. this means you can Count() in
-	a loop without the time spent counting lots of things.
-	//*/
-
-	////////////////////////////////
-	////////////////////////////////
-
-	protected
 	$Data = [];
 	/*//
 	@type Array
@@ -48,8 +36,6 @@ implements Iterator {
 	//*/
 
 		$this->Data = $Input;
-		$this->Count = count($this->Data);
-
 		return $this;
 	}
 
@@ -266,29 +252,17 @@ implements Iterator {
 	//*/
 
 		$this->Data = [];
-		$this->Count = 0;
 		return $this;
 	}
 
 	public function
-	Count($Recount=FALSE) {
+	Count() {
 	/*//
 	@return Int
-	count how many items are in this datastore. only recount the actual
-	dataset if it is demanded, as we assume that the counter is working
-	as expected.
+	count how many items are in this datastore.
 	//*/
 
-		// handle underflow attempts.
-		if($this->Count < 0)
-		$this->Count = 0;
-
-		// return local count by default.
-		if(!$Recount)
-		return $this->Count;
-
-		// get actual count and cache.
-		return $this->Count = count($this->Data);
+		return count($this->Data);
 	}
 
 	public function
@@ -355,12 +329,7 @@ implements Iterator {
 	the dataset.
 	//*/
 
-		if($this->Count > 0) {
-			$this->Count--;
-			return array_pop($this->Data);
-		}
-
-		return NULL;
+		return array_pop($this->Data);
 	}
 
 	public function
@@ -372,9 +341,6 @@ implements Iterator {
 	specified and a data for that key already existed, then it will be
 	overwritten with the new data.
 	//*/
-
-		if($Key === NULL || !array_key_exists($Key,$this->Data))
-		$this->Count++;
 
 		if($Key === NULL)
 		$this->Data[] = $Value;
@@ -415,9 +381,6 @@ implements Iterator {
 	associative data.
 	//*/
 
-		if(!array_key_exists($Key,$this->Data))
-		$this->Count++;
-
 		$this->Data[$Key] = $Value;
 		return $this;
 	}
@@ -431,10 +394,8 @@ implements Iterator {
 	nothing happens and you can just go on your way.
 	//*/
 
-		if(array_key_exists($Key,$this->Data)) {
-			unset($this->Data[$Key]);
-			$this->Count--;
-		}
+		if(array_key_exists($Key,$this->Data))
+		unset($this->Data[$Key]);
 
 		return $this;
 	}
@@ -450,7 +411,6 @@ implements Iterator {
 	the front of the dataset.
 	//*/
 
-		$this->Count--;
 		return array_shift($this->Data);
 	}
 
@@ -462,7 +422,6 @@ implements Iterator {
 	onto the front of the array.
 	//*/
 
-		$this->Count++;
 		array_unshift($this->Data,$Val);
 		return $this;
 	}
@@ -487,13 +446,11 @@ implements Iterator {
 		foreach($Input as $Key => $Val) {
 			if(is_int($Key)) {
 				$this->Data[] = $Val;
-				$this->Count++;
 				continue;
 			}
 
 			if(!array_key_exists($Key,$this->Data)) {
 				$this->Data[$Key] = $Val;
-				$this->Count++;
 				continue;
 			}
 		}
@@ -520,13 +477,11 @@ implements Iterator {
 		foreach(array_reverse($Input) as $Key => $Val) {
 			if(is_int($Key)) {
 				$this->Data[] = $Val;
-				$this->Count++;
 				continue;
 			}
 
 			if(!array_key_exists($Key,$this->Data)) {
 				$this->Data[$Key] = $Val;
-				$this->Count++;
 				continue;
 			}
 		}
@@ -553,7 +508,6 @@ implements Iterator {
 			$Input
 		);
 
-		$this->Count = count($this->Data);
 		return $this;
 	}
 
@@ -581,7 +535,6 @@ implements Iterator {
 			array_reverse($Input)
 		));
 
-		$this->Count = count($this->Data);
 		return $this;
 	}
 
