@@ -18,7 +18,6 @@
 		}
 	},
 	"require-dev": {
-		"netherphp/standards": "~0.1.0",
-		"phpunit/phpunit": "*"
+		"netherphp/standards": "~0.1.0"
 	}
 }
