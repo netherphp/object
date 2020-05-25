@@ -10,6 +10,19 @@ use \Iterator as Iterator;
 class Datastore
 implements Iterator {
 
+
+	public function
+	__Construct(?Array $Input=NULL) {
+
+		if(is_array($Input))
+		$this->SetData($Input);
+
+		return;
+	}
+
+	////////////////////////////////
+	////////////////////////////////
+
 	protected
 	$Data = [];
 	/*//
