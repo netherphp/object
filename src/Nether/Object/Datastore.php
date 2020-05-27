@@ -372,6 +372,19 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
+	Map(Callable $FilterFunc):
+	Datastore {
+	/*//
+	@date 2020-05-27
+	return a new datastore of the result of an array map.
+	//*/
+
+		return new static(
+			array_map($FilterFunc,$this->Data)
+		);
+	}
+
+	public function
 	Pop() {
 	/*//
 	@return Mixed | null
@@ -420,6 +433,19 @@ implements Iterator, ArrayAccess, Countable {
 		}
 
 		$this->Data = $Data;
+		return $this;
+	}
+
+	public function
+	Remap(Callable $FilterFunc):
+	self {
+	/*//
+	@date 2020-05-27
+	alter the current dataset using the array_map filtering.
+	//*/
+
+		$this->Data = array_map($FilterFunc,$this->Data);
+
 		return $this;
 	}
 
