@@ -591,4 +591,55 @@ extends \PHPUnit\Framework\TestCase {
 		return;
 	}
 
+	/** @test */
+	public function
+	TestMapAndRemap() {
+	/*//
+	testing that we were able to tell it what format to write to disk as, and
+	that an invalid value resulted in a sane default.
+	//*/
+
+		$Store = new Nether\Object\Datastore;
+		$Store->Push('1')->Push('2')->Push('3');
+		$New = NULL;
+
+		// make sure i have a store of strings.
+
+		$this->AssertEquals(3,$Store->Count());
+
+		$Store->Each(function($Val){
+			$this->AssertTrue(is_string($Val));
+			return;
+		});
+
+		// make sure i have an old store of strings and a new store
+		// of integers.
+
+		$New = $Store->Map(function($Val){ return (Int)$Val; });
+		$this->AssertEquals(3,$Store->Count());
+		$this->AssertEquals(3,$New->Count());
+
+		$Store->Each(function($Val){
+			$this->AssertTrue(is_string($Val));
+			return;
+		});
+
+		$New->Each(function($Val){
+			$this->AssertTrue(is_int($Val));
+			return;
+		});
+
+		// make sure my store of its is now a store of strings.
+
+		$New->Remap(function($Val){ return (String)$Val; });
+		$this->AssertEquals(3,$New->Count());
+
+		$New->Each(function($Val){
+			$this->AssertTrue(is_string($Val));
+			return;
+		});
+
+		return;
+	}
+
 }
