@@ -710,10 +710,10 @@ implements Iterator, ArrayAccess, Countable {
 		////////
 
 		if(!file_exists($Filename))
-		throw new Exception("File {$Basename} not found.");
+		throw new Exception("File {$Basename} not found.",1);
 
 		if(!is_readable($Filename))
-		throw new Exception("File {$Basename} is not readable.");
+		throw new Exception("File {$Basename} is not readable.",2);
 
 		////////
 		////////
