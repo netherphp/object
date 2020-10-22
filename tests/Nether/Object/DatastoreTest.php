@@ -594,10 +594,6 @@ extends \PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestMapAndRemap() {
-	/*//
-	testing that we were able to tell it what format to write to disk as, and
-	that an invalid value resulted in a sane default.
-	//*/
 
 		$Store = new Nether\Object\Datastore;
 		$Store->Push('1')->Push('2')->Push('3');
@@ -638,6 +634,37 @@ extends \PHPUnit\Framework\TestCase {
 			$this->AssertTrue(is_string($Val));
 			return;
 		});
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestFilterAndDistill() {
+
+		$Store = new Nether\Object\Datastore;
+		$Other = NULL;
+
+		$Store->Push(1)->Push(2)->Push(3);
+		$this->AssertEquals(3,$Store->Count());
+
+		$Other = $Store->Distill(function($Val){ return $Val !== 2; });
+		$this->AssertEquals(2,$Other->Count());
+		$this->AssertEquals(3,$Store->Count());
+		$this->AssertTrue($Other->HasValue(2) === FALSE);
+		$this->AssertTrue($Store->HasValue(2) !== FALSE);
+		$this->AssertTrue($Store !== $Other);
+
+		$Other->Push(4);
+		$this->AssertEquals(3,$Other->Count());
+		$this->AssertEquals(3,$Store->Count());
+		$this->AssertTrue($Other->HasValue(4) !== FALSE);
+		$this->AssertTrue($Store->HasValue(4) === FALSE);
+
+		$Other = $Store->Filter(function($Val){ return $Val !== 2; });
+		$this->AssertEquals(2,$Store->Count());
+		$this->AssertTrue($Store->HasValue(2) === FALSE);
+		$this->AssertTrue($Store === $Other);
 
 		return;
 	}

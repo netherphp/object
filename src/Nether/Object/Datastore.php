@@ -317,6 +317,32 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
+	Distill(Callable $FilterFunc):
+	Datastore {
+	/*//
+	@date 2020-10-22
+	return a new datastore of the result of an array filter.
+	//*/
+
+		return new static(
+			array_filter($this->Data,$FilterFunc)
+		);
+	}
+
+	public function
+	Filter(Callable $FilterFunc):
+	self {
+	/*//
+	@date 2020-05-27
+	alter the current dataset with the result of an array filter.
+	//*/
+
+		$this->Data = array_filter($this->Data,$FilterFunc);
+
+		return $this;
+	}
+
+	public function
 	Get($Key) {
 	/*//
 	@argv Mixed KeyName
