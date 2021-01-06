@@ -507,6 +507,7 @@ implements Iterator, ArrayAccess, Countable {
 	Value() {
 	/*//
 	@date 2021-01-05
+	get this dataset after passing through array_values.
 	//*/
 
 		return array_values($this->Data);
@@ -516,6 +517,7 @@ implements Iterator, ArrayAccess, Countable {
 	Revalue() {
 	/*//
 	@date 2021-01-05
+	run this dataset through array_values.
 	//*/
 
 		$this->Data = array_values($this->Data);
