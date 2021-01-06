@@ -503,6 +503,25 @@ implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 
+	public function
+	Value() {
+	/*//
+	@date 2021-01-05
+	//*/
+
+		return array_values($this->Data);
+	}
+
+	public function
+	Revalue() {
+	/*//
+	@date 2021-01-05
+	//*/
+
+		$this->Data = array_values($this->Data);
+		return $this;
+	}
+
 	////////////////////////////////
 	////////////////////////////////
 
