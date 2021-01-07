@@ -18,6 +18,6 @@
 		}
 	},
 	"require-dev": {
-		"netherphp/standards": "~0.1.0"
+		"netherphp/standards": ">=0.1.0"
 	}
 }
