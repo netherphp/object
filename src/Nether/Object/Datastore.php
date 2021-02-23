@@ -476,6 +476,18 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
+	Shuffle():
+	static {
+	/*//
+	@date 2021-02-22
+	randomize the array in-place.
+	//*/
+
+		shuffle($this->Data);
+		return $this;
+	}
+
+	public function
 	Shove($Key,$Value) {
 	/*//
 	append the specified item to the end of the dataset. if the key already
