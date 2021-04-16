@@ -490,6 +490,18 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
+	Shuffle():
+	static {
+	/*//
+	@date 2021-02-22
+	randomize the array in-place.
+	//*/
+
+		shuffle($this->Data);
+		return $this;
+	}
+
+	public function
 	Shove($Key,$Value) {
 	/*//
 	append the specified item to the end of the dataset. if the key already
@@ -514,6 +526,25 @@ implements Iterator, ArrayAccess, Countable {
 		if(array_key_exists($Key,$this->Data))
 		unset($this->Data[$Key]);
 
+		return $this;
+	}
+
+	public function
+	Value() {
+	/*//
+	@date 2021-01-05
+	//*/
+
+		return array_values($this->Data);
+	}
+
+	public function
+	Revalue() {
+	/*//
+	@date 2021-01-05
+	//*/
+
+		$this->Data = array_values($this->Data);
 		return $this;
 	}
 
