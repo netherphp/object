@@ -14,7 +14,7 @@ class Datastore
 implements Iterator, ArrayAccess, Countable {
 
 	public function
-	__Construct(?Array $Input=NULL) {
+	__Construct(?array $Input=NULL) {
 
 		if(is_array($Input))
 		$this->SetData($Input);
@@ -43,7 +43,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	SetData(Array $Input) {
+	SetData(array $Input) {
 	/*//
 	@argv Array InputData
 	@return self
@@ -66,13 +66,13 @@ implements Iterator, ArrayAccess, Countable {
 
 	public function
 	GetFilename():
-	String {
+	string {
 
 		return $this->Filename;
 	}
 
 	public function
-	SetFilename(String $Filename):
+	SetFilename(string $Filename):
 	Self {
 
 		$this->Filename = $Filename;
@@ -96,12 +96,12 @@ implements Iterator, ArrayAccess, Countable {
 
 	public function
 	GetFormat():
-	Int {
+	int {
 		return $this->Format;
 	}
 
 	public function
-	SetFormat(Int $Format):
+	SetFormat(int $Format):
 	Self {
 
 		switch($Format) {
@@ -161,13 +161,13 @@ implements Iterator, ArrayAccess, Countable {
 
 	public function
 	GetTitle():
-	String {
+	string {
 
 		return $this->Title;
 	}
 
 	public function
-	SetTitle(String $Title=''):
+	SetTitle(string $Title=''):
 	Self {
 
 		$this->Title = $Title;
@@ -182,7 +182,7 @@ implements Iterator, ArrayAccess, Countable {
 
 	public function
 	OffsetExists($Key):
-	Bool {
+	bool {
 
 		return array_key_exists($Key,$this->Data);
 	}
@@ -196,7 +196,7 @@ implements Iterator, ArrayAccess, Countable {
 
 	public function
 	OffsetSet($Key,$Value):
-	Void {
+	void {
 
 		$this->Data[$Key] = $Value;
 		return;
@@ -204,7 +204,7 @@ implements Iterator, ArrayAccess, Countable {
 
 	public function
 	OffsetUnset($Key):
-	VOid {
+	void {
 
 		unset($this->Data[$Key]);
 		return;
@@ -270,10 +270,24 @@ implements Iterator, ArrayAccess, Countable {
 	////////////////////////////////
 	////////////////////////////////
 
-	// item management api for the datastore.
 
 	public function
-	Append(Array $List, Bool $Keys=FALSE) {
+	Accumulate(mixed $Initial, callable $Function):
+	mixed {
+	/*//
+	@date 2021-04-15
+	//*/
+
+		// i absolutely loath that its called array_reduce when at no point
+		// does it reduce the data set. in reality what this function does
+		// is play the telephone game with an initial value. that is why
+		// it is called accumulate here.
+
+		return array_reduce($this->Data,$Function,$Initial);
+	}
+
+	public function
+	Append(array $List, bool $Keys=FALSE) {
 	/*//
 	goes through the given array and appends all the data to this dataset. by
 	default the array keys are completely ignored. if you need to preseve
@@ -367,7 +381,7 @@ implements Iterator, ArrayAccess, Countable {
 	can manipulate non-objects if needed.
 	//*/
 
-		if(Array_Key_Exists($Key,$this->Data))
+		if(array_key_exists($Key,$this->Data))
 		return $this->Data[$Key];
 
 		return NULL;
@@ -533,7 +547,7 @@ implements Iterator, ArrayAccess, Countable {
 	////////////////////////////////
 
 	public function
-	BlendRight(Array $Input) {
+	BlendRight(array $Input) {
 	/*//
 	@return self
 	works the same as MergeRight, only instead of your input overwriting the
@@ -562,7 +576,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	BlendLeft(Array $Input) {
+	BlendLeft(array $Input) {
 	/*//
 	@return self
 	works the same as MergeLeft, only instead of your input overwriting the
@@ -594,7 +608,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	MergeRight(Array $Input) {
+	MergeRight(array $Input) {
 	/*//
 	@return self
 	appends the input to the dataset. if there are conflicting assoc keys, the
@@ -615,7 +629,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	MergeLeft(Array $Input) {
+	MergeLeft(array $Input) {
 	/*//
 	@return self
 	appends the input to the dataset. same as MergeRight but will appear to add
@@ -647,7 +661,7 @@ implements Iterator, ArrayAccess, Countable {
 	// item manipulation api for the data.
 
 	public function
-	Each(Callable $Function, ?Array $Argv=[]) {
+	Each(Callable $Function, ?array $Argv=[]) {
 	/*//
 	@argv callable Func
 	run the specified function against every single thing in the list. it is
@@ -665,7 +679,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Sort(Callable $Function=NULL, Bool $Presort=FALSE):
+	Sort(Callable $Function=NULL, bool $Presort=FALSE):
 	Self {
 	/*//
 	sort the dataset by the function defined in this datastore's
@@ -692,7 +706,7 @@ implements Iterator, ArrayAccess, Countable {
 	////////////////////////////////
 
 	public function
-	Read(String $Filename=NULL) {
+	Read(string $Filename=NULL) {
 
 		if($Filename === NULL) $Filename = $this->Filename;
 		else $this->Filename = $Filename;
@@ -734,7 +748,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Write(String $Filename=NULL) {
+	Write(string $Filename=NULL) {
 	/*//
 	write this datastructure to disk.
 	//*/
