@@ -1,57 +1,73 @@
 <?php
 
 namespace Nether\Object;
-
 use Nether;
 
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionNamedType;
-use Nether\Object\PropertyMapCache;
+
+use Nether\Object\PropertyMap;
+use Nether\Object\ObjectFlags;
 use Nether\Object\Meta\PropertySource;
 
 class Mapped2 {
-
-	const
-	PMapName = 0,
-	PMapType = 1;
+/*//
+@date 2021-08-05
+provides a self-sealing stem object to build from where you can trust that the
+properties you need will exist, prefilled with a default value if needed.
+//*/
 
 	public function
-	__Construct(array $Raw, ?array $Default=NULL) {
+	__Construct(?array $Raw=NULL, ?array $Default=NULL, int $Flags=0) {
 	/*//
 	@date 2021-08-05
 	//*/
 
-		$PropertyMap = $this::GetPropertyMap();
+		// this constructor is going to do the bulk of the work to avoid
+		// polluting the base object with excess properties and methods
+		// that could get sucked up by documentation systems while being
+		// pointless.
+
+		$PropertyMap = static::GetPropertyMap();
+		$Raw ??= [];
 		$Src = NULL;
-		$Dest = NULL;
 		$Val = NULL;
 
 		// apply any default values that were supplied.
 
-		if(is_array($Default) || is_object($Default))
-		foreach($Default as $Src => $Dest)
-		$this->{$Src} = $Dest;
-
-		// apply any mapped values that were supplied.
-
-		if(is_array($PropertyMap))
-		foreach($PropertyMap as $Src => $Dest) {
-			if(!property_exists($this,$Dest[$this::PMapName]))
+		if($Default !== NULL)
+		foreach($Default as $Src => $Val) {
+			if(($Flags & ObjectFlags::StrictDefault) !== 0)
+			if(!property_exists($this,$Src))
 			continue;
 
-			if(!array_key_exists($Src,$Raw))
-			continue;
-
-			$Val = $Raw[$Src];
-
-			if($Dest[$this::PMapType])
-			settype($Val,$Dest[$this::PMapType]);
-
-			$this->{$Dest[$this::PMapName]} = $Val;
+			$this->{$Src} = $Val;
 		}
 
-		$this->OnReady();
+		// apply any mapped property values.
+
+		foreach($Raw as $Src => $Val) {
+			if(array_key_exists($Src,$PropertyMap)) {
+				if($PropertyMap[$Src][PropertyMap::Type])
+				settype($Val,$PropertyMap[$Src][PropertyMap::Type]);
+
+				$this->{$PropertyMap[$Src][PropertyMap::Name]} = $Val;
+				continue;
+			}
+
+			if(($Flags & ObjectFlags::CullUsingDefault) !== 0)
+			if(is_array($Default) && !array_key_exists($Src,$Default))
+			continue;
+
+			if(($Flags & ObjectFlags::StrictInput) !== 0)
+			if(!property_exists($this,$Src))
+			continue;
+
+			$this->{$Src} = $Val;
+		}
+
+		$this->OnReady($Raw,$Default,$Flags);
 		return;
 	}
 
@@ -59,7 +75,7 @@ class Mapped2 {
 	////////////////////////////////////////////////////////////////
 
 	protected function
-	OnReady():
+	OnReady(?array $Raw=NULL, ?array $Default=NULL, int $Flags=0):
 	void {
 
 		return;
@@ -75,8 +91,8 @@ class Mapped2 {
 	@date 2021-08-05
 	//*/
 
-		if(PropertyMapCache::Has(static::class))
-		return PropertyMapCache::Get(static::class);
+		if(PropertyMap::Has(static::class))
+		return PropertyMap::Get(static::class);
 
 		////////
 
@@ -87,11 +103,12 @@ class Mapped2 {
 		$Attribs = NULL;
 		$Attrib = NULL;
 		$Inst = NULL;
-		$Output = [];
+		$Map = NULL;
 
 		////////
 
 		$RefClass = new ReflectionClass(static::class);
+		$Map = [];
 
 		$Props = $RefClass->GetProperties(
 			ReflectionProperty::IS_PUBLIC |
@@ -105,15 +122,18 @@ class Mapped2 {
 
 			foreach($Attribs as $Attrib) {
 				$Inst = $Attrib->NewInstance();
-				$Output[$Inst->Name] = [ $Prop->GetName(), NULL ];
+				$Map[$Inst->Name] = [
+					PropertyMap::Name => $Prop->GetName(),
+					PropertyMap::Type => NULL
+				];
 
 				if($Type instanceof ReflectionNamedType)
 				if($Type->IsBuiltin())
-				$Output[$Inst->Name][1] = $Type->GetName();
+				$Map[$Inst->Name][PropertyMap::Type] = $Type->GetName();
 			}
 		}
 
-		return PropertyMapCache::Set(static::class,$Output);
+		return PropertyMap::Set(static::class, $Map);
 	}
 
 }
