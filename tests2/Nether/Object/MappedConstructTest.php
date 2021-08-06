@@ -13,7 +13,7 @@ extends \PHPUnit\Framework\TestCase {
 	an object which has no properties.
 	//*/
 
-		$Obj = new Object\Mapped2;
+		$Obj = new Object\Prototype;
 		$this->AssertTrue(count(get_object_vars($Obj)) === 0);
 
 		return;
@@ -35,7 +35,7 @@ extends \PHPUnit\Framework\TestCase {
 			'PropertyTwo' => 2
 		];
 
-		$Object = new Object\Mapped2($Input);
+		$Object = new Object\Prototype($Input);
 
 		foreach($Input as $Key => $Value) {
 			$this->AssertObjectHasAttribute($Key,$Object);
@@ -69,7 +69,7 @@ extends \PHPUnit\Framework\TestCase {
 
 		$Result = $Input + $Default;
 
-		$Object = new Object\Mapped2($Input,$Default);
+		$Object = new Object\Prototype($Input,$Default);
 		foreach($Result as $Key => $Value) {
 			$this->AssertObjectHasAttribute($Key,$Object);
 			$this->AssertEquals($Object->{$Key},$Value);
@@ -105,7 +105,7 @@ extends \PHPUnit\Framework\TestCase {
 		$Result = $Input + $Default;
 		unset($Result['PropertyOne']);
 
-		$Object = new Object\Mapped2(
+		$Object = new Object\Prototype(
 			$Input,
 			$Default,
 			Object\ObjectFlags::CullUsingDefault
@@ -141,7 +141,7 @@ extends \PHPUnit\Framework\TestCase {
 			'PropertyWhat'   => '42.42'
 		];
 
-		$Object = new class($Input) extends Object\Mapped2 {
+		$Object = new class($Input) extends Object\Prototype {
 			public int $PropertyInt;
 			public float $PropertyFloat;
 			public string $PropertyString;
@@ -153,7 +153,7 @@ extends \PHPUnit\Framework\TestCase {
 
 		//var_dump($Object::GetPropertyMap());
 
-		//$Object = new Object\Mapped2($Input);
+		//$Object = new Object\Prototype($Input);
 		$this->AssertTrue($Object->PropertyInt === 1);
 		$this->AssertTrue($Object->PropertyFloat === 1.234);
 		$this->AssertTrue($Object->PropertyString === '42');
@@ -177,7 +177,7 @@ extends \PHPUnit\Framework\TestCase {
 			'PropertyFloat' => '9000.1'
 		];
 
-		$Object = new class($Input,$Default) extends Object\Mapped2 {
+		$Object = new class($Input,$Default) extends Object\Prototype {
 			public float $PropertyFloat;
 		};
 

@@ -11,7 +11,7 @@ use Nether\Object\PropertyMap;
 use Nether\Object\ObjectFlags;
 use Nether\Object\Meta\PropertySource;
 
-class Mapped2 {
+class Prototype {
 /*//
 @date 2021-08-05
 provides a self-sealing stem object to build from where you can trust that the
@@ -122,6 +122,7 @@ properties you need will exist, prefilled with a default value if needed.
 			$Type = $Prop->GetType();
 			$Attribs = $Prop->GetAttributes();
 			$Castable = (
+				$Type instanceof ReflectionNamedType &&
 				$Type->IsBuiltIn() &&
 				$Type->GetName() !== 'mixed'
 			);

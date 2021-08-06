@@ -2,25 +2,28 @@
 
 namespace Nether;
 
-use \PHPUnit as PHPUnit;
+use Nether\Object\ObjectFlags;
+use PHPUnit;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 class RegionTest
-extends Object\Mapped {
+extends Object\Prototype {
 /*//
 this is a test class to demonstrate the ability of the static property map
 to do its job. it is designed to emulate the mutation of an ugly data set
 like from the database into properties you actually want to type.
 //*/
 
-	static protected
-	$PropertyMap = [
-		'country_id'   => 'ID:int',
-		'country_code' => 'Code',
-		'country_name' => 'Name'
-	];
+	#[Object\Meta\PropertySource('country_id')]
+	public int $ID = 0;
+
+	#[Object\Meta\PropertySource('country_code')]
+	public ?string $Code = NULL;
+
+	#[Object\Meta\PropertySource('country_name')]
+	public ?string $Name = NULL;
 
 }
 
@@ -53,11 +56,12 @@ extends PHPUnit\Framework\TestCase {
 	//*/
 
 		$Object = new RegionTest($this->Input);
+
 		foreach(RegionTest::GetPropertyMap() as $Old => $New) {
 			$this->AssertFalse(property_exists($Object,$Old));
 			$this->AssertTrue(property_exists(
 				$Object,
-				Object\Mapped::__GetTypecastedPropertyName($New)
+				$New[Object\PropertyMap::Name]
 			));
 		}
 
@@ -66,13 +70,13 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestMappingDropUnmapped() {
+	TestMappingDropUnPrototype() {
 	/*//
-	check that properties which were not mapped were dropped which is also
+	check that properties which were not Prototype were dropped which is also
 	the default behaviour of this object.
 	//*/
 
-		$Object = new RegionTest($this->Input);
+		$Object = new RegionTest($this->Input,NULL,ObjectFlags::StrictInput);
 		$this->AssertFalse(property_exists($Object,'country_king'));
 
 		return;
@@ -80,14 +84,15 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestMappingIncludeUnmapped() {
+	TestMappingIncludeUnPrototype() {
 	/*//
-	check that we were able to include unmapped properties as an option.
+	check that we were able to include unPrototype properties as an option.
 	//*/
 
-		$Object = new RegionTest($this->Input,null,[
-			'MappedKeysOnly' => false
-		]);
+		$Object = new RegionTest(
+			$this->Input,
+			NULL
+		);
 
 		$this->AssertTrue(property_exists($Object,'country_king'));
 		$this->AssertEquals($Object->country_king,$this->Input['country_king']);

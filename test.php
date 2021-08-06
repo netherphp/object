@@ -3,7 +3,7 @@
 require('src/Nether/Object/ObjectFlags.php');
 require('src/Nether/Object/PropertyMap.php');
 require('src/Nether/Object/Mapped.php');
-require('src/Nether/Object/Mapped2.php');
+require('src/Nether/Object/Prototype.php');
 require('src/Nether/Object/Meta/PropertySource.php');
 
 $Which = sprintf('Whatever%d',$_SERVER['argv'][1]);
@@ -35,7 +35,7 @@ extends Nether\Object\Mapped {
 }
 
 class Whatever2
-extends Nether\Object\Mapped2 {
+extends Nether\Object\Prototype {
 
 	#[Nether\Object\Meta\PropertySource('user_id')]
 	public int

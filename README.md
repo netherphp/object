@@ -93,4 +93,12 @@ $User = new User(
 	$Defaults,
 	Nether\Object\ObjectFlags::StrictInput
 );
+
+// there is a flag for if your $Defaults array contains extra data as well.
+
+$User = new User(
+	$RowFromDB,
+	$Defaults,
+	Nether\Object\ObjectFlags::StrictDefault
+);
 ```
