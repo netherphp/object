@@ -2,249 +2,95 @@
 
 [![Build Status](https://travis-ci.org/netherphp/object.svg?branch=master)](https://travis-ci.org/netherphp/object)  [![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Packagist](https://img.shields.io/packagist/dt/netherphp/object.svg)](https://packagist.org/packages/netherphp/object)
 
-This package provides a self-constructing object translation matrix capacitor.
+This package provides a self-sealing stem object capable of translating schemas and ensuring that properties exist and have default values assigned that you may want different than ones hard coded in your class definition.
 
-It's kind of the cornerstone of all the things in Nether. It lets you do things like
-translate database schemes that look like this:
+# Usage Without Attributes
 
-	obj_id int
-	obj_name string
-	obj_date string
-
-Into stuff you actually want to type in your code, such as...
-
-	Object->ID
-	Object->Name
-	Object->Date
-
-It also does a few other things, like it can be used to be sure beyond a doubt that the
-random StdClass you are passing around in your app have the bare minimum properties
-required for various intregrity reasons.
-
-Obviously, not fully documented yet.
-
-
-
-## Use Case: Transforming an Ugly DB Result
-
-Most of our database schemas are probably too annoying to type. Via the Object
-PropertyMapping ability we can transform results easiliy.
+Without any attributes or additional arguments you get an object back with the properties you asked it to have. The class does not need to have the properties defined, but if it does it will do basic type casting to make sure the data works in the field it was asked to be in.
 
 ```php
-<?php
-
 class User
-extends Nether\Object\Mapped {
+extends Nether\Object\Mapped2 {
 
-	static protected
-	$PropertyMap = [
-		'u_id'    => 'ID:int',
-		'u_email' => 'Email',
-		'u_alias' => 'Alias',
-		'u_fname' => 'FirstName',
-		'u_lname' => 'Surname'
-	];
+	public int
+	$ID = 0;
 
-	static public
-	GetByID(Int $UserID):
-	Self {
-	/*//
-	fetch a user from the database by the primary key aka user id.
-	//*/
+	public ?string
+	$Name = NULL;
 
-		$Result = Nether\Database::Get()->Query(
-			'SELECT * FROM users WHERE u_id=:UserID LIMIT 1;',
-			[ 'UserID' => $UserID ]
-		);
+	public ?string
+	$Email = NULL;
 
-		if(!$Result->OK)
-		throw new Exception('DB Query Failure');
-
-		if(!$Result->Count)
-		throw new UserNotFoundException($UserID);
-
-		return new self($Result->Next());
-	}
-
-	protected function
-	__ready() {
-	/*//
-	to allow the property map to do its job, we want to avoid overwriting the
-	normal __construct method for this class. if you define a __ready method
-	then that will be called after Nether\Object has done its work and the
-	object is ready for use.
-	//*/
-
-		$this->FullName = "{$this->FirstName} {$this->Surname}";
-		$this->EmailName = "{$this->FullName} <{$this->Email}>";
-		return;
-	}
+	public ?string
+	$Title = NULL;
 
 }
-```
 
-
-## Use Case: Builing Message Objects with Default Properties
-
-We have an object with properties which define a query we want to run. We want
-to make sure that it has the bare minimum properties required so that we do
-not attempt to access undefined properties later on. The end result is we want
-to have an object that is promised to have the properties we need with default
-values if they had not yet been defined.
-
-Here is what you would have to write to kinda pull that off without Nether\Object.
-
-```php
-<?php
-
-function
-GetChildrenForObject($Opts):
-Array {
-/*//
-@argv Array $Options
-@argv Object $Options
-
-query the database for objects which are children of the specified object.
-- ParentID - the parent object.
-- Limit - how many results you want.
-//*/
-
-	// if input options arg invalid then force it.
-	if(!$Opts || (!is_array($Opts) && !is_object($Opts)))
-	$Opts = [];
-
-	// force default values for any missing options.
-	$Opts = (Object)array_merge([
-		'ParentID' => false,
-		'Limit'    => 10
-	],(Array)$Opts);
-
-	////////
-
-	if(!$Opts->ParentID)
-	throw new Exception('No ParentID specified');
-
-	$Result = Nether\Database::Get()->Query(
-		'SELECT * FROM objects WHERE parent_id=:ParentID LIMIT :Limit;',
-		$Opts
-	);
-
-	if(!$Result->OK)
-	throw new Exception('DB Query Failure');
-
-	return $Result->Glomp();
-}
-```
-
-With the Nether\Object class we can clean up the first half of that function a bit.
-
-```php
-<?php
-
-function GetChildrenForObject($Opts): Array {
-/*//
-@argv Array $Options
-@argv Object $Options
-
-query the database for objects which are children of the specified object.
-- ParentID - the parent object.
-- Limit - how many results you want.
-//*/
-
-	$Opts = new Nether\Object\Mapped($Opts,[
-		'ParentID' => 0,
-		'Limit'    => 10
-	]);
-
-	////////
-
-	if(!$Opts->ParentID)
-	throw new Exception('No ParentID specified');
-
-	$Result = Nether\Database::Get()->Query(
-		'SELECT * FROM objects WHERE parent_id=:ParentID LIMIT :Limit;',
-		$Opts
-	);
-
-	if(!$Result->OK)
-	throw new Exception('DB Query Failed');
-
-	return $Result->Glomp();
-}
-```
-
-It can be a bit more involved. Like if we know an we want any input to be
-coerced into literal integers automatically.
-
-```php
-<?php
-
-$Opts = new Nether\Object\Mapped($Opts,[
-	'ParentID:int' => 0,
-	'Limit:int'    => 10
+$User = new User([
+	'ID'    => 1,
+	'Name'  => 'bob',
+	'Email' => 'bmajdak@php.net',
+	'Title' => 'Chief Engineer'
 ]);
 ```
 
+# Usage With Attributes
 
-# Constructor
+With attributes you can add schema translation. Imagine your crappy database structure that you never want to actually read and write. Dump it on your constructor and any properties with the PropertySource attribute will get filled by translation.
 
 ```php
-<?php
+class User
+extends Nether\Object\Mapped2 {
 
-// constructor prototype
-Nether\Object\Mapped::__construct(
-	Object|Array $InputData,
-	Object|Array $DefaultData default NULL,
-	Object|Array $Options default NULL
-);
+	#[Nether\Object\Meta\PropertySource('user_id')]
+	public int
+	$ID = 0;
 
-// default options if omitted
-$Options = [
-	'MappedKeysOnly' => TRUE,
-	// if there is a PropertyMap and it is not empty, then anything defined
-	// in the input which is not defined in the map will be ignored. setting
-	// this to FALSE will include any unmapped properties as they were given.
-	// this is mainly only for classes which extend Object.
+	#[Nether\Object\Meta\PropertySource('user_name')]
+	public ?string
+	$Name = NULL;
 
-	'DefaultKeysOnly' => FALSE,
-	// when using Object to ensure message objects contain all the properties
-	// they need to have and with default values, by default all properties
-	// from the input will be included. if this is set to TRUE then the
-	// properties must exist in both Input and Defaults to get included into
-	// the final object.
-];
+	#[Nether\Object\Meta\PropertySource('user_email')]
+	public ?string
+	$Email = NULL;
 
-// as you would see it in userland:
-$Object = new Nether\Object\Mapped($Inputs, $Defaults, $Options);
+	#[Nether\Object\Meta\PropertySource('user_title')]
+	public ?string
+	$Title = NULL;
+
+}
+
+$User = new User([
+	'user_id'    => 1,
+	'user_name'  => 'bob',
+	'user_email' => 'bmajdak@php.net',
+	'user_title' => 'Chief Engineer'
+]);
 ```
 
-# Install
+# Usage With Default Values
 
-To use it stand alone, Composer yourself a netherphp/object with a version of 3.*
+The second argument to the constructor is an array of default values that should be filled into the object if the data source was missing something.
 
-If you are using any other Nether components you'll most likely already have this.
+```php
+$User = new User($RowFromDB,[
+	'Title' => 'Generic Worker Person'
+]);
+```
 
+# Usage With Additional Flags
 
+The third argument to the constructor is a flagset that can change some of the behaviours during construction.
 
-# Running Tests
+```php
+// our $RowFromDB has a bunch of fields we do not want in this object.
+// using the strict input flag to have it ignore any properties not
+// specifically defined by the class. otherwise anything not defined
+// will be automatically created as a public property on the fly.
 
-This library uses PHPUnit to test.
-
-	> composer install
-
-After that you should be able to run it.
-
-	> phpunit tests --bootstrap vendor\autoload.php
-
-That should yield something like this.
-
-	> phpunit tests --bootstrap vendor\autoload.php
-
-	PHPUnit 5.3.2 by Sebastian Bergmann and contributors.
-	..................... 21 / 21 (100%)
-	Time: 157 ms, Memory: 8.00Mb
-	OK (21 tests, 165 assertions)
-
-
-
-
+$User = new User(
+	$RowFromDB,
+	$Defaults,
+	Nether\Object\ObjectFlags::StrictInput
+);
+```
