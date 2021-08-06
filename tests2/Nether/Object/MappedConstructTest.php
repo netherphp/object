@@ -124,7 +124,7 @@ extends \PHPUnit\Framework\TestCase {
 		return;
 	}
 
-	/** @testt */
+	/** @test */
 	public function
 	TestTypecasting() {
 	/*//
@@ -132,28 +132,40 @@ extends \PHPUnit\Framework\TestCase {
 	//*/
 
 		$Input = [
-			'PropertyInt:int'          => '1',
-			'PropertyFloat:float'      => '1.234',
-			'PropertyString:string'    => 42,
-			'PropertyBool1:bool'       => 0,
-			'PropertyBool2:bool'       => 1,
-			'PropertyBool3:bool'       => 'five',
-			'PropertyWhat:invalidtype' => 42.42
+			'PropertyInt'    => '1',
+			'PropertyFloat'  => '1.234',
+			'PropertyString' => 42,
+			'PropertyBool1'  => 0,
+			'PropertyBool2'  => 1,
+			'PropertyBool3'  => 'five',
+			'PropertyWhat'   => '42.42'
 		];
 
-		$Object = new Object\Mapped2($Input);
+		$Object = new class($Input) extends Object\Mapped2 {
+			public int $PropertyInt;
+			public float $PropertyFloat;
+			public string $PropertyString;
+			public bool $PropertyBool1;
+			public bool $PropertyBool2;
+			public bool $PropertyBool3;
+			public mixed $PropertyWhat;
+		};
+
+		//var_dump($Object::GetPropertyMap());
+
+		//$Object = new Object\Mapped2($Input);
 		$this->AssertTrue($Object->PropertyInt === 1);
 		$this->AssertTrue($Object->PropertyFloat === 1.234);
 		$this->AssertTrue($Object->PropertyString === '42');
 		$this->AssertTrue($Object->PropertyBool1 === FALSE);
 		$this->AssertTrue($Object->PropertyBool2 === TRUE);
 		$this->AssertTrue($Object->PropertyBool3 === TRUE);
-		$this->AssertTrue($Object->PropertyWhat === 42.42);
+		$this->AssertTrue($Object->PropertyWhat === '42.42');
 
 		return;
 	}
 
-	/** @testr */
+	/** @test */
 	public function
 	TestDefaultsWithTypecasting() {
 	/*//
@@ -162,12 +174,14 @@ extends \PHPUnit\Framework\TestCase {
 
 		$Input = [];
 		$Default = [
-			'PropertyFloat:float' => '9000.1'
+			'PropertyFloat' => '9000.1'
 		];
 
-		$Object = new Object\Mapped2($Input,$Default);
-		$this->AssertTrue($Object->PropertyFloat === 9000.1);
+		$Object = new class($Input,$Default) extends Object\Mapped2 {
+			public float $PropertyFloat;
+		};
 
+		$this->AssertTrue($Object->PropertyFloat === 9000.1);
 		return;
 	}
 

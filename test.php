@@ -1,6 +1,7 @@
 <?php
 
-require('src/Nether/Object/PropertyMapCache.php');
+require('src/Nether/Object/ObjectFlags.php');
+require('src/Nether/Object/PropertyMap.php');
 require('src/Nether/Object/Mapped.php');
 require('src/Nether/Object/Mapped2.php');
 require('src/Nether/Object/Meta/PropertySource.php');
@@ -15,7 +16,8 @@ extends Nether\Object\Mapped {
 		'user_id'    => 'ID:int',
 		'user_name'  => 'Name',
 		'user_email' => 'Email',
-		'user_title' => 'Title'
+		'user_title' => 'Title',
+		'user_time'  => 'Time:int'
 	];
 
 	public int
@@ -51,30 +53,16 @@ extends Nether\Object\Mapped2 {
 	public ?string
 	$Title = NULL;
 
-}
-
-class Whatever3
-extends Whatever2 {
-
 	#[Nether\Object\Meta\PropertySource('user_time')]
-	public ?int
-	$Time = NULL;
-
-}
-
-class Whatever4
-extends Whatever3 {
-
-	#[Nether\Object\Meta\PropertySource('user_banned')]
-	public ?int
-	$Banned = NULL;
+	public int
+	$Time = 0;
 
 }
 
 $End = 0;
 $Iter = 0;
 $Obj = NULL;
-$Start = microtime(true);
+$Start = microtime(TRUE);
 
 for($Iter = 0; $Iter < 100000; $Iter++)
 $Obj = new $Which(
@@ -82,7 +70,7 @@ $Obj = new $Which(
 	[ 'Title'=> 'lame' ]
 );
 
-$End = microtime(true);
+$End = microtime(TRUE);
 echo $Which , ' ', $Iter, PHP_EOL;
 echo $End - $Start, 'sec', PHP_EOL;
 print_r($Obj);

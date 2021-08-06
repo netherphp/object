@@ -100,15 +100,16 @@ properties you need will exist, prefilled with a default value if needed.
 		$Props = NULL;
 		$Prop = NULL;
 		$Type = NULL;
+		$Name = NULL;
+		$Castable = FALSE;
 		$Attribs = NULL;
 		$Attrib = NULL;
 		$Inst = NULL;
-		$Map = NULL;
+		$Map = [];
 
 		////////
 
 		$RefClass = new ReflectionClass(static::class);
-		$Map = [];
 
 		$Props = $RefClass->GetProperties(
 			ReflectionProperty::IS_PUBLIC |
@@ -117,19 +118,39 @@ properties you need will exist, prefilled with a default value if needed.
 		);
 
 		foreach($Props as $Prop) {
+			$Name = $Prop->GetName();
 			$Type = $Prop->GetType();
-			$Attribs = $Prop->GetAttributes(PropertySource::class);
+			$Attribs = $Prop->GetAttributes();
+			$Castable = (
+				$Type->IsBuiltIn() &&
+				$Type->GetName() !== 'mixed'
+			);
+
+			// add this property to the map if there are no attributes.
+
+			if(!count($Attribs)) {
+				$Map[$Name] = [
+					PropertyMap::Name => $Name,
+					PropertyMap::Type => $Castable ? $Type->GetName() : NULL
+				];
+				continue;
+			}
 
 			foreach($Attribs as $Attrib) {
 				$Inst = $Attrib->NewInstance();
-				$Map[$Inst->Name] = [
-					PropertyMap::Name => $Prop->GetName(),
-					PropertyMap::Type => NULL
-				];
 
-				if($Type instanceof ReflectionNamedType)
-				if($Type->IsBuiltin())
-				$Map[$Inst->Name][PropertyMap::Type] = $Type->GetName();
+				if($Inst instanceof PropertySource) {
+					$Map[$Inst->Name] = [
+						PropertyMap::Name => $Prop->GetName(),
+						PropertyMap::Type => NULL
+					];
+
+					if($Type instanceof ReflectionNamedType)
+					if($Type->IsBuiltin())
+					$Map[$Inst->Name][PropertyMap::Type] = $Type->GetName();
+
+					continue;
+				}
 			}
 		}
 
