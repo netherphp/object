@@ -1,77 +1,85 @@
 <?php
 
-require('src/Nether/Object/ObjectFlags.php');
-require('src/Nether/Object/PropertyMap.php');
-require('src/Nether/Object/Mapped.php');
-require('src/Nether/Object/Prototype.php');
-require('src/Nether/Object/Meta/PropertySource.php');
+require('vendor/autoload.php');
 
-$Which = sprintf('Whatever%d',$_SERVER['argv'][1]);
+$RowFromDB = [
+	'user_id'    => '1',
+	'user_name'  => 'bob',
+	'user_email' => 'bmajdak-at-php-dot-net',
+	'user_title' => 'Chief Iconoclast'
+];
 
-class Whatever1
-extends Nether\Object\Mapped {
+$Defaults = [
+	'Status' => 'Probably Cool'
+];
 
-	static protected
-	$PropertyMap = [
-		'user_id'    => 'ID:int',
-		'user_name'  => 'Name',
-		'user_email' => 'Email',
-		'user_title' => 'Title',
-		'user_time'  => 'Time:int'
-	];
-
-	public int
-	$ID = 0;
-
-	public ?string
-	$Name = NULL;
-
-	public ?string
-	$Email = NULL;
-
-	public ?string
-	$Title = NULL;
+class User1
+extends Nether\Object\Prototype {
 
 }
 
-class Whatever2
+class User2
+extends Nether\Object\Prototype {
+
+	public int $user_id;
+	public string $user_name;
+	public string $user_email;
+	public string $user_title;
+
+}
+
+class User3
 extends Nether\Object\Prototype {
 
 	#[Nether\Object\Meta\PropertySource('user_id')]
-	public int
-	$ID = 0;
+	public int $ID;
 
 	#[Nether\Object\Meta\PropertySource('user_name')]
-	public ?string
-	$Name = NULL;
+	public string $Name;
 
 	#[Nether\Object\Meta\PropertySource('user_email')]
-	public ?string
-	$Email = NULL;
+	public string $Email;
 
 	#[Nether\Object\Meta\PropertySource('user_title')]
-	public ?string
-	$Title = NULL;
-
-	#[Nether\Object\Meta\PropertySource('user_time')]
-	public int
-	$Time = 0;
+	public string $Title;
 
 }
 
-$End = 0;
-$Iter = 0;
-$Obj = NULL;
-$Start = microtime(TRUE);
+class User4
+extends Nether\Object\Prototype {
 
-for($Iter = 0; $Iter < 100000; $Iter++)
-$Obj = new $Which(
-	[ 'user_id'=> 1, 'user_name'=> 'bob', 'user_email'=> 'bob@majdak.net', 'user_time'=> 1234 ],
-	[ 'Title'=> 'lame' ]
-);
+	#[Nether\Object\Meta\PropertySource('user_id')]
+	public int $ID;
 
-$End = microtime(TRUE);
-echo $Which , ' ', $Iter, PHP_EOL;
-echo $End - $Start, 'sec', PHP_EOL;
-print_r($Obj);
+	#[Nether\Object\Meta\PropertySource('user_name')]
+	public string $Name;
 
+	#[Nether\Object\Meta\PropertySource('user_email')]
+	public string $Email;
+
+	#[Nether\Object\Meta\PropertySource('user_title')]
+	public string $Title;
+
+	#[Nether\Object\Meta\PropertySource('user_status')]
+	public string $Status;
+
+}
+
+class User5
+extends Nether\Object\Prototype {
+
+	#[Nether\Object\Meta\PropertySource('user_id')]
+	public int $ID;
+
+	#[Nether\Object\Meta\PropertySource('user_name')]
+	public string $Name;
+
+}
+
+var_dump(new User1($RowFromDB));
+var_dump(new User2($RowFromDB));
+var_dump(new User3($RowFromDB));
+var_dump(new User4($RowFromDB));
+var_dump(new User4($RowFromDB,$Defaults));
+var_dump(new User5($RowFromDB));
+var_dump(new User5($RowFromDB,NULL,Nether\Object\PrototypeFlags::StrictInput));

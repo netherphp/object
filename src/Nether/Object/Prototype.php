@@ -8,7 +8,7 @@ use ReflectionProperty;
 use ReflectionNamedType;
 
 use Nether\Object\PropertyMap;
-use Nether\Object\ObjectFlags;
+use Nether\Object\PrototypeFlags;
 use Nether\Object\Meta\PropertySource;
 
 class Prototype {
@@ -38,7 +38,7 @@ properties you need will exist, prefilled with a default value if needed.
 
 		if($Default !== NULL)
 		foreach($Default as $Src => $Val) {
-			if(($Flags & ObjectFlags::StrictDefault) !== 0)
+			if(($Flags & PrototypeFlags::StrictDefault) !== 0)
 			if(!property_exists($this,$Src))
 			continue;
 
@@ -56,11 +56,11 @@ properties you need will exist, prefilled with a default value if needed.
 				continue;
 			}
 
-			if(($Flags & ObjectFlags::CullUsingDefault) !== 0)
+			if(($Flags & PrototypeFlags::CullUsingDefault) !== 0)
 			if(is_array($Default) && !array_key_exists($Src,$Default))
 			continue;
 
-			if(($Flags & ObjectFlags::StrictInput) !== 0)
+			if(($Flags & PrototypeFlags::StrictInput) !== 0)
 			if(!property_exists($this,$Src))
 			continue;
 

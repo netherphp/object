@@ -2,7 +2,7 @@
 
 namespace Nether;
 
-use Nether\Object\ObjectFlags;
+use Nether\Object\PrototypeFlags;
 use PHPUnit;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ extends PHPUnit\Framework\TestCase {
 	the default behaviour of this object.
 	//*/
 
-		$Object = new RegionTest($this->Input,NULL,ObjectFlags::StrictInput);
+		$Object = new RegionTest($this->Input,NULL,PrototypeFlags::StrictInput);
 		$this->AssertFalse(property_exists($Object,'country_king'));
 
 		return;

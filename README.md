@@ -1,104 +1,241 @@
 # Nether Object
 
-[![Build Status](https://travis-ci.org/netherphp/object.svg?branch=master)](https://travis-ci.org/netherphp/object)  [![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Packagist](https://img.shields.io/packagist/dt/netherphp/object.svg)](https://packagist.org/packages/netherphp/object)
+[![Build Status](https://travis-ci.org/netherphp/object.svg?branch=AttributeBased)](https://travis-ci.org/netherphp/object)  [![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Packagist](https://img.shields.io/packagist/dt/netherphp/object.svg)](https://packagist.org/packages/netherphp/object)
 
-This package provides a self-sealing stem object capable of translating schemas and ensuring that properties exist and have default values assigned that you may want different than ones hard coded in your class definition.
+This package provides some classes for utility and using as object bases.
 
-# Usage Without Attributes
 
-Without any attributes or additional arguments you get an object back with the properties you asked it to have. The class does not need to have the properties defined, but if it does it will do basic type casting to make sure the data works in the field it was asked to be in.
+
+# Nether\Object\Prototype
+
+The Prototype Object a self-sealing stem object capable of translating schemas
+and ensuring that properties exist with default values if needed. Using this
+class as the parent enables the attribute based functionality all the way down.
 
 ```php
+$Object = new Nether\Object\Prototype(
+	array|object|null $Input,
+	array|object|null $Defaults,
+	int|null $Flags
+);
+```
+
+## Usage Without Anything
+
+Without any properties, attributes, or additional arguments, you get an object
+back with the properties you asked it to have. Here you can see MySQL gave us
+back a number as string and it will continue to be so after this.
+
+```php
+$RowFromDB = [
+	'user_id'    => '1',
+	'user_name'  => 'bob',
+	'user_email' => 'bmajdak-at-php-dot-net',
+	'user_title' => 'Chief Iconoclast'
+];
+
 class User
-extends Nether\Object\Mapped2 {
-
-	public int
-	$ID = 0;
-
-	public ?string
-	$Name = NULL;
-
-	public ?string
-	$Email = NULL;
-
-	public ?string
-	$Title = NULL;
+extends Nether\Object\Prototype {
 
 }
 
-$User = new User([
-	'ID'    => 1,
-	'Name'  => 'bob',
-	'Email' => 'bmajdak@php.net',
-	'Title' => 'Chief Engineer'
-]);
+var_dump(new User($RowFromDB));
 ```
 
-# Usage With Attributes
+```
+object(User)#1 (4) {
+	["user_id"] => string(1) "1"
+	["user_name"] => string(3) "bob"
+	["user_email"] => string(22) "bmajdak-at-php-dot-net"
+	["user_title"] => string(16) "Chief Iconoclast"
+}
+```
 
-With attributes you can add schema translation. Imagine your crappy database structure that you never want to actually read and write. Dump it on your constructor and any properties with the PropertySource attribute will get filled by translation.
+
+
+## Usage With Typed Properties
+
+Changing nothing except adding typed properties to the class will cause it
+to typecast the value for you. In the example where MySQL gave us back a string
+numeral '1' which will then be casted to `(int)'1'` for you. Only the core PHP
+types can be casted - `mixed` and classes/interfaces currently cannot be.
 
 ```php
 class User
-extends Nether\Object\Mapped2 {
+extends Nether\Object\Prototype {
+
+	public int $user_id;
+	public string $user_name;
+	public string $user_email;
+	public string $user_title;
+
+}
+
+var_dump(new User($RowFromDB));
+```
+
+```
+object(User)#2 (4) {
+	["user_id"] => int(1)
+	["user_name"] => string(3) "bob"
+	["user_email"] => string(22) "bmajdak-at-php-dot-net"
+	["user_title"] => string(16) "Chief Iconoclast"
+}
+```
+
+
+
+## Usage With Mapped Input
+
+We all know that Dave asked absolutely nobody when he designed that database
+table, and now you are stuck having to type that snake-case crap the rest
+of your life. Using attributes the input data can be remapped to an API that
+will not damage your calm. Technically this makes it half of an ORM.
+
+```php
+class User
+extends Nether\Object\Prototype {
 
 	#[Nether\Object\Meta\PropertySource('user_id')]
-	public int
-	$ID = 0;
+	public int $ID;
 
 	#[Nether\Object\Meta\PropertySource('user_name')]
-	public ?string
-	$Name = NULL;
+	public string $Name;
 
 	#[Nether\Object\Meta\PropertySource('user_email')]
-	public ?string
-	$Email = NULL;
+	public string $Email;
 
 	#[Nether\Object\Meta\PropertySource('user_title')]
-	public ?string
-	$Title = NULL;
+	public string $Title;
 
 }
 
-$User = new User([
-	'user_id'    => 1,
-	'user_name'  => 'bob',
-	'user_email' => 'bmajdak@php.net',
-	'user_title' => 'Chief Engineer'
-]);
+var_dump(new User($RowFromDB));
 ```
 
-# Usage With Default Values
+```
+object(User)#3 (4) {
+	["ID"] => int(1)
+	["Name"] => string(3) "bob"
+	["Email"] => string(22) "bmajdak-at-php-dot-net"
+	["Title"] => string(16) "Chief Iconoclast"
+}
+```
 
-The second argument to the constructor is an array of default values that should be filled into the object if the data source was missing something.
+
+
+## Usage With Default Values
+
+The second argument to the constructor is an array of default values that
+should be filled into the object if the data source was missing something.
+In this example our MySQL data had no user_status field.
 
 ```php
-$User = new User($RowFromDB,[
-	'Title' => 'Generic Worker Person'
-]);
+class User
+extends Nether\Object\Prototype {
+
+	#[Nether\Object\Meta\PropertySource('user_id')]
+	public int $ID;
+
+	#[Nether\Object\Meta\PropertySource('user_name')]
+	public string $Name;
+
+	#[Nether\Object\Meta\PropertySource('user_email')]
+	public string $Email;
+
+	#[Nether\Object\Meta\PropertySource('user_title')]
+	public string $Title;
+
+	#[Nether\Object\Meta\PropertySource('user_status')]
+	public string $Status;
+
+}
+
+$Defaults = [
+	'Status' => 'Probably Cool'
+];
+
+var_dump(new User($RowFromDB));
+var_dump(new User($RowFromDB, $Defaults));
 ```
 
-# Usage With Additional Flags
+```
+object(User)#4 (4) {
+	["ID"] => int(1)
+	["Name"] => string(3) "bob"
+	["Email"] => string(22) "bmajdak-at-php-dot-net"
+	["Title"] => string(16) "Chief Iconoclast"
+	["Status"] => uninitialized(string)
+}
 
-The third argument to the constructor is a flagset that can change some of the behaviours during construction.
+object(User)#5 (5) {
+	["ID"] => int(1)
+	["Name"] => string(3) "bob"
+	["Email"] => string(22) "bmajdak-at-php-dot-net"
+	["Title"] => string(16) "Chief Iconoclast"
+	["Status"] => string(13) "Probably Cool"
+}
+```
+
+
+
+## Usage With Additional Flags
+
+The third argument to the constructor is a flagset that can change some of the
+behaviours during construction. By default if properties have not been directly
+mapped in the class the additional ones will be added on the fly, which makes
+them both public and mixed type. Using the Strict flags you can have it only
+include the properties that are hardcoded into the class definition.
 
 ```php
-// our $RowFromDB has a bunch of fields we do not want in this object.
-// using the strict input flag to have it ignore any properties not
-// specifically defined by the class. otherwise anything not defined
-// will be automatically created as a public property on the fly.
+use Nether\Object\Prototype;
+use Nether\Object\PrototypeFlags;
+use Nether\Object\Meta\PropertySource;
 
-$User = new User(
+class User
+extends Prototype {
+
+	#[PropertySource('user_id')]
+	public int $ID;
+
+	#[PropertySource('user_name')]
+	public string $Name;
+
+}
+
+var_dump(new User(
+	$RowFromDB,
+	$Defaults
+));
+
+var_dump(new User(
 	$RowFromDB,
 	$Defaults,
-	Nether\Object\ObjectFlags::StrictInput
-);
+	(PrototypeFlags::StrictInput | PrototypeFlags::StrictDefault)
+));
 
-// there is a flag for if your $Defaults array contains extra data as well.
-
-$User = new User(
-	$RowFromDB,
-	$Defaults,
-	Nether\Object\ObjectFlags::StrictDefault
-);
 ```
+
+```
+object(User)#6 (4) {
+	["ID"]         => int(1)
+	["Name"]       => string(3) "bob"
+	["Status"]     => string(13) "Probably Cool"
+	["user_email"] => string(22) "bmajdak-at-php-dot-net"
+	["user_title"] => string(16) "Chief Iconoclast"
+}
+
+object(User)#7 (2) {
+	["ID"]   => int(1)
+	["Name"] => string(3) "bob"
+}
+```
+
+
+
+# Nether\Object\Datastore
+
+Provides a collection store so you can do array like things in an object
+oriented manner.
+
+;; TODO 2021-08-06

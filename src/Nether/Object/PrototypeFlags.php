@@ -2,7 +2,7 @@
 
 namespace Nether\Object;
 
-class ObjectFlags {
+class PrototypeFlags {
 
 	const
 	StrictDefault    = (1 << 0),

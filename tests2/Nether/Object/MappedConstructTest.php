@@ -108,7 +108,7 @@ extends \PHPUnit\Framework\TestCase {
 		$Object = new Object\Prototype(
 			$Input,
 			$Default,
-			Object\ObjectFlags::CullUsingDefault
+			Object\PrototypeFlags::CullUsingDefault
 		);
 
 		foreach($Result as $Key => $Value) {
