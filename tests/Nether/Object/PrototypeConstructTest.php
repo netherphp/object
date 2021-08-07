@@ -2,8 +2,10 @@
 
 namespace Nether;
 
-class MappedConstructTest
-extends \PHPUnit\Framework\TestCase {
+use PHPUnit;
+
+class PrototypeConstructTest
+extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
