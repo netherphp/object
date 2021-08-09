@@ -1,12 +1,12 @@
 {
 	"name":"netherphp/object",
-	"description":"A little object builder.",
+	"description":"Self-Sealing Stem Object",
 	"keywords":["php","object"],
 	"license":"BSD-2-Clause",
 	"authors":[
 		{ "name":"Bob Majdak Jr",
 		  "email":"bmajdak@php.net",
-		  "homepage":"http://twitter.com/bobmagicii",
+		  "homepage":"http://pegasusgate.net/+bob",
 		  "role":"developer" }
 	],
 	"require":{
