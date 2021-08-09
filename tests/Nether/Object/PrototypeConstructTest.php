@@ -110,7 +110,7 @@ extends PHPUnit\Framework\TestCase {
 		$Object = new Object\Prototype(
 			$Input,
 			$Default,
-			Object\PrototypeFlags::CullUsingDefault
+			Object\Prototype\Flags::CullUsingDefault
 		);
 
 		foreach($Result as $Key => $Value) {
@@ -184,6 +184,28 @@ extends PHPUnit\Framework\TestCase {
 		};
 
 		$this->AssertTrue($Object->PropertyFloat === 9000.1);
+		return;
+	}
+
+	/** @test */
+	public function
+	TestPropertyObjectify():
+	void {
+	/*//
+	check that methods attributed with PropertyObjectify create new instances
+	where wanted.
+	//*/
+
+		$Object = new class() extends Object\Prototype {
+			#[Object\Meta\PropertyObjectify]
+			public Object\Datastore $Data;
+		};
+
+		$this->AssertInstanceOf(
+			'Nether\\Object\\Datastore',
+			$Object->Data
+		);
+
 		return;
 	}
 

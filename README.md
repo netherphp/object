@@ -189,7 +189,7 @@ include the properties that are hardcoded into the class definition.
 
 ```php
 use Nether\Object\Prototype;
-use Nether\Object\PrototypeFlags;
+use Nether\Object\Prototype\Flags;
 use Nether\Object\Meta\PropertySource;
 
 class User
@@ -211,7 +211,7 @@ var_dump(new User(
 var_dump(new User(
 	$RowFromDB,
 	$Defaults,
-	(PrototypeFlags::StrictInput | PrototypeFlags::StrictDefault)
+	(Prototype\Flags::StrictInput | Prototype\Flags::StrictDefault)
 ));
 
 ```

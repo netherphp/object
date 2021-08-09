@@ -1,12 +1,12 @@
 <?php
 
-namespace Nether\Object;
+namespace Nether\Object\Prototype;
 
-class PropertyMap {
-
-	const
-	Name = 0,
-	Type = 1;
+class PropertyCache {
+/*//
+@date 2021-08-09
+provides an instance cache for the prototype property attribute structures.
+//*/
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////

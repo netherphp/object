@@ -1,8 +1,8 @@
 <?php
 
-namespace Nether\Object;
+namespace Nether\Object\Prototype;
 
-class PrototypeFlags {
+class Flags {
 
 	const
 	StrictDefault    = (1 << 0),

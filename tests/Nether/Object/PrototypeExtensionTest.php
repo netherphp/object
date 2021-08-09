@@ -4,8 +4,6 @@ namespace Nether;
 
 use PHPUnit;
 
-use Nether\Object\PrototypeFlags;
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -59,14 +57,11 @@ extends PHPUnit\Framework\TestCase {
 
 		$Object = new PrototypeRegionTest($this->Input);
 		$Old = NULL;
-		$New = NULL;
+		$Attrib = NULL;
 
-		foreach(PrototypeRegionTest::GetPropertyMap() as $Old => $New) {
-			$this->AssertFalse(property_exists($Object,$Old));
-			$this->AssertTrue(property_exists(
-				$Object,
-				$New[Object\PropertyMap::Name]
-			));
+		foreach(PrototypeRegionTest::GetPropertyAttributes() as $Old => $Attrib) {
+			$this->AssertObjectNotHasAttribute($Old,$Object);
+			$this->AssertObjectHasAttribute($Attrib->Name,$Object);
 		}
 
 		return;
@@ -80,7 +75,12 @@ extends PHPUnit\Framework\TestCase {
 	the default behaviour of this object.
 	//*/
 
-		$Object = new PrototypeRegionTest($this->Input,NULL,PrototypeFlags::StrictInput);
+		$Object = new PrototypeRegionTest(
+			$this->Input,
+			NULL,
+			Object\Prototype\Flags::StrictInput
+		);
+
 		$this->AssertFalse(property_exists($Object,'country_king'));
 
 		return;
