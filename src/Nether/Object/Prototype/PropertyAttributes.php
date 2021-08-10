@@ -5,9 +5,14 @@ namespace Nether\Object\Prototype;
 use ReflectionProperty;
 use ReflectionNamedType;
 use Nether\Object\Meta\PropertyObjectify;
-use Nether\Object\Meta\PropertySource;
+use Nether\Object\Meta\PropertyOrigin;
 
 class PropertyAttributes {
+/*//
+@date 2021-08-09
+this class defines everything via pre-processing about a class property that
+the prototype system will want to know about.
+//*/
 
 	public string
 	$Name = '';
@@ -24,28 +29,28 @@ class PropertyAttributes {
 	public ?PropertyObjectify
 	$Objectify = NULL;
 
-	public ?array
-	$Meta = NULL;
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	public function
-	__Construct(ReflectionProperty $Prop, bool $KeepMetaObjects=FALSE) {
+	__Construct(ReflectionProperty $Prop) {
 
+		$Type = $Prop->GetType();
 		$Attrib = NULL;
 		$Inst = NULL;
-		$Type = $Prop->GetType();
 
 		// get some various info.
 
-		$this->Name = $this->Origin = $Prop->GetName();
+		$this->Name = $Prop->GetName();
+		$this->Origin = $this->Name;
 		$this->Type = $Type->GetName();
-		$this->Meta = $KeepMetaObjects ? [] : NULL;
 
 		// determine if it can be progamatically typecast.
 
 		$this->Castable = (
-			$Type instanceof ReflectionNamedType &&
-			$Type->IsBuiltIn() &&
-			$Type->GetName() !== 'mixed'
+			$Type instanceof ReflectionNamedType
+			&& $Type->IsBuiltIn()
+			&& $this->Type !== 'mixed'
 		);
 
 		// get all the attributes.
@@ -53,15 +58,13 @@ class PropertyAttributes {
 		foreach($Prop->GetAttributes() as $Attrib) {
 			$Inst = $Attrib->NewInstance();
 
-			if($Inst instanceof PropertySource)
-			$this->Origin = $Inst->Name;
-
-			if($Inst instanceof PropertyObjectify) {
-				$this->Objectify = $Inst;
+			if($Inst instanceof PropertyOrigin) {
+				$this->Origin = $Inst->Name;
 			}
 
-			if($KeepMetaObjects)
-			$this->Meta[] = $Inst;
+			elseif($Inst instanceof PropertyObjectify) {
+				$this->Objectify = $Inst;
+			}
 		}
 
 		return;

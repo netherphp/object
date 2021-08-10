@@ -1,6 +1,18 @@
 <?php
 
 require('vendor/autoload.php');
+$Argv = $_SERVER['argv'];
+
+if(count($Argv) < 2) {
+	echo PHP_EOL;
+	echo "usage: {$_SERVER['SCRIPT_NAME']} <testnum> <count>", PHP_EOL;
+	echo "       1 = old mapped object", PHP_EOL;
+	echo "       2 = new prototype object (vs #1 (faster))", PHP_EOL;
+	echo "       3 = prototype objectify via OnReady", PHP_EOL;
+	echo "       4 = prototype objectify via attribute (vs #3 (slower))", PHP_EOL;
+	echo PHP_EOL;
+	exit(0);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,8 +28,11 @@ $Input = [
 	'user_id'    => 42,
 	'user_name'  => 'bobmagicii',
 	'user_email' => 'bmajdak@php.net',
-	'user_title' => 'Professional Iconoclast'
+	'user_title' => 'Chief Iconoclast'
 ];
+
+if(count($Argv) >= 3 && $Argv[2])
+$IterMax = (int)$Argv[2];
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,17 +53,42 @@ extends Nether\Object\Mapped {
 class User2
 extends Nether\Object\Prototype {
 
-	#[Nether\Object\Meta\PropertySource('user_id')]
+	#[Nether\Object\Meta\PropertyOrigin('user_id')]
 	public int $ID;
 
-	#[Nether\Object\Meta\PropertySource('user_name')]
+	#[Nether\Object\Meta\PropertyOrigin('user_name')]
 	public string $Name;
 
-	#[Nether\Object\Meta\PropertySource('user_email')]
+	#[Nether\Object\Meta\PropertyOrigin('user_email')]
 	public string $Email;
 
-	#[Nether\Object\Meta\PropertySource('user_title')]
+	#[Nether\Object\Meta\PropertyOrigin('user_title')]
 	public string $Title;
+
+};
+
+class User3
+extends Nether\Object\Prototype {
+
+	public Nether\Object\Datastore
+	$Data;
+
+	protected function
+	OnReady(Nether\Object\Prototype\ConstructArgs $Args):
+	void {
+
+		$this->Data = new Nether\Object\Datastore;
+		return;
+	}
+
+};
+
+class User4
+extends Nether\Object\Prototype {
+
+	#[Nether\Object\Meta\PropertyObjectify]
+	public Nether\Object\Datastore
+	$Data;
 
 };
 
@@ -62,7 +102,7 @@ $Start = 0;
 printf(
 	'Class: %s, Count: %s... ',
 	$ClassName,
-	$IterMax
+	number_format($IterMax)
 );
 
 $Start = microtime(TRUE);
@@ -71,7 +111,8 @@ $Start = microtime(TRUE);
 $Stop = microtime(TRUE);
 
 printf(
-	'[%.6fs]%s',
+	'[%.6fs]%s%s',
 	($Stop - $Start),
+	PHP_EOL,
 	PHP_EOL
 );

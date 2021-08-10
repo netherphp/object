@@ -96,16 +96,16 @@ will not damage your calm. Technically this makes it half of an ORM.
 class User
 extends Nether\Object\Prototype {
 
-	#[Nether\Object\Meta\PropertySource('user_id')]
+	#[Nether\Object\Meta\PropertyOrigin('user_id')]
 	public int $ID;
 
-	#[Nether\Object\Meta\PropertySource('user_name')]
+	#[Nether\Object\Meta\PropertyOrigin('user_name')]
 	public string $Name;
 
-	#[Nether\Object\Meta\PropertySource('user_email')]
+	#[Nether\Object\Meta\PropertyOrigin('user_email')]
 	public string $Email;
 
-	#[Nether\Object\Meta\PropertySource('user_title')]
+	#[Nether\Object\Meta\PropertyOrigin('user_title')]
 	public string $Title;
 
 }
@@ -134,19 +134,19 @@ In this example our MySQL data had no user_status field.
 class User
 extends Nether\Object\Prototype {
 
-	#[Nether\Object\Meta\PropertySource('user_id')]
+	#[Nether\Object\Meta\PropertyOrigin('user_id')]
 	public int $ID;
 
-	#[Nether\Object\Meta\PropertySource('user_name')]
+	#[Nether\Object\Meta\PropertyOrigin('user_name')]
 	public string $Name;
 
-	#[Nether\Object\Meta\PropertySource('user_email')]
+	#[Nether\Object\Meta\PropertyOrigin('user_email')]
 	public string $Email;
 
-	#[Nether\Object\Meta\PropertySource('user_title')]
+	#[Nether\Object\Meta\PropertyOrigin('user_title')]
 	public string $Title;
 
-	#[Nether\Object\Meta\PropertySource('user_status')]
+	#[Nether\Object\Meta\PropertyOrigin('user_status')]
 	public string $Status;
 
 }
@@ -190,15 +190,15 @@ include the properties that are hardcoded into the class definition.
 ```php
 use Nether\Object\Prototype;
 use Nether\Object\Prototype\Flags;
-use Nether\Object\Meta\PropertySource;
+use Nether\Object\Meta\PropertyOrigin;
 
 class User
 extends Prototype {
 
-	#[PropertySource('user_id')]
+	#[PropertyOrigin('user_id')]
 	public int $ID;
 
-	#[PropertySource('user_name')]
+	#[PropertyOrigin('user_name')]
 	public string $Name;
 
 }

@@ -4,7 +4,7 @@ require('vendor/autoload.php');
 
 $Object = new class([]) extends Nether\Object\Prototype {
 
-	#[Nether\Object\Meta\PropertySource('user_id')]
+	#[Nether\Object\Meta\PropertyOrigin('user_id')]
 	public int $ID = 0;
 
 	#[Nether\Object\Meta\PropertyObjectify]
@@ -12,4 +12,4 @@ $Object = new class([]) extends Nether\Object\Prototype {
 
 };
 
-var_dump($Object);
+print_r($Object);

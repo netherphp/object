@@ -9,7 +9,7 @@ use ReflectionNamedType;
 
 use Nether\Object\PropertyMap;
 use Nether\Object\Prototype\Flags;
-use Nether\Object\Meta\PropertySource;
+use Nether\Object\Meta\PropertyOrigin;
 use Nether\Object\Meta\PropertyObjectify;
 
 class Prototype {
@@ -20,7 +20,7 @@ properties you need will exist, prefilled with a default value if needed.
 //*/
 
 	public function
-	__Construct(?array $Raw=NULL, ?array $Default=NULL, int $Flags=0) {
+	__Construct(array|object|NULL $Raw=NULL, array|object|NULL $Defaults=NULL, int $Flags=0) {
 	/*//
 	@date 2021-08-05
 	//*/
@@ -30,52 +30,64 @@ properties you need will exist, prefilled with a default value if needed.
 		// that could get sucked up by documentation systems while being
 		// pointless.
 
-		$Attributes = static::GetPropertyAttributes();
-		$Raw ??= [];
+		$Args = new Prototype\ConstructArgs(
+			$Raw,
+			$Defaults,
+			$Flags,
+			static::GetPropertyAttributes()
+		);
+
 		$Src = NULL;
 		$Val = NULL;
 		$Key = NULL;
 
-		// apply any default values that were supplied.
+		// loop over the default data for population.
 
-		if($Default !== NULL)
-		foreach($Default as $Src => $Val) {
-			if(($Flags & Prototype\Flags::StrictDefault) !== 0)
-			if(!property_exists($this,$Src))
+		if($Args->Defaults !== NULL)
+		foreach($Args->Defaults as $Src => $Val) {
+			if($Args->StrictDefault && !property_exists($this,$Src))
 			continue;
 
 			$this->{$Src} = $Val;
 		}
 
-		// apply any mapped property values.
+		// loop over the supplied data for population.
 
-		foreach($Raw as $Src => $Val) {
+		if($Args->Raw !== NULL)
+		foreach($Args->Raw as $Src => $Val) {
 			$Key = $Src;
 
-			if(array_key_exists($Src,$Attributes)) {
-				$Key = $Attributes[$Src]->Name;
+			// special cases from attributes.
 
-				if($Attributes[$Src]->Castable)
-				settype($Val,$Attributes[$Src]->Type);
+			if(array_key_exists($Src,$Args->Properties)) {
+				$Key = $Args->Properties[$Src]->Name;
+
+				if($Args->Properties[$Src]->Castable)
+				settype($Val,$Args->Properties[$Src]->Type);
 			}
 
-			if(($Flags & Prototype\Flags::CullUsingDefault) !== 0)
-			if(is_array($Default) && !array_key_exists($Key,$Default))
+			// cases for culling.
+
+			if($Args->CullUsingDefault && !array_key_exists($Key,$Args->Defaults))
 			continue;
 
-			if(($Flags & Prototype\Flags::StrictInput) !== 0)
-			if(!property_exists($this,$Key))
+			if($Args->StrictInput && !property_exists($this,$Key))
 			continue;
 
 			$this->{$Key} = $Val;
 		}
 
-		foreach($Attributes as $Src => $Val) {
+		// apply any follow up attribute demands.
+
+		if($Args->Properties !== NULL)
+		foreach($Args->Properties as $Src => $Val) {
 			if($Val->Objectify)
-			$this->{$Val->Name} = new ($Val->Type);
+			$this->{$Val->Name} = new ($Val->Type)(...$Val->Objectify->Args);
 		}
 
-		$this->OnReady($Raw,$Default,$Flags);
+		// release the kraken.
+
+		$this->OnReady($Args);
 		return;
 	}
 
@@ -83,8 +95,13 @@ properties you need will exist, prefilled with a default value if needed.
 	////////////////////////////////////////////////////////////////
 
 	protected function
-	OnReady(?array $Raw=NULL, ?array $Default=NULL, int $Flags=0):
+	OnReady(Prototype\ConstructArgs $Args):
 	void {
+	/*//
+	@date 2021-08-09
+	this can/should overriden by children to add construct-time
+	processing.
+	//*/
 
 		return;
 	}
@@ -104,21 +121,16 @@ properties you need will exist, prefilled with a default value if needed.
 		if(Prototype\PropertyCache::Has(static::class))
 		return Prototype\PropertyCache::Get(static::class);
 
+		$Output = [];
 		$RefClass = NULL;
 		$Prop = NULL;
 		$Attrib = NULL;
-		$Output = [];
 
 		////////
 
 		$RefClass = new ReflectionClass(static::class);
-		$PropertyFilter = (
-			ReflectionProperty::IS_PUBLIC |
-			ReflectionProperty::IS_PROTECTED |
-			ReflectionProperty::IS_PRIVATE
-		);
 
-		foreach($RefClass->GetProperties($PropertyFilter) as $Prop) {
+		foreach($RefClass->GetProperties() as $Prop) {
 			$Attrib = new Prototype\PropertyAttributes($Prop);
 			$Output[$Attrib->Origin] = $Attrib;
 		}

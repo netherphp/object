@@ -15,13 +15,13 @@ to do its job. it is designed to emulate the mutation of an ugly data set
 like from the database into properties you actually want to type.
 //*/
 
-	#[Object\Meta\PropertySource('country_id')]
+	#[Object\Meta\PropertyOrigin('country_id')]
 	public int $ID = 0;
 
-	#[Object\Meta\PropertySource('country_code')]
+	#[Object\Meta\PropertyOrigin('country_code')]
 	public ?string $Code = NULL;
 
-	#[Object\Meta\PropertySource('country_name')]
+	#[Object\Meta\PropertyOrigin('country_name')]
 	public ?string $Name = NULL;
 
 }

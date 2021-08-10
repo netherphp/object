@@ -5,7 +5,10 @@ namespace Nether\Object\Meta;
 use Attribute;
 
 #[Attribute]
-class PropertySource {
+class PropertyOrigin {
+
+	public string
+	$Name;
 
 	public function
 	__Construct(string $Name) {
