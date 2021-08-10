@@ -3,6 +3,7 @@
 namespace Nether\Object\Meta;
 
 use Attribute;
+use Stringable;
 
 #[Attribute]
 class PropertyOrigin {

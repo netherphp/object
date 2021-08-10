@@ -81,7 +81,7 @@ extends PHPUnit\Framework\TestCase {
 			Object\Prototype\Flags::StrictInput
 		);
 
-		$this->AssertFalse(property_exists($Object,'country_king'));
+		$this->AssertObjectNotHasAttribute('country_king',$Object);
 
 		return;
 	}

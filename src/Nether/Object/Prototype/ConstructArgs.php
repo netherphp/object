@@ -10,7 +10,7 @@ passed around in a single bundle later on.
 //*/
 
 	public ?array
-	$Raw;
+	$Input;
 
 	public ?array
 	$Defaults;
@@ -28,18 +28,13 @@ passed around in a single bundle later on.
 	$StrictInput = FALSE;
 
 	public function
-	__Construct(array|object|NULL $Raw, array|object|NULL $Defaults, int $Flags, array $Props) {
+	__Construct(array|object|NULL $Input, array|object|NULL $Defaults, int $Flags, array $Props) {
 
 		// the main data we want to transport.
-		$this->Raw = $Raw;
+		$this->Input = $Input;
 		$this->Defaults = $Defaults;
 		$this->Flags = $Flags;
 		$this->Properties = $Props;
-
-		// ask some questions once that get reused in loopses.
-		$this->StrictDefault = ($Flags & Flags::StrictDefault) !== 0;
-		$this->StrictInput = ($Flags & Flags::StrictInput) !== 0;
-		$this->CullUsingDefault = ($Flags & Flags::CullUsingDefault) !== 0 && $Defaults;
 
 		return;
 	}

@@ -30,11 +30,20 @@ properties you need will exist, prefilled with a default value if needed.
 		// that could get sucked up by documentation systems while being
 		// pointless.
 
+		// there has also been a lot of micro-optimizations made in this
+		// entire flow in regards to the read and write speed of object
+		// properties.
+
+		$StrictDefaults = ($Flags & Flags::StrictDefault) !== 0;
+		$CullUsingDefaults = ($Flags & Flags::CullUsingDefault) !== 0;
+		$StrictInput = ($Flags & Flags::StrictInput) !== 0;
+		$Properties = NULL;
+
 		$Args = new Prototype\ConstructArgs(
 			$Raw,
 			$Defaults,
 			$Flags,
-			static::GetPropertyAttributes()
+			$Properties = static::GetPropertyAttributes()
 		);
 
 		$Src = NULL;
@@ -45,7 +54,7 @@ properties you need will exist, prefilled with a default value if needed.
 
 		if($Args->Defaults !== NULL)
 		foreach($Args->Defaults as $Src => $Val) {
-			if($Args->StrictDefault && !property_exists($this,$Src))
+			if($StrictDefaults && !property_exists($this,$Src))
 			continue;
 
 			$this->{$Src} = $Val;
@@ -53,25 +62,27 @@ properties you need will exist, prefilled with a default value if needed.
 
 		// loop over the supplied data for population.
 
-		if($Args->Raw !== NULL)
-		foreach($Args->Raw as $Src => $Val) {
+		if($Args->Input !== NULL)
+		foreach($Args->Input as $Src => $Val) {
 			$Key = $Src;
 
 			// special cases from attributes.
 
-			if(array_key_exists($Src,$Args->Properties)) {
-				$Key = $Args->Properties[$Src]->Name;
+			if(array_key_exists($Src,$Properties)) {
+				$Key = $Properties[$Src]->Name;
 
-				if($Args->Properties[$Src]->Castable)
-				settype($Val,$Args->Properties[$Src]->Type);
+				if($Properties[$Src]->Castable)
+				settype($Val,$Properties[$Src]->Type);
 			}
 
 			// cases for culling.
 
-			if($Args->CullUsingDefault && !array_key_exists($Key,$Args->Defaults))
+			if($CullUsingDefaults)
+			if(!array_key_exists($Key,$Args->Defaults))
 			continue;
 
-			if($Args->StrictInput && !property_exists($this,$Key))
+			if($StrictInput)
+			if(!property_exists($this,$Key))
 			continue;
 
 			$this->{$Key} = $Val;
@@ -79,10 +90,12 @@ properties you need will exist, prefilled with a default value if needed.
 
 		// apply any follow up attribute demands.
 
-		if($Args->Properties !== NULL)
-		foreach($Args->Properties as $Src => $Val) {
+		if($Properties !== NULL)
+		foreach($Properties as $Src => $Val) {
 			if($Val->Objectify)
-			$this->{$Val->Name} = new ($Val->Type)(...$Val->Objectify->Args);
+			$this->{$Val->Name} = new ($Val->Type)(
+				...$Val->Objectify->Args
+			);
 		}
 
 		// release the kraken.

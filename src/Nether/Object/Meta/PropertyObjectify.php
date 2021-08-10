@@ -15,8 +15,8 @@ defined as. arguments given to the attribute will be passed along as arguments
 to the object being constructed for that property.
 //*/
 
-	public ?array
-	$Args = NULL;
+	public array
+	$Args;
 
 	public function
 	__Construct(...$Args) {

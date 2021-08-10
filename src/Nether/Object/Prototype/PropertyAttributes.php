@@ -15,13 +15,13 @@ the prototype system will want to know about.
 //*/
 
 	public string
-	$Name = '';
-
-	public ?string
-	$Origin = NULL;
+	$Name;
 
 	public string
-	$Type = 'mixed';
+	$Origin;
+
+	public string
+	$Type;
 
 	public bool
 	$Castable = FALSE;
@@ -41,9 +41,8 @@ the prototype system will want to know about.
 
 		// get some various info.
 
-		$this->Name = $Prop->GetName();
-		$this->Origin = $this->Name;
 		$this->Type = $Type->GetName();
+		$this->Name = $this->Origin = $Prop->GetName();
 
 		// determine if it can be progamatically typecast.
 
@@ -52,8 +51,6 @@ the prototype system will want to know about.
 			&& $Type->IsBuiltIn()
 			&& $this->Type !== 'mixed'
 		);
-
-		// get all the attributes.
 
 		foreach($Prop->GetAttributes() as $Attrib) {
 			$Inst = $Attrib->NewInstance();

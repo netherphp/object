@@ -14,9 +14,13 @@ provides an instance cache for the prototype property attribute structures.
 	static private array
 	$Cache = [];
 
+
 	static public function
 	Get(string $ClassName):
 	?array {
+
+		if(!array_key_exists($ClassName,static::$Cache))
+		return NULL;
 
 		return static::$Cache[$ClassName];
 	}
