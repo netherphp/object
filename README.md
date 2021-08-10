@@ -10,7 +10,7 @@ This package provides base classes with basic utility.
 
 ## Nether\Object\Prototype
 
-The Prototype Object a self-sealing stem object capable of remapping schemas
+The Prototype Object is a self-sealing stem object capable of remapping schemas
 and ensuring that properties exist with default values if needed. Using this
 class as the parent enables the attribute based functionality all the way down.
 
