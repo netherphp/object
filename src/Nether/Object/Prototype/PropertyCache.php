@@ -8,18 +8,18 @@ class PropertyCache {
 provides an instance cache for the prototype property attribute structures.
 //*/
 
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
-	static private array
+	static public array
 	$Cache = [];
-
 
 	static public function
 	Get(string $ClassName):
 	?array {
+	/*//
+	@date 2021-08-08
+	@mopt isset
+	//*/
 
-		if(!array_key_exists($ClassName,static::$Cache))
+		if(!isset(static::$Cache[$ClassName]))
 		return NULL;
 
 		return static::$Cache[$ClassName];
@@ -28,13 +28,20 @@ provides an instance cache for the prototype property attribute structures.
 	static public function
 	Has(string $ClassName):
 	bool {
+	/*//
+	@date 2021-08-08
+	@mopt isset
+	//*/
 
-		return array_key_exists($ClassName,static::$Cache);
+		return isset(static::$Cache[$ClassName]);
 	}
 
 	static public function
 	Set(string $ClassName, array $PropertyMap):
 	array {
+	/*//
+	@date 2021-08-08
+	//*/
 
 		static::$Cache[$ClassName] = $PropertyMap;
 		return $PropertyMap;

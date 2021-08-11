@@ -28,9 +28,8 @@ passed around in a single bundle later on.
 	$StrictInput = FALSE;
 
 	public function
-	__Construct(array|object|NULL $Input, array|object|NULL $Defaults, int $Flags, array $Props) {
+	__Construct(?array $Input, ?array $Defaults, int $Flags, array $Props) {
 
-		// the main data we want to transport.
 		$this->Input = $Input;
 		$this->Defaults = $Defaults;
 		$this->Flags = $Flags;

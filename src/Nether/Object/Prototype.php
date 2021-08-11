@@ -32,19 +32,20 @@ properties you need will exist, prefilled with a default value if needed.
 
 		// there has also been a lot of micro-optimizations made in this
 		// entire flow in regards to the read and write speed of object
-		// properties.
+		// properties and checking if a key exists.
 
+		if(is_object($Raw))
+		$Raw = (array)$Raw;
+
+		if(is_object($Defaults))
+		$Defaults = (array)$Defaults;
+
+		////////
+
+		$Properties = static::GetPropertyAttributes();
 		$StrictDefaults = ($Flags & Flags::StrictDefault) !== 0;
 		$CullUsingDefaults = ($Flags & Flags::CullUsingDefault) !== 0;
 		$StrictInput = ($Flags & Flags::StrictInput) !== 0;
-		$Properties = NULL;
-
-		$Args = new Prototype\ConstructArgs(
-			$Raw,
-			$Defaults,
-			$Flags,
-			$Properties = static::GetPropertyAttributes()
-		);
 
 		$Src = NULL;
 		$Val = NULL;
@@ -52,8 +53,8 @@ properties you need will exist, prefilled with a default value if needed.
 
 		// loop over the default data for population.
 
-		if($Args->Defaults !== NULL)
-		foreach($Args->Defaults as $Src => $Val) {
+		if($Defaults !== NULL)
+		foreach($Defaults as $Src => $Val) {
 			if($StrictDefaults && !property_exists($this,$Src))
 			continue;
 
@@ -62,13 +63,13 @@ properties you need will exist, prefilled with a default value if needed.
 
 		// loop over the supplied data for population.
 
-		if($Args->Input !== NULL)
-		foreach($Args->Input as $Src => $Val) {
+		if($Raw !== NULL)
+		foreach($Raw as $Src => $Val) {
 			$Key = $Src;
 
 			// special cases from attributes.
 
-			if(array_key_exists($Src,$Properties)) {
+			if(isset($Properties[$Src])) {
 				$Key = $Properties[$Src]->Name;
 
 				if($Properties[$Src]->Castable)
@@ -78,7 +79,7 @@ properties you need will exist, prefilled with a default value if needed.
 			// cases for culling.
 
 			if($CullUsingDefaults)
-			if(!array_key_exists($Key,$Args->Defaults))
+			if(!isset($Defaults[$Key]))
 			continue;
 
 			if($StrictInput)
@@ -100,7 +101,13 @@ properties you need will exist, prefilled with a default value if needed.
 
 		// release the kraken.
 
-		$this->OnReady($Args);
+		$this->OnReady(new Prototype\ConstructArgs(
+			$Raw,
+			$Defaults,
+			$Flags,
+			$Properties
+		));
+
 		return;
 	}
 
@@ -127,12 +134,16 @@ properties you need will exist, prefilled with a default value if needed.
 	array {
 	/*//
 	@date 2021-08-05
+	@mopt isset, direct read, direct write.
 	builds a structure indexed by the origin value of the property that
 	describes all the various things we need to respect.
 	//*/
 
-		if(Prototype\PropertyCache::Has(static::class))
-		return Prototype\PropertyCache::Get(static::class);
+		//if(Prototype\PropertyCache::Has(static::class))
+		//return Prototype\PropertyCache::Get(static::class);
+
+		if(isset(Prototype\PropertyCache::$Cache[static::class]))
+		return Prototype\PropertyCache::$Cache[static::class];
 
 		$Output = [];
 		$RefClass = NULL;
@@ -148,7 +159,7 @@ properties you need will exist, prefilled with a default value if needed.
 			$Output[$Attrib->Origin] = $Attrib;
 		}
 
-		return Prototype\PropertyCache::Set(static::class, $Output);
+		return Prototype\PropertyCache::$Cache[static::class] = $Output;
 	}
 
 }

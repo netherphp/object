@@ -95,24 +95,42 @@ extends Nether\Object\Prototype {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+
+$Rounds = 4;
 $Iter = 0;
+
+$Round = 0;
+$Total = 0;
+$Current = 0;
 $Stop = 0;
 $Start = 0;
 
 printf(
 	'Class: %s, Count: %s... ',
 	$ClassName,
-	number_format($IterMax)
+	number_format($IterMax),
+	PHP_EOL
 );
 
-$Start = microtime(TRUE);
-	for($Iter = 0; $Iter < $IterMax; $Iter++)
-	new $ClassName($Input);
-$Stop = microtime(TRUE);
+$Round = $Rounds;
+while($Round--) {
+	$Start = microtime(TRUE);
+		for($Iter = 0; $Iter < $IterMax; $Iter++)
+		new $ClassName($Input);
+	$Stop = microtime(TRUE);
+
+	printf(
+		'[%.6fs] ',
+		($Current = $Stop - $Start)
+	);
+
+	$Total += $Current;
+}
 
 printf(
-	'[%.6fs]%s%s',
-	($Stop - $Start),
+	'%sAverage: %.6fs %s%s',
+	PHP_EOL,
+	($Total / $Rounds),
 	PHP_EOL,
 	PHP_EOL
 );
