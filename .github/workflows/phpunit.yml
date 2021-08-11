@@ -5,6 +5,7 @@ jobs:
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ 'ubuntu-latest', 'windows-latest' ]
         php-versions: [ '8.0', '8.1' ]
