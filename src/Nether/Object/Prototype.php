@@ -146,8 +146,8 @@ impact i can find while packing in as many features as possible.
 	/*//
 	@date 2021-08-05
 	@mopt isset, direct read, direct write.
-	builds a structure indexed by the origin value of the property that
-	describes all the various things we need to respect.
+	returns an array of all the properties on this class keyed to their
+	data origin name.
 	//*/
 
 		if(isset(Prototype\PropertyCache::$Cache[static::class]))

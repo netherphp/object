@@ -24,7 +24,7 @@ the prototype system will want to know about.
 	$Type;
 
 	public bool
-	$Castable = FALSE;
+	$Castable;
 
 	public ?PropertyObjectify
 	$Objectify = NULL;
@@ -36,16 +36,19 @@ the prototype system will want to know about.
 	__Construct(ReflectionProperty $Prop) {
 	/*//
 	@date 2021-08-09
-	@mopt busyunit
+	@mopt busyunit, avoid-obj-prop-rw
 	//*/
 
 		$Type = $Prop->GetType();
 		$Attrib = NULL;
 		$Inst = NULL;
+		//$HasOrigin = FALSE;
+		//$StrName = NULL;
+		$StrType = NULL;
 
 		// get some various info.
 
-		$this->Type = $Type->GetName();
+		$this->Type = $StrType = $Type->GetName();
 		$this->Name = $this->Origin = $Prop->GetName();
 
 		// determine if it can be progamatically typecast.
@@ -53,19 +56,17 @@ the prototype system will want to know about.
 		$this->Castable = (
 			$Type instanceof ReflectionNamedType
 			&& $Type->IsBuiltIn()
-			&& $this->Type !== 'mixed'
+			&& $StrType !== 'mixed'
 		);
 
 		foreach($Prop->GetAttributes() as $Attrib) {
-			$Inst = $Attrib->NewInstance();
+			$Inst = $Attrib->NewInstance($this);
 
-			if($Inst instanceof PropertyOrigin) {
-				$this->Origin = $Inst->Name;
-			}
+			if($Inst instanceof PropertyOrigin)
+			$this->Origin = $Inst->Name;
 
-			elseif($Inst instanceof PropertyObjectify) {
-				$this->Objectify = $Inst;
-			}
+			elseif($Inst instanceof PropertyObjectify)
+			$this->Objectify = $Inst;
 		}
 
 		return;
