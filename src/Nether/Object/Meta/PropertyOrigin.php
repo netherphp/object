@@ -3,9 +3,12 @@
 namespace Nether\Object\Meta;
 
 use Attribute;
+use Nether\Object\Prototype\AttributeInterface;
+use Nether\Object\Prototype\PropertyAttributes;
 
-#[Attribute]
-class PropertyOrigin {
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class PropertyOrigin
+implements AttributeInterface {
 /*//
 @date 2021-08-05
 @related Nether\Object\Prototype::__Construct
@@ -19,8 +22,16 @@ it into the property this is attached to.
 
 	public function
 	__Construct(string $Name) {
+
 		$this->Name = $Name;
 		return;
 	}
 
+	public function
+	OnReady(PropertyAttributes $Attrib):
+	static {
+
+		$Attrib->Origin = $this->Name;
+		return $this;
+	}
 }

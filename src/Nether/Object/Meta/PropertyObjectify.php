@@ -3,9 +3,12 @@
 namespace Nether\Object\Meta;
 
 use Attribute;
+use Nether\Object\Prototype\AttributeInterface;
+use Nether\Object\Prototype\PropertyAttributes;
 
-#[Attribute]
-class PropertyObjectify {
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class PropertyObjectify
+implements AttributeInterface {
 /*//
 @date 2021-08-09
 @related Nether\Object\Prototype::__Construct
@@ -20,8 +23,17 @@ to the object being constructed for that property.
 
 	public function
 	__Construct(...$Args) {
+
 		$this->Args = $Args;
 		return;
+	}
+
+	public function
+	OnReady(PropertyAttributes $Attrib):
+	static {
+
+		$Attrib->Objectify = $this;
+		return $this;
 	}
 
 }

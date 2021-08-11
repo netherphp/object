@@ -5,7 +5,7 @@ namespace Nether\Object\Prototype;
 use ReflectionProperty;
 use ReflectionNamedType;
 use Nether\Object\Meta\PropertyObjectify;
-use Nether\Object\Meta\PropertyOrigin;
+use Nether\Object\Prototype\AttributeInterface;
 
 class PropertyAttributes {
 /*//
@@ -41,14 +41,10 @@ the prototype system will want to know about.
 
 		$Type = $Prop->GetType();
 		$Attrib = NULL;
-		$Inst = NULL;
-		//$HasOrigin = FALSE;
-		//$StrName = NULL;
-		$StrType = NULL;
 
 		// get some various info.
 
-		$this->Type = $StrType = $Type->GetName();
+		$this->Type = $Type->GetName();
 		$this->Name = $this->Origin = $Prop->GetName();
 
 		// determine if it can be progamatically typecast.
@@ -56,17 +52,11 @@ the prototype system will want to know about.
 		$this->Castable = (
 			$Type instanceof ReflectionNamedType
 			&& $Type->IsBuiltIn()
-			&& $StrType !== 'mixed'
+			&& $this->Type !== 'mixed'
 		);
 
 		foreach($Prop->GetAttributes() as $Attrib) {
-			$Inst = $Attrib->NewInstance($this);
-
-			if($Inst instanceof PropertyOrigin)
-			$this->Origin = $Inst->Name;
-
-			elseif($Inst instanceof PropertyObjectify)
-			$this->Objectify = $Inst;
+			$Attrib->NewInstance()->OnReady($this);
 		}
 
 		return;
