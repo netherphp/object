@@ -32,3 +32,5 @@ jobs:
         run: |
           composer install
           phpunit tests --bootstrap vendor/autoload.php
+          php tests/timed.php 1 100000
+          php tests/timed.php 2 100000
