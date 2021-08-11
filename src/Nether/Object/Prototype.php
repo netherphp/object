@@ -1,28 +1,25 @@
 <?php
 
 namespace Nether\Object;
-use Nether;
 
 use ReflectionClass;
-use ReflectionProperty;
-use ReflectionNamedType;
-
-use Nether\Object\PropertyMap;
 use Nether\Object\Prototype\Flags;
-use Nether\Object\Meta\PropertyOrigin;
-use Nether\Object\Meta\PropertyObjectify;
+use Nether\Object\Prototype\ConstructArgs;
 
 class Prototype {
 /*//
 @date 2021-08-05
 provides a self-sealing stem object to build from where you can trust that the
-properties you need will exist, prefilled with a default value if needed.
+properties you need will exist, prefilled with a default value if needed. this
+class and its supports have been micro-optimized to have the most minimal
+impact i can find while packing in as many features as possible.
 //*/
 
 	public function
 	__Construct(array|object|NULL $Raw=NULL, array|object|NULL $Defaults=NULL, int $Flags=0) {
 	/*//
 	@date 2021-08-05
+	@mopt busyunit, isset, avoid-obj-prop-rw
 	//*/
 
 		// this constructor is going to do the bulk of the work to avoid
@@ -65,25 +62,36 @@ properties you need will exist, prefilled with a default value if needed.
 
 		if($Raw !== NULL)
 		foreach($Raw as $Src => $Val) {
+			// start off writing to the same property its keyed to by
+			// default.
+
 			$Key = $Src;
 
-			// special cases from attributes.
-
 			if(isset($Properties[$Src])) {
+				// if there is an attribute for the source property
+				// update the destination property name.
+
 				$Key = $Properties[$Src]->Name;
+
+				// check if the value needs to be typecast.
 
 				if($Properties[$Src]->Castable)
 				settype($Val,$Properties[$Src]->Type);
 			}
 
-			// cases for culling.
-
-			if($CullUsingDefaults)
-			if(!isset($Defaults[$Key]))
-			continue;
+			// if StrictInput then do not assign any properties that
+			// are not hardcoded on the class.
 
 			if($StrictInput)
 			if(!property_exists($this,$Key))
+			continue;
+
+			// if CullUsingDefaults then do not assign any properties
+			// that are not also mapped in the defaults. honestly i think
+			// this is stupid and might be removed.
+
+			if($CullUsingDefaults)
+			if(!array_key_exists($Key,$Defaults))
 			continue;
 
 			$this->{$Key} = $Val;
@@ -91,7 +99,6 @@ properties you need will exist, prefilled with a default value if needed.
 
 		// apply any follow up attribute demands.
 
-		if($Properties !== NULL)
 		foreach($Properties as $Src => $Val) {
 			if($Val->Objectify)
 			$this->{$Val->Name} = new ($Val->Type)(
@@ -99,9 +106,13 @@ properties you need will exist, prefilled with a default value if needed.
 			);
 		}
 
-		// release the kraken.
+		// as handy as it was to create this ConstructArgs first thing
+		// and have it do the sanitization and stuff i had to refactor this
+		// to micro-optimize by avoiding to access object members. having
+		// this up there makes it too obviously tempting to use it instead
+		// of creating local variables.
 
-		$this->OnReady(new Prototype\ConstructArgs(
+		$this->OnReady(new ConstructArgs(
 			$Raw,
 			$Defaults,
 			$Flags,
@@ -115,7 +126,7 @@ properties you need will exist, prefilled with a default value if needed.
 	////////////////////////////////////////////////////////////////
 
 	protected function
-	OnReady(Prototype\ConstructArgs $Args):
+	OnReady(ConstructArgs $Args):
 	void {
 	/*//
 	@date 2021-08-09
@@ -138,9 +149,6 @@ properties you need will exist, prefilled with a default value if needed.
 	builds a structure indexed by the origin value of the property that
 	describes all the various things we need to respect.
 	//*/
-
-		//if(Prototype\PropertyCache::Has(static::class))
-		//return Prototype\PropertyCache::Get(static::class);
 
 		if(isset(Prototype\PropertyCache::$Cache[static::class]))
 		return Prototype\PropertyCache::$Cache[static::class];

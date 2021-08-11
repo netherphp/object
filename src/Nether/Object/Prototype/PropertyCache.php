@@ -5,7 +5,7 @@ namespace Nether\Object\Prototype;
 class PropertyCache {
 /*//
 @date 2021-08-09
-provides an instance cache for the prototype property attribute structures.
+provides a static cache for the prototype property attribute structures.
 //*/
 
 	static public array

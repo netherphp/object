@@ -34,6 +34,10 @@ the prototype system will want to know about.
 
 	public function
 	__Construct(ReflectionProperty $Prop) {
+	/*//
+	@date 2021-08-09
+	@mopt busyunit
+	//*/
 
 		$Type = $Prop->GetType();
 		$Attrib = NULL;
