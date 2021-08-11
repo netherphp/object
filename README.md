@@ -38,4 +38,5 @@ These are old things that still exist but are no longer preferred to be used.
 Replaced during PHP 8 the Mapped provides similiar functionality as Prototype
 in regards to filling properties and remapping schemas.
 
-* Documentation: TODO
+* Documentation
+  https://github.com/netherphp/object/wiki/Class:-Nether%5CObject%5CMapped
