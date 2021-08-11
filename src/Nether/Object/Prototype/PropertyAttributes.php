@@ -2,6 +2,7 @@
 
 namespace Nether\Object\Prototype;
 
+use Attribute;
 use ReflectionProperty;
 use ReflectionNamedType;
 use Nether\Object\Meta\PropertyObjectify;
@@ -41,10 +42,12 @@ the prototype system will want to know about.
 
 		$Type = $Prop->GetType();
 		$Attrib = NULL;
+		$Inst = NULL;
+		$StrType = '';
 
 		// get some various info.
 
-		$this->Type = $Type->GetName();
+		$this->Type = $StrType = $Type->GetName();
 		$this->Name = $this->Origin = $Prop->GetName();
 
 		// determine if it can be progamatically typecast.
@@ -52,11 +55,14 @@ the prototype system will want to know about.
 		$this->Castable = (
 			$Type instanceof ReflectionNamedType
 			&& $Type->IsBuiltIn()
-			&& $this->Type !== 'mixed'
+			&& $StrType !== 'mixed'
 		);
 
 		foreach($Prop->GetAttributes() as $Attrib) {
-			$Attrib->NewInstance()->OnReady($this);
+			$Inst = $Attrib->NewInstance();
+
+			if($Inst instanceof AttributeInterface)
+			$Inst->OnReady($this);
 		}
 
 		return;
