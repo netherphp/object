@@ -19,7 +19,6 @@
 	},
 	"require-dev": {
 		"netherphp/standards": ">=0.1.0",
-		"phpunit/phpunit": "^9.5",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
 	}
 }
