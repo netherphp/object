@@ -15,7 +15,9 @@ them interfaces and to check that after asking reflection for the list.
 	/*//
 	@date 2021-08-11
 	implement this method in your attribute to make it do something when
-	this attribute is indexed by the prototype system.
+	this attribute is indexed by the prototype system. example: setting
+	a property on the PropertyAttribute object passed as an argument from
+	data calculated by this attribute.
 	//*/
 
 }
