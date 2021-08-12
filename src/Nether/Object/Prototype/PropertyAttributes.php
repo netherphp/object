@@ -62,7 +62,7 @@ the prototype system will want to know about.
 			$Inst = $Attrib->NewInstance();
 
 			if($Inst instanceof AttributeInterface)
-			$Inst->OnReady($this);
+			$Inst->OnPropertyAttributes($this);
 		}
 
 		return;

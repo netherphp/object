@@ -28,7 +28,7 @@ it into the property this is attached to.
 	}
 
 	public function
-	OnReady(PropertyAttributes $Attrib):
+	OnPropertyAttributes(PropertyAttributes $Attrib):
 	static {
 
 		$Attrib->Origin = $this->Name;
