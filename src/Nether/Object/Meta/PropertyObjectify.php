@@ -29,7 +29,7 @@ to the object being constructed for that property.
 	}
 
 	public function
-	OnReady(PropertyAttributes $Attrib):
+	OnPropertyAttributes(PropertyAttributes $Attrib):
 	static {
 
 		$Attrib->Objectify = $this;
