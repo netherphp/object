@@ -5,6 +5,7 @@ namespace Nether\Object;
 use ReflectionClass;
 use Nether\Object\Prototype\Flags;
 use Nether\Object\Prototype\ConstructArgs;
+use ReflectionProperty;
 
 class Prototype {
 /*//
@@ -168,6 +169,26 @@ impact i can find while packing in as many features as possible.
 		}
 
 		return Prototype\PropertyCache::$Cache[static::class] = $Output;
+	}
+
+	static public function
+	GetPropertyMap():
+	array {
+	/*//
+	@date 2021-08-16
+	returns an assoc array keyed with a data source name and values of the
+	data destination name.
+	//*/
+
+		$Output = array_map(
+			(fn($Val)=> $Val->Name),
+			array_filter(
+				static::GetPropertyAttributes(),
+				(fn($Val)=> !$Val->Static)
+			)
+		);
+
+		return $Output;
 	}
 
 }

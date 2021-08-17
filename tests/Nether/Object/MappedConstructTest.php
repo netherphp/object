@@ -2,8 +2,21 @@
 
 namespace Nether;
 
+use PHPUnit;
+
+class LocalTest
+extends Object\Mapped {
+
+	static protected
+	$PropertyMap = [
+		'number_one' => 'One',
+		'number_two' => 'Two'
+	];
+
+}
+
 class MappedConstructTest
-extends \PHPUnit\Framework\TestCase {
+extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
@@ -165,6 +178,22 @@ extends \PHPUnit\Framework\TestCase {
 
 		$Object = new Object\Mapped($Input,$Default);
 		$this->AssertTrue($Object->PropertyFloat === 9000.1);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetPropertyMap() {
+
+		$Map = LocalTest::GetPropertyMap();
+
+		$this->AssertTrue(is_array($Map));
+		$this->AssertTrue(count($Map) === 2);
+		$this->AssertTrue(array_key_exists('number_one',$Map));
+		$this->AssertTrue($Map['number_one'] === 'One');
+		$this->AssertTrue(array_key_exists('number_two',$Map));
+		$this->AssertTrue($Map['number_two'] === 'Two');
 
 		return;
 	}

@@ -4,6 +4,17 @@ namespace Nether;
 
 use PHPUnit;
 
+class LocalTest2
+extends Object\Prototype {
+
+	#[Object\Meta\PropertyOrigin('number_one')]
+	public int $One;
+
+	#[Object\Meta\PropertyOrigin('number_two')]
+	public int $Two;
+
+}
+
 class PrototypeConstructTest
 extends PHPUnit\Framework\TestCase {
 
@@ -205,6 +216,22 @@ extends PHPUnit\Framework\TestCase {
 			'Nether\\Object\\Datastore',
 			$Object->Data
 		);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetPropertyMap() {
+
+		$Map = LocalTest2::GetPropertyMap();
+
+		$this->AssertTrue(is_array($Map));
+		$this->AssertTrue(count($Map) === 2);
+		$this->AssertTrue(array_key_exists('number_one',$Map));
+		$this->AssertTrue($Map['number_one'] === 'One');
+		$this->AssertTrue(array_key_exists('number_two',$Map));
+		$this->AssertTrue($Map['number_two'] === 'Two');
 
 		return;
 	}
