@@ -27,6 +27,9 @@ the prototype system will want to know about.
 	public bool
 	$Castable;
 
+	public bool
+	$Static;
+
 	public ?PropertyObjectify
 	$Objectify = NULL;
 
@@ -52,6 +55,7 @@ the prototype system will want to know about.
 
 		$this->Name = $this->Origin = $Prop->GetName();
 		$this->Type = $StrType;
+		$this->Static = $Prop->IsStatic();
 
 		// determine if it can be progamatically typecast.
 
