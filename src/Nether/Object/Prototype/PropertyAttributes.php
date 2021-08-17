@@ -43,12 +43,15 @@ the prototype system will want to know about.
 		$Type = $Prop->GetType();
 		$Attrib = NULL;
 		$Inst = NULL;
-		$StrType = '';
+		$StrType = 'mixed';
 
 		// get some various info.
 
-		$this->Type = $StrType = $Type->GetName();
+		if($Type !== NULL)
+		$StrType = $Type->GetName();
+
 		$this->Name = $this->Origin = $Prop->GetName();
+		$this->Type = $StrType;
 
 		// determine if it can be progamatically typecast.
 
