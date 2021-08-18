@@ -1,15 +1,23 @@
 <?php
 
 namespace Nether\Object;
-use \Nether;
-use \Exception;
+
+use Exception;
 
 class Deepstore
 extends Datastore {
+/*//
+@date 2016-04-22
+//*/
+
+	////////////////////////////////////////////////////////////////
+	// Magic Methods ///////////////////////////////////////////////
 
 	public function
-	__Get($Key) {
+	__Get(mixed $Key):
+	mixed {
 	/*//
+	@date 2016-04-22
 	handle when you attempt to read data out directly as a property. if the
 	data in question is an array then it will convert that array into a
 	datastore on the fly.
@@ -28,8 +36,10 @@ extends Datastore {
 	}
 
 	public function
-	__Set($Key,$Value) {
+	__Set(mixed $Key, mixed $Value):
+	void {
 	/*//
+	@date 2016-04-22
 	handle when you attempt to write data directly to a property. at this point
 	we will not actually anything with it. using the Get method right after
 	this will return an array as you gave it. it is not fussed with until you
@@ -37,12 +47,14 @@ extends Datastore {
 	//*/
 
 		$this->Data[$Key] = $Value;
-		return $Value;
+		return;
 	}
 
 	public function
-	__Call($Key,$Args) {
+	__Call(mixed $Key, mixed $Args):
+	mixed {
 	/*//
+	@date 2016-04-22
 	i cannot believe this works. i mean, i can, but, still, i did not intend
 	for this to be a feature of this datastore until i had this hillarious idea
 	of how bad i can be.
