@@ -9,6 +9,9 @@ use Countable;
 
 class Datastore
 implements Iterator, ArrayAccess, Countable {
+/*//
+@date 2015-12-02
+//*/
 
 	const
 	FormatPHP  = 1,
