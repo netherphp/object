@@ -1,7 +1,7 @@
 <?php
 
 class DatastoreTest
-extends \PHPUnit\Framework\TestCase {
+extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
@@ -12,6 +12,9 @@ extends \PHPUnit\Framework\TestCase {
 	//*/
 
 		// testing right out of the box.
+
+		$Key = NULL;
+		$Item = NULL;
 
 		$Store = new Nether\Object\Datastore;
 		$this->AssertTrue($Store->Count() === 0);
@@ -47,12 +50,16 @@ extends \PHPUnit\Framework\TestCase {
 	management api of the storage.
 	//*/
 
+		$X = NULL;
+		$Key = NULL;
+		$Value = NULL;
+
 		$Store = new Nether\Object\Datastore;
 
 		// test that we can add items one at a time.
 
-		for($x = 1; $x <= 6; $x++)
-		$Store->Push($x);
+		for($X = 1; $X <= 6; $X++)
+		$Store->Push($X);
 
 		// and that it properly counted them.
 
@@ -74,6 +81,8 @@ extends \PHPUnit\Framework\TestCase {
 	management api with associative keys.
 	//*/
 
+		$Key = NULL;
+		$Value = NULL;
 		$Store = new Nether\Object\Datastore;
 
 		// test that we can add items one at a time.
@@ -116,7 +125,7 @@ extends \PHPUnit\Framework\TestCase {
 
 		$Store->Remove(1);
 		$this->AssertTrue($Store->Count() === 9);
-		$this->AssertTrue($Store->Get(1) === null);
+		$this->AssertTrue($Store->Get(1) === NULL);
 
 		$Store->Reindex();
 		$this->AssertTrue($Store->Count() === 9);
@@ -164,6 +173,7 @@ extends \PHPUnit\Framework\TestCase {
 		$this->AssertTrue($Store->Shift() === 2);
 		$this->AssertTrue($Store->Shift() === 3);
 		$this->AssertTrue($Store->Count() === 0);
+		return;
 	}
 
 	/** @test */
@@ -251,7 +261,7 @@ extends \PHPUnit\Framework\TestCase {
 		$this->AssertTrue($Data[5] === 'tres');
 		$this->AssertTrue($Data[6] === 4);
 
-		$this->AssertTrue(count($Data) === $Store->Count(false));
+		$this->AssertTrue(count($Data) === $Store->Count(FALSE));
 
 		return;
 	}
@@ -312,7 +322,7 @@ extends \PHPUnit\Framework\TestCase {
 		$this->AssertTrue($Data[4] === 'five');
 		$this->AssertTrue($Data[5] === 1);
 
-		$this->AssertTrue(count($Data) === $Store->Count(false));
+		$this->AssertTrue(count($Data) === $Store->Count(FALSE));
 
 		return;
 	}
@@ -372,7 +382,7 @@ extends \PHPUnit\Framework\TestCase {
 		$this->AssertTrue($Data[5] === 'three');
 		$this->AssertTrue($Data[6] === 4);
 
-		$this->AssertTrue(count($Data) === $Store->Count(false));
+		$this->AssertTrue(count($Data) === $Store->Count(FALSE));
 
 		return;
 	}
@@ -433,7 +443,7 @@ extends \PHPUnit\Framework\TestCase {
 		$this->AssertTrue($Data[5] === 1);
 		$this->AssertTrue($Data[10] === 'three');
 
-		$this->AssertTrue(count($Data) === $Store->Count(false));
+		$this->AssertTrue(count($Data) === $Store->Count(FALSE));
 
 		return;
 	}
@@ -448,12 +458,12 @@ extends \PHPUnit\Framework\TestCase {
 		$Store = new Nether\Object\Datastore;
 		$Store->SetData([1,2,3]);
 
-		$this->AssertTrue($Store->Count(false) === 3);
+		$this->AssertTrue($Store->Count(FALSE) === 3);
 
 		$Store->Clear();
 
-		$this->AssertTrue($Store->Count(false) === 0);
-		$this->AssertTrue($Store->Count(false) === count($Store->GetData()));
+		$this->AssertTrue($Store->Count(FALSE) === 0);
+		$this->AssertTrue($Store->Count(FALSE) === count($Store->GetData()));
 
 		return;
 	}
@@ -487,7 +497,7 @@ extends \PHPUnit\Framework\TestCase {
 		$Dataset = [1,2,3];
 		$Filename = sprintf(
 			'/tmp/nether-object-datastore-%s.phson',
-			md5(microtime(true))
+			md5(microtime(TRUE))
 		);
 
 		// test that we could create a new file.
@@ -522,10 +532,12 @@ extends \PHPUnit\Framework\TestCase {
 	public function
 	TestReadFromDisk() {
 
+		$Iter = NULL;
+
 		$Dataset = [1,2,3];
 		$Filename = sprintf(
 			'/tmp/nether-object-datastore-%s.phson',
-			md5(microtime(true))
+			md5(microtime(TRUE))
 		);
 
 		// write a file.
@@ -565,7 +577,7 @@ extends \PHPUnit\Framework\TestCase {
 		$Dataset = [1,'two'=>2,3];
 		$Filename = sprintf(
 			'/tmp/nether-object-datastore-%s.json',
-			md5(microtime(true))
+			md5(microtime(TRUE))
 		);
 
 		// write a file.
@@ -665,6 +677,29 @@ extends \PHPUnit\Framework\TestCase {
 		$this->AssertEquals(2,$Store->Count());
 		$this->AssertTrue($Store->HasValue(2) === FALSE);
 		$this->AssertTrue($Store === $Other);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestJsonise() {
+
+		$Object = new Nether\Object\Datastore([
+			'one', 'two', 'three'
+		]);
+
+		$JSON = json_encode($Object);
+		$Data = json_decode($JSON);
+		$this->AssertIsArray($Data);
+		$this->AssertCount(3, $Data);
+
+		$Object->SetFullToJSON(TRUE);
+
+		$JSON = json_encode($Object);
+		$Data = json_decode($JSON);
+		$this->AssertIsObject($Data);
+		$this->AssertInstanceOf(StdClass::class, $Data);
 
 		return;
 	}

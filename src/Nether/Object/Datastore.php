@@ -6,9 +6,10 @@ use Exception;
 use Iterator;
 use ArrayAccess;
 use Countable;
+use JsonSerializable;
 
 class Datastore
-implements Iterator, ArrayAccess, Countable {
+implements Iterator, ArrayAccess, Countable, JsonSerializable {
 /*//
 @date 2015-12-02
 //*/
@@ -25,6 +26,9 @@ implements Iterator, ArrayAccess, Countable {
 
 	protected int
 	$Format = self::FormatPHP;
+
+	protected bool
+	$FullToJSON = FALSE;
 
 	protected mixed
 	$Sorter = NULL;
@@ -121,6 +125,27 @@ implements Iterator, ArrayAccess, Countable {
 			}
 		}
 
+		return $this;
+	}
+
+	public function
+	GetFullToJSON():
+	bool {
+	/*//
+	@date 2021-08-18
+	//*/
+
+		return $this->FullToJSON;
+	}
+
+	public function
+	SetFullToJSON(bool $Val):
+	static {
+	/*//
+	@date 2021-08-18
+	//*/
+
+		$this->FullToJSON = $Val;
 		return $this;
 	}
 
@@ -261,6 +286,22 @@ implements Iterator, ArrayAccess, Countable {
 	//*/
 
 		return (key($this->Data) !== NULL);
+	}
+
+	////////////////////////////////////////////////////////////////
+	// implements JsonSerializable /////////////////////////////////
+
+	public function
+	JsonSerialize():
+	mixed {
+	/*//
+	@date 2021-08-18
+	//*/
+
+		if(!$this->FullToJSON)
+		return $this->Data;
+
+		return $this;
 	}
 
 	////////////////////////////////////////////////////////////////
