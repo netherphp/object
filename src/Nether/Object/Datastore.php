@@ -1,108 +1,110 @@
 <?php
 
 namespace Nether\Object;
-use \Nether as Nether;
 
-use
-\Closure as Closure,
-\Exception as Exception,
-\Iterator as Iterator,
-\ArrayAccess as ArrayAccess,
-\Countable   as Countable;
+use Exception;
+use Iterator;
+use ArrayAccess;
+use Countable;
 
 class Datastore
 implements Iterator, ArrayAccess, Countable {
 
+	const
+	FormatPHP  = 1,
+	FormatJSON = 2;
+
+	protected string
+	$Title = '';
+
+	protected string
+	$Filename = '';
+
+	protected int
+	$Format = self::FormatPHP;
+
+	protected mixed
+	$Sorter = NULL;
+
+	protected array
+	$Data = [];
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	public function
 	__Construct(?array $Input=NULL) {
+	/*//
+	@date 2015-12-02
+	//*/
 
-		if(is_array($Input))
+		if($Input !== NULL)
 		$this->SetData($Input);
 
 		return;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
-	protected
-	$Data = [];
-	/*//
-	@type Array
-	holds the data that we will operate upon.
-	//*/
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	public function
-	GetData() {
+	GetData():
+	array {
 	/*//
-	@return Array
-	get the literal array storing the data.
+	@date 2015-12-02
 	//*/
 
 		return $this->Data;
 	}
 
 	public function
-	SetData(array $Input) {
+	SetData(array $Input):
+	static {
 	/*//
-	@argv Array InputData
-	@return self
-	force the data array to be the specified input.
+	@date 2015-12-02
 	//*/
 
 		$this->Data = $Input;
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
-	protected
-	$Filename = '';
-	/*//
-	@type string
-	the filename that we loaded from and will write to.
-	//*/
-
 	public function
 	GetFilename():
 	string {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		return $this->Filename;
 	}
 
 	public function
 	SetFilename(string $Filename):
-	Self {
+	static {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		$this->Filename = $Filename;
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
-	const
-	FormatPHP  = 1,
-	FormatJSON = 2;
-
-	protected
-	$Format = self::FormatPHP;
-	/*//
-	@type Int
-	defines the mode that will be used when serializing this object to write
-	it to disk. valid values are php or json.
-	//*/
-
 	public function
 	GetFormat():
 	int {
+	/*//
+	@date 2015-12-02
+	//*/
+
 		return $this->Format;
 	}
 
 	public function
 	SetFormat(int $Format):
-	Self {
+	static {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		switch($Format) {
 			case static::FormatPHP:
@@ -119,21 +121,10 @@ implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 
-
-	////////////////////////////////
-	////////////////////////////////
-
-	protected
-	$Sorter = NULL;
-	/*//
-	@type Callable
-	holds a callable method for sorting.
-	//*/
-
 	public function
 	GetSorter() {
 	/*//
-	@todo strict type this when php 7 has nullable types.
+	@date 2016-02-25
 	//*/
 
 		return $this->Sorter;
@@ -141,62 +132,65 @@ implements Iterator, ArrayAccess, Countable {
 
 	public function
 	SetSorter(Callable $Function):
-	Self {
+	static {
+	/*//
+	@date 2016-02-25
+	//*/
 
 		$this->Sorter = $Function;
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
-	protected
-	$Title = '';
-	/*//
-	@type String
-	holds a title for this list for whatever purposes you wish to use it for.
-	we mainly use it for grouped widgets which contain multiple of these
-	datastores.
-	//*/
-
 	public function
 	GetTitle():
 	string {
+	/*//
+	@date 2016-03-25
+	//*/
 
 		return $this->Title;
 	}
 
 	public function
 	SetTitle(string $Title=''):
-	Self {
+	static {
+	/*//
+	@date 2016-03-25
+	//*/
 
 		$this->Title = $Title;
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
-	// implementation of the array access interface.
-	// these allow access like an array.
+	////////////////////////////////////////////////////////////////
+	// implements ArrayAccess //////////////////////////////////////
 
 	public function
-	OffsetExists($Key):
+	OffsetExists(mixed $Key):
 	bool {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		return array_key_exists($Key,$this->Data);
 	}
 
 	public function
-	OffsetGet($Key) {
+	OffsetGet(mixed $Key):
+	mixed {
+	/*//
+	@date 2015-12-02
+	//*/
 
-		// php 7 is automatically calling our OffsetExists for us now.
 		return $this->Data[$Key];
 	}
 
 	public function
-	OffsetSet($Key,$Value):
+	OffsetSet(mixed $Key, mixed $Value):
 	void {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		$this->Data[$Key] = $Value;
 		return;
@@ -205,77 +199,77 @@ implements Iterator, ArrayAccess, Countable {
 	public function
 	OffsetUnset($Key):
 	void {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		unset($this->Data[$Key]);
 		return;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
-	// implementation of the iterator interface.
-	// these allow the object to be used in things such as foreach loops.
+	////////////////////////////////////////////////////////////////
+	// implements Iterator /////////////////////////////////////////
 
 	public function
-	Current() {
+	Current():
+	mixed {
 	/*//
-	@return Mixed
-	allow the object to be queried for the current array item.
+	@date 2015-12-02
 	//*/
 
 		return current($this->Data);
 	}
 
 	public function
-	Key() {
+	Key():
+	int|string {
 	/*//
-	@return Int | String
-	allow the object to to be queried for the current array key.
+	@date 2015-12-02
 	//*/
 
 		return key($this->Data);
 	}
 
 	public function
-	Next() {
+	Next():
+	mixed {
 	/*//
-	@return Mixed
-	allow the object to be queried for the next item in the array wich will
-	also progress the array's pointer.
+	@date 2015-12-02
 	//*/
 
 		return next($this->Data);
 	}
 
 	public function
-	Rewind() {
+	Rewind():
+	mixed {
 	/*//
-	@return Mixed
-	allow the object to have its data iteration reset.
+	@date 2015-12-02
 	//*/
 
 		return reset($this->Data);
 	}
 
 	public function
-	Valid() {
+	Valid():
+	bool {
 	/*//
-	@return Bool
-	allow the object to be queried if we are still within range of the data.
+	@date 2015-12-02
 	//*/
 
 		return (key($this->Data) !== NULL);
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
+	////////////////////////////////////////////////////////////////
+	// General API /////////////////////////////////////////////////
 
 	public function
 	Accumulate(mixed $Initial, callable $Function):
 	mixed {
 	/*//
 	@date 2021-04-15
+	pass the initial value through a chained callable game and return the
+	resulting value.
 	//*/
 
 		// i absolutely loath that its called array_reduce when at no point
@@ -287,8 +281,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Append(array $List, bool $Keys=FALSE) {
+	Append(array $List, bool $Keys=FALSE):
+	static {
 	/*//
+	@date 2015-12-02
 	goes through the given array and appends all the data to this dataset. by
 	default the array keys are completely ignored. if you need to preseve
 	the keys (and ergo overwrite any existing data) set the second argument
@@ -306,24 +302,29 @@ implements Iterator, ArrayAccess, Countable {
 			$this->Shove($Key,$Value);
 		}
 
-		return;
-	}
-
-	public function
-	Clear() {
-	/*//
-	dump the old dataset to start fresh. syntaxual sugar instead of having to
-	use $Store->SetData([]);
-	//*/
-
-		$this->Data = [];
 		return $this;
 	}
 
 	public function
-	Count() {
+	Clear():
+	static {
 	/*//
-	@return Int
+	@date 2016-03-19
+	dump the old dataset to start fresh. syntaxual sugar instead of having to
+	use $Store->SetData([]);
+	//*/
+
+		unset($this->Data);
+		$this->Data = [];
+
+		return $this;
+	}
+
+	public function
+	Count():
+	int {
+	/*//
+	@date 2015-12-02
 	count how many items are in this datastore.
 	//*/
 
@@ -331,7 +332,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Distill(Callable $FilterFunc):
+	Distill(callable $FilterFunc):
 	Datastore {
 	/*//
 	@date 2020-10-22
@@ -344,7 +345,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Filter(Callable $FilterFunc):
+	Filter(callable $FilterFunc):
 	self {
 	/*//
 	@date 2020-05-27
@@ -357,10 +358,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Get($Key) {
+	Get(mixed $Key):
+	mixed {
 	/*//
-	@argv Mixed KeyName
-	@return Mixed | null
+	@date 2015-12-02
 	returns the data by the specified key name. if data with that key did not
 	exist then it will return null. keep this in mind if you are also
 	inserting nulls into the dataset.
@@ -373,10 +374,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	&Use($Key) {
+	&GetRef(mixed $Key):
+	mixed {
 	/*//
-	@argv Mixed KeyName
-	@return &Mixed | NULL
+	@date 2015-12-02
 	works the same as Get but instead returns a reference to the data so you
 	can manipulate non-objects if needed.
 	//*/
@@ -388,10 +389,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	HasKey($Key) {
+	HasKey(mixed $Key):
+	bool {
 	/*//
-	@argv Mixed KeyName
-	@return Bool
+	@date 2015-12-02
 	returns if this datastore has the requested key.
 	//*/
 
@@ -399,10 +400,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	HasValue($Val,$Strict=FALSE) {
+	HasValue(mixed $Val, bool $Strict=FALSE):
+	bool {
 	/*//
-	@argv Mixed KeyName
-	@return Mixed
+	@date 2015-12-02
 	returns if this datastore has the requested value. if the value is found
 	it will return the key that contains it. if not found it will return a
 	boolean false.
@@ -425,9 +426,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Pop() {
+	Pop():
+	mixed {
 	/*//
-	@return Mixed | null
+	@date 2015-12-02
 	return and remove the last value on the array. if the array is empty it
 	will return null. keep this in mind if you are also inserting nulls into
 	the dataset.
@@ -437,10 +439,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Push($Value,$Key=NULL) {
+	Push(mixed $Value, mixed $Key=NULL):
+	static {
 	/*//
-	@argv Mixed Input
-	@return self
+	@date 2015-12-02
 	appends the specified item to the end of the dataset. if a key is
 	specified and a data for that key already existed, then it will be
 	overwritten with the new data.
@@ -456,17 +458,18 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Reindex() {
+	Reindex():
+	static {
 	/*//
-	@return self
+	@date 2015-12-02
 	reindex the data array to remove gaps in the numeric keys while still
 	preserving any string keys that existed.
 	//*/
 
 		$Key = NULL;
 		$Value = NULL;
-
 		$Data = [];
+
 		foreach($this->Data as $Key => $Value) {
 			if(is_int($Key)) $Data[] = $Value;
 			else $Data[$Key] = $Value;
@@ -477,8 +480,8 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Remap(Callable $FilterFunc):
-	self {
+	Remap(callable $FilterFunc):
+	static {
 	/*//
 	@date 2020-05-27
 	alter the current dataset using the array_map filtering.
@@ -502,8 +505,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Shove($Key,$Value) {
+	Shove(mixed $Key, mixed $Value):
+	static {
 	/*//
+	@date 2015-12-02
 	append the specified item to the end of the dataset. if the key already
 	exists then the original data will be overwritten in the same place. same
 	principal as Push, but syntaxally makes more sense when dealing with
@@ -515,10 +520,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Remove($Key) {
+	Remove($Key):
+	static {
 	/*//
-	@argv Mixed KeyName
-	@return self
+	@date 2015-12-02
 	removes the data by the specified key name if it exists. if not then
 	nothing happens and you can just go on your way.
 	//*/
@@ -530,7 +535,8 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Value() {
+	Value():
+	array {
 	/*//
 	@date 2021-01-05
 	//*/
@@ -539,7 +545,8 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Revalue() {
+	Revalue():
+	static {
 	/*//
 	@date 2021-01-05
 	//*/
@@ -548,13 +555,12 @@ implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
 
 	public function
-	Shift() {
+	Shift():
+	mixed {
 	/*//
-	@return mixed
+	@date 2015-12-02
 	performs a standard array shifting operation returning whatever slide off
 	the front of the dataset.
 	//*/
@@ -563,9 +569,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Unshift($Val) {
+	Unshift(mixed $Val):
+	static {
 	/*//
-	@return self
+	@date 2015-12-02
 	performs a standard array unshifting operation, shoving the specified value
 	onto the front of the array.
 	//*/
@@ -574,13 +581,11 @@ implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
 	public function
-	BlendRight(array $Input) {
+	BlendRight(array $Input):
+	static {
 	/*//
-	@return self
+	@date 2016-03-18
 	works the same as MergeRight, only instead of your input overwriting the
 	original data will be kept. your new data will appear at the end of the
 	array, and the original data will maintain its original location. numeric
@@ -607,9 +612,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	BlendLeft(array $Input) {
+	BlendLeft(array $Input):
+	static {
 	/*//
-	@return self
+	@date 2016-03-18
 	works the same as MergeLeft, only instead of your input overwriting the
 	original data will be kept. your new data will appear at the beginning
 	of the array pushing the original data down.
@@ -639,9 +645,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	MergeRight(array $Input) {
+	MergeRight(array $Input):
+	static {
 	/*//
-	@return self
+	@date 2016-03-18
 	appends the input to the dataset. if there are conflicting assoc keys, the
 	input data here will override whatever already existed. numeric keys will
 	be appended no matter what.
@@ -660,9 +667,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	MergeLeft(array $Input) {
+	MergeLeft(array $Input):
+	static {
 	/*//
-	@return self
+	@date 2016-03-18
 	appends the input to the dataset. same as MergeRight but will appear to add
 	your data to the start of the array, and still overwriting. the union
 	operator is not good for this instance because it doesnt behave as a proper
@@ -686,15 +694,11 @@ implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
-
-	// item manipulation api for the data.
-
 	public function
-	Each(Callable $Function, ?array $Argv=[]) {
+	Each(callable $Function, ?array $Argv=[]):
+	static {
 	/*//
-	@argv callable Func
+	@date 2016-12-02
 	run the specified function against every single thing in the list. it is
 	is slower than running a direct foreach() on the property but it sure makes
 	for some nice looking shit sometimes.
@@ -710,9 +714,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Sort(Callable $Function=NULL, bool $Presort=FALSE):
-	Self {
+	Sort(callable $Function=NULL, bool $Presort=FALSE):
+	static {
 	/*//
+	@date 2015-12-02
 	sort the dataset by the function defined in this datastore's
 	sorter property. if a function is defined as an argument here
 	then we will use that instead of the sorter property. if presort
@@ -733,11 +738,15 @@ implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 
-	////////////////////////////////
-	////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	// File Operations /////////////////////////////////////////////
 
 	public function
-	Read(string $Filename=NULL) {
+	Read(?string $Filename=NULL):
+	static {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		if($Filename === NULL) $Filename = $this->Filename;
 		else $this->Filename = $Filename;
@@ -779,8 +788,10 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Write(string $Filename=NULL) {
+	Write(?string $Filename=NULL):
+	static {
 	/*//
+	@date 2015-12-02
 	write this datastructure to disk.
 	//*/
 
@@ -835,7 +846,11 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public static function
-	GetFromFile($Filename) {
+	GetFromFile(string $Filename):
+	static {
+	/*//
+	@date 2015-12-02
+	//*/
 
 		return (new static)->Read($Filename);
 	}
