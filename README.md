@@ -24,7 +24,8 @@ class as the parent enables the attribute based functionality all the way down.
 Provides an array-like object so that items can be stored like arrays but
 manipulated with chainable methods.
 
-* Documentation: TODO
+* Documentation:
+  https://github.com/netherphp/object/wiki/Class:-Nether%5CObject%5CDatastore
 
 
 
@@ -33,7 +34,7 @@ manipulated with chainable methods.
 These are old things that still exist but are no longer preferred to be used.
 
 
-# Nether\Object\Mapped (deprecated)
+## Nether\Object\Mapped (deprecated)
 
 Replaced during PHP 8 the Mapped provides similiar functionality as Prototype
 in regards to filling properties and remapping schemas.
