@@ -28,7 +28,10 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	$Format = self::FormatPHP;
 
 	protected bool
-	$FullToJSON = FALSE;
+	$FullJSON = FALSE;
+
+	protected bool
+	$FullDebug = FALSE;
 
 	protected mixed
 	$Sorter = NULL;
@@ -49,6 +52,23 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		$this->SetData($Input);
 
 		return;
+	}
+
+	public function
+	__DebugInfo():
+	array {
+
+		if(!$this->FullDebug)
+		return $this->Data;
+
+		return (array)$this;
+	}
+
+	public function
+	__Invoke():
+	array {
+
+		return $this->Data;
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -129,23 +149,44 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	GetFullToJSON():
+	GetFullDebug():
 	bool {
 	/*//
 	@date 2021-08-18
 	//*/
 
-		return $this->FullToJSON;
+		return $this->FullDebug;
 	}
 
 	public function
-	SetFullToJSON(bool $Val):
+	SetFullDebug(bool $Val):
 	static {
 	/*//
 	@date 2021-08-18
 	//*/
 
-		$this->FullToJSON = $Val;
+		$this->FullDebug = $Val;
+		return $this;
+	}
+
+	public function
+	GetFullJSON():
+	bool {
+	/*//
+	@date 2021-08-18
+	//*/
+
+		return $this->FullJSON;
+	}
+
+	public function
+	SetFullJSON(bool $Val):
+	static {
+	/*//
+	@date 2021-08-18
+	//*/
+
+		$this->FullJSON = $Val;
 		return $this;
 	}
 
@@ -298,7 +339,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	@date 2021-08-18
 	//*/
 
-		if(!$this->FullToJSON)
+		if(!$this->FullJSON)
 		return $this->Data;
 
 		return $this;
@@ -319,7 +360,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	Each(callable $Function, ?array $Argv=[]):
+	Each(callable $Function, ?array $Argv=NULL):
 	static {
 	/*//
 	@date 2016-12-02
@@ -332,7 +373,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		$Value = NULL;
 
 		foreach($this->Data as $Key => &$Value)
-		$Function($Value,$Key,$this,...$Argv);
+		$Function($Value,$Key,$this,...($Argv??[]));
 
 		return $this;
 	}
@@ -393,7 +434,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	Value():
+	Values():
 	array {
 	/*//
 	@date 2021-01-05
@@ -465,7 +506,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	Map(Callable $FilterFunc):
+	Map(callable $FilterFunc):
 	Datastore {
 	/*//
 	@date 2020-05-27
@@ -545,6 +586,33 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	Remove(mixed $Key):
+	static {
+	/*//
+	@date 2015-12-02
+	removes the data by the specified key name if it exists. if not then
+	nothing happens and you can just go on your way.
+	//*/
+
+		if(array_key_exists($Key,$this->Data))
+		unset($this->Data[$Key]);
+
+		return $this;
+	}
+
+	public function
+	Revalue():
+	static {
+	/*//
+	@date 2021-01-05
+	rebuilds the dataset with clean indexes via array_values.
+	//*/
+
+		$this->Data = array_values($this->Data);
+		return $this;
+	}
+
+	public function
 	Shove(mixed $Key, mixed $Value):
 	static {
 	/*//
@@ -568,33 +636,6 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	//*/
 
 		shuffle($this->Data);
-		return $this;
-	}
-
-	public function
-	Remove($Key):
-	static {
-	/*//
-	@date 2015-12-02
-	removes the data by the specified key name if it exists. if not then
-	nothing happens and you can just go on your way.
-	//*/
-
-		if(array_key_exists($Key,$this->Data))
-		unset($this->Data[$Key]);
-
-		return $this;
-	}
-
-	public function
-	Revalue():
-	static {
-	/*//
-	@date 2021-01-05
-	rebuilds the dataset with clean indexes via array_values.
-	//*/
-
-		$this->Data = array_values($this->Data);
 		return $this;
 	}
 
