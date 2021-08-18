@@ -131,7 +131,7 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	SetSorter(Callable $Function):
+	SetSorter(callable $Function):
 	static {
 	/*//
 	@date 2016-02-25
@@ -264,63 +264,6 @@ implements Iterator, ArrayAccess, Countable {
 	// General API /////////////////////////////////////////////////
 
 	public function
-	Accumulate(mixed $Initial, callable $Function):
-	mixed {
-	/*//
-	@date 2021-04-15
-	pass the initial value through a chained callable game and return the
-	resulting value.
-	//*/
-
-		// i absolutely loath that its called array_reduce when at no point
-		// does it reduce the data set. in reality what this function does
-		// is play the telephone game with an initial value. that is why
-		// it is called accumulate here.
-
-		return array_reduce($this->Data,$Function,$Initial);
-	}
-
-	public function
-	Append(array $List, bool $Keys=FALSE):
-	static {
-	/*//
-	@date 2015-12-02
-	goes through the given array and appends all the data to this dataset. by
-	default the array keys are completely ignored. if you need to preseve
-	the keys (and ergo overwrite any existing data) set the second argument
-	to true.
-	//*/
-
-		$Key = NULL;
-		$Value = NULL;
-
-		foreach($List as $Key => $Value) {
-			if(!$Keys)
-			$this->Push($Value);
-
-			else
-			$this->Shove($Key,$Value);
-		}
-
-		return $this;
-	}
-
-	public function
-	Clear():
-	static {
-	/*//
-	@date 2016-03-19
-	dump the old dataset to start fresh. syntaxual sugar instead of having to
-	use $Store->SetData([]);
-	//*/
-
-		unset($this->Data);
-		$this->Data = [];
-
-		return $this;
-	}
-
-	public function
 	Count():
 	int {
 	/*//
@@ -332,27 +275,20 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Distill(callable $FilterFunc):
-	Datastore {
+	Each(callable $Function, ?array $Argv=[]):
+	static {
 	/*//
-	@date 2020-10-22
-	return a new datastore of the result of an array filter.
+	@date 2016-12-02
+	run the specified function against every single thing in the list. it is
+	is slower than running a direct foreach() on the property but it sure makes
+	for some nice looking shit sometimes.
 	//*/
 
-		return new static(
-			array_filter($this->Data,$FilterFunc)
-		);
-	}
+		$Key = NULL;
+		$Value = NULL;
 
-	public function
-	Filter(callable $FilterFunc):
-	self {
-	/*//
-	@date 2020-05-27
-	alter the current dataset with the result of an array filter.
-	//*/
-
-		$this->Data = array_filter($this->Data,$FilterFunc);
+		foreach($this->Data as $Key => &$Value)
+		$Function($Value,$Key,$this,...$Argv);
 
 		return $this;
 	}
@@ -410,6 +346,78 @@ implements Iterator, ArrayAccess, Countable {
 	//*/
 
 		return array_search($Val,$this->Data,$Strict);
+	}
+
+	public function
+	Value():
+	array {
+	/*//
+	@date 2021-01-05
+	fetches a clean indexed copy of the data via array_values.
+	//*/
+
+		return array_values($this->Data);
+	}
+
+	////////////////////////////////////////////////////////////////
+	// Manipulation API ////////////////////////////////////////////
+
+	public function
+	Accumulate(mixed $Initial, callable $Function):
+	mixed {
+	/*//
+	@date 2021-04-15
+	pass the initial value through a chained callable game and return the
+	resulting value.
+	//*/
+
+		// i absolutely loath that its called array_reduce when at no point
+		// does it reduce the data set. in reality what this function does
+		// is play the telephone game with an initial value. that is why
+		// it is called accumulate here.
+
+		return array_reduce($this->Data,$Function,$Initial);
+	}
+
+	public function
+	Clear():
+	static {
+	/*//
+	@date 2016-03-19
+	dump the old dataset to start fresh. syntaxual sugar instead of having to
+	use $Store->SetData([]);
+	//*/
+
+		unset($this->Data);
+		$this->Data = [];
+
+		return $this;
+	}
+
+	public function
+	Distill(callable $FilterFunc):
+	Datastore {
+	/*//
+	@date 2020-10-22
+	return a new datastore of the result of an array filter.
+	//*/
+
+		return new static(
+			array_filter($this->Data,$FilterFunc)
+		);
+	}
+
+	public function
+	Filter(callable $FilterFunc):
+	self {
+	/*//
+	@date 2020-05-27
+	alter the current dataset with the result of an array filter.
+	//*/
+
+		$this->Data = array_filter($this->Data,$FilterFunc);
+
+		return $this;
 	}
 
 	public function
@@ -493,18 +501,6 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Shuffle():
-	static {
-	/*//
-	@date 2021-02-22
-	randomize the array in-place.
-	//*/
-
-		shuffle($this->Data);
-		return $this;
-	}
-
-	public function
 	Shove(mixed $Key, mixed $Value):
 	static {
 	/*//
@@ -516,6 +512,18 @@ implements Iterator, ArrayAccess, Countable {
 	//*/
 
 		$this->Data[$Key] = $Value;
+		return $this;
+	}
+
+	public function
+	Shuffle():
+	static {
+	/*//
+	@date 2021-02-22
+	randomize the array in-place.
+	//*/
+
+		shuffle($this->Data);
 		return $this;
 	}
 
@@ -535,26 +543,16 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
-	Value():
-	array {
-	/*//
-	@date 2021-01-05
-	//*/
-
-		return array_values($this->Data);
-	}
-
-	public function
 	Revalue():
 	static {
 	/*//
 	@date 2021-01-05
+	rebuilds the dataset with clean indexes via array_values.
 	//*/
 
 		$this->Data = array_values($this->Data);
 		return $this;
 	}
-
 
 	public function
 	Shift():
@@ -569,6 +567,31 @@ implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function
+	Sort(callable $Function=NULL, bool $Presort=FALSE):
+	static {
+	/*//
+	@date 2015-12-02
+	sort the dataset by the function defined in this datastore's
+	sorter property. if a function is defined as an argument here
+	then we will use that instead of the sorter property. if presort
+	is enabled then the specified sort function will be used before
+	the defined sorter.
+	//*/
+
+		if(is_callable($Function)) {
+			uasort($this->Data,$Function);
+			if(!$Presort) return $this;
+		}
+
+		if(is_callable($this->Sorter)) {
+			uasort($this->Data,$this->Sorter);
+			return $this;
+		}
+
+		return $this;
+	}
+
+	public function
 	Unshift(mixed $Val):
 	static {
 	/*//
@@ -578,6 +601,46 @@ implements Iterator, ArrayAccess, Countable {
 	//*/
 
 		array_unshift($this->Data,$Val);
+		return $this;
+	}
+
+	////////////////////////////////////////////////////////////////
+	// Merging API /////////////////////////////////////////////////
+
+	public function
+	MergeRight(array $Input):
+	static {
+	/*//
+	@date 2016-03-18
+	appends the input to the dataset. if there are conflicting assoc keys, the
+	input data here will override whatever already existed. numeric keys will
+	be appended no matter what. all new data will appear at the end of the
+	array. any data that had conflicting assoc keys will remain in the
+	sequence position that it was already in.
+	//*/
+
+		$this->Data = array_merge(
+			$this->Data,
+			$Input
+		);
+
+		return $this;
+	}
+
+	public function
+	MergeLeft(array $Input):
+	static {
+	/*//
+	@date 2016-03-18
+	works like MergeRight except it appears your data was added to the
+	beginning of the dataset.
+	//*/
+
+		$this->Data = array_reverse(array_merge(
+			array_reverse($this->Data),
+			array_reverse($Input)
+		));
+
 		return $this;
 	}
 
@@ -616,11 +679,8 @@ implements Iterator, ArrayAccess, Countable {
 	static {
 	/*//
 	@date 2016-03-18
-	works the same as MergeLeft, only instead of your input overwriting the
-	original data will be kept. your new data will appear at the beginning
-	of the array pushing the original data down.
-
-	as with MergeLeft, this function is much less performant.
+	works the same as BlendRight, only it appears your data was added to
+	the beginning to the dataset.
 	//*/
 
 		$Key = NULL;
@@ -641,100 +701,6 @@ implements Iterator, ArrayAccess, Countable {
 		}
 
 		$this->Data = array_reverse($this->Data);
-		return $this;
-	}
-
-	public function
-	MergeRight(array $Input):
-	static {
-	/*//
-	@date 2016-03-18
-	appends the input to the dataset. if there are conflicting assoc keys, the
-	input data here will override whatever already existed. numeric keys will
-	be appended no matter what.
-
-	all new data will appear at the end of the array. any data that had
-	conflicting assoc keys will remain in the sequence position that it was
-	already in.
-	//*/
-
-		$this->Data = array_merge(
-			$this->Data,
-			$Input
-		);
-
-		return $this;
-	}
-
-	public function
-	MergeLeft(array $Input):
-	static {
-	/*//
-	@date 2016-03-18
-	appends the input to the dataset. same as MergeRight but will appear to add
-	your data to the start of the array, and still overwriting. the union
-	operator is not good for this instance because it doesnt behave as a proper
-	merge, allowing numerical keys to cause collisions, and this needs to
-	accurately mirror standard array_merge behaviour.
-
-	all new data will appear at the beginning of the array. any data that had
-	conflicting assoc keys will remain in the sequence position that it was
-	already in.
-
-	this is not performant. use sparingly. it is suggested you attempt to
-	structure your data such that order doesnt really matter, or your code
-	such that data can always be appended in the most cheap way possible.
-	//*/
-
-		$this->Data = array_reverse(array_merge(
-			array_reverse($this->Data),
-			array_reverse($Input)
-		));
-
-		return $this;
-	}
-
-	public function
-	Each(callable $Function, ?array $Argv=[]):
-	static {
-	/*//
-	@date 2016-12-02
-	run the specified function against every single thing in the list. it is
-	is slower than running a direct foreach() on the property but it sure makes
-	for some nice looking shit sometimes.
-	//*/
-
-		$Key = NULL;
-		$Value = NULL;
-
-		foreach($this->Data as $Key => &$Value)
-		$Function($Value,$Key,$this,...$Argv);
-
-		return $this;
-	}
-
-	public function
-	Sort(callable $Function=NULL, bool $Presort=FALSE):
-	static {
-	/*//
-	@date 2015-12-02
-	sort the dataset by the function defined in this datastore's
-	sorter property. if a function is defined as an argument here
-	then we will use that instead of the sorter property. if presort
-	is enabled then the specified sort function will be used before
-	the defined sorter.
-	//*/
-
-		if(is_callable($Function)) {
-			uasort($this->Data,$Function);
-			if(!$Presort) return $this;
-		}
-
-		if(is_callable($this->Sorter)) {
-			uasort($this->Data,$this->Sorter);
-			return $this;
-		}
-
 		return $this;
 	}
 
