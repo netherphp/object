@@ -694,7 +694,7 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertIsArray($Data);
 		$this->AssertCount(3, $Data);
 
-		$Object->SetFullToJSON(TRUE);
+		$Object->SetFullJSON(TRUE);
 
 		$JSON = json_encode($Object);
 		$Data = json_decode($JSON);
