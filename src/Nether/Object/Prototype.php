@@ -142,6 +142,63 @@ impact i can find while packing in as many features as possible.
 	////////////////////////////////////////////////////////////////
 
 	static public function
+	FetchClassAttributes(bool $Init=TRUE):
+	array {
+	/*//
+	@date 2021-08-24
+	return a list of all the attributes on this class.
+	//*/
+
+		$RefClass = new ReflectionClass(static::class);
+		$Attrib = NULL;
+		$Output = [];
+
+		foreach($RefClass->GetAttributes() as $Attrib)
+		$Output[] = $Init ? $Attrib->NewInstance() : $Attrib;
+
+		return $Output;
+	}
+
+	static public function
+	FetchPropertyAttributes(?string $Property=NULL, bool $Init=TRUE):
+	array {
+	/*//
+	@date 2021-08-24
+	if a property is specified returns a list of the attributes upon it.
+	else it returns a list of all the properties on this class each
+	containing their list of attributes.
+	//*/
+
+		$RefClass = new ReflectionClass(static::class);
+		$RefProp = NULL;
+		$Name = NULL;
+		$Attrib = NULL;
+		$Output = [];
+
+		// return a list of the attributes for the specified property.
+
+		if($Property !== NULL) {
+			if($RefProp = $RefClass->GetProperty($Property))
+			foreach($RefProp->GetAttributes() as $Attrib)
+			$Output[] = $Init ? $Attrib->NewInstance() : $Attrib;
+
+			return $Output;
+		}
+
+		// else return a list of all the properties in this class and
+		// their attributes.
+
+		foreach($RefClass->GetProperties() as $RefProp) {
+			$Output[($Name = $RefProp->GetName())] = [];
+
+			foreach($RefProp->GetAttributes() as $Attrib)
+			$Output[$Name][] = $Init ? $Attrib->NewInstance() : $Attrib;
+		}
+
+		return $Output;
+	}
+
+	static public function
 	GetPropertyAttributes():
 	array {
 	/*//
