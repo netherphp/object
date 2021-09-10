@@ -248,4 +248,38 @@ impact i can find while packing in as many features as possible.
 		return $Output;
 	}
 
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	static public function
+	New(...$Argv):
+	static {
+	/*//
+	@date 2021-09-09
+	provides the most extreme generic support for using named properties
+	instead of an array to build your objects. implies the strict input
+	flag as well so new properties are not created. if you would like your
+	code completion to be able to suggest the arguments you would need
+	to override this method with one of your own.
+	//*/
+
+		return new static(
+			$Argv,
+			NULL,
+			Prototype\Flags::StrictInput
+		);
+	}
+
+	static public function
+	NewRelaxed(...$Argv):
+	static {
+	/*//
+	@date 2021-09-09
+	same as the New() method but without the strict input flag. any named
+	variables you provide will be created if they did not already exist.
+	//*/
+
+		return new static($Argv);
+	}
+
 }

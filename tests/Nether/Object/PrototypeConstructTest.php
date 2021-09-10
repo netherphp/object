@@ -236,4 +236,31 @@ extends PHPUnit\Framework\TestCase {
 		return;
 	}
 
+	/** @test */
+	public function
+	TestNamedPropertyConstruct() {
+
+		$Test1 = LocalTest2::New(
+			One: 1,
+			Two: 2,
+			Three: 3
+		);
+
+		$Test2 = LocalTest2::NewRelaxed(
+			One: 1,
+			Two: 2,
+			Three: 3
+		);
+
+		$this->AssertObjectHasAttribute('One',$Test1);
+		$this->AssertObjectHasAttribute('Two',$Test1);
+		$this->AssertObjectNotHasAttribute('Three',$Test1);
+
+		$this->AssertObjectHasAttribute('One',$Test2);
+		$this->AssertObjectHasAttribute('Two',$Test2);
+		$this->AssertObjectHasAttribute('Three',$Test2);
+
+		return;
+	}
+
 }
