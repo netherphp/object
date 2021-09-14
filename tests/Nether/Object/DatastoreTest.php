@@ -704,4 +704,43 @@ extends PHPUnit\Framework\TestCase {
 		return;
 	}
 
+	/** @test */
+	public function
+	TestGetFirstLastKeys() {
+
+		$Data = new Nether\Object\Datastore([
+			'one',
+			'two',
+			'three'
+		]);
+
+		$Key = NULL;
+		$Val = NULL;
+
+		$this->AssertEquals(0, $Data->GetFirstKey());
+		$this->AssertEquals(2, $Data->GetLastKey());
+
+		foreach($Data as $Key => $Val) {
+			if($Val === 'one')
+			$this->AssertTrue(
+				$Data->IsFirstKey($Key)
+				&& !$Data->IsLastKey($Key)
+			);
+
+			if($Val === 'two')
+			$this->AssertTrue(
+				!$Data->IsFirstKey($Key)
+				&& !$Data->IsLastKey($Key)
+			);
+
+			if($Val === 'three')
+			$this->AssertTrue(
+				!$Data->IsFirstKey($Key)
+				&& $Data->IsLastKey($Key)
+			);
+		}
+
+		return;
+	}
+
 }

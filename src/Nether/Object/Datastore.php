@@ -410,6 +410,28 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	GetFirstKey():
+	mixed {
+	/*//
+	@date 2021-09-13
+	get what the first key in this dataset is.
+	//*/
+
+		return array_key_first($this->Data);
+	}
+
+	public function
+	GetLastKey():
+	mixed {
+	/*//
+	@date 2021-09-13
+	get what the last key in this dataset is.
+	//*/
+
+		return array_key_last($this->Data);
+	}
+
+	public function
 	HasKey(mixed $Key):
 	bool {
 	/*//
@@ -431,6 +453,28 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	//*/
 
 		return array_search($Val,$this->Data,$Strict);
+	}
+
+	public function
+	IsFirstKey(mixed $Key):
+	bool {
+	/*//
+	@date 2021-09-13
+	ask if this is the first key.
+	//*/
+
+		return ($Key === array_key_first($this->Data));
+	}
+
+	public function
+	IsLastKey(mixed $Key):
+	bool {
+	/*//
+	@date 2021-09-13
+	ask if this is the last key.
+	//*/
+
+		return ($Key === array_key_last($this->Data));
 	}
 
 	public function
