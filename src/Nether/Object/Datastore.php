@@ -478,6 +478,16 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	Keys():
+	array {
+	/*//
+	@date 2021-09-20
+	//*/
+
+		return array_keys($this->Data);
+	}
+
+	public function
 	Values():
 	array {
 	/*//
@@ -563,6 +573,29 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	MapKeys(callable $Func):
+	Datastore {
+	/*//
+	@date 2021-09-20
+	same as RemapKeys except it returns a new datastore of the result.
+	//*/
+
+		$Output = [];
+		$Result = NULL;
+		$Key = NULL;
+		$Val = NULL;
+
+		foreach($this->Data as $Key => $Val) {
+			$Result = $Func($Key,$Val,$this);
+
+			if(is_array($Result))
+			$Output[key($Result)] = current($Result);
+		}
+
+		return new Datastore($Output);
+	}
+
+	public function
 	Pop():
 	mixed {
 	/*//
@@ -613,6 +646,38 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		}
 
 		$this->Data = $Data;
+		return $this;
+	}
+
+	public function
+	RemapKeys(callable $Func):
+	static {
+	/*//
+	@date 2021-09-20
+	rekey and remap this dataset by returning an array with a single
+	element from the callback. the key of the result is where the data will
+	be moved to, with the data of the result being said data. if false or
+	null is returned instead, it will also filter that item out of the
+	array. modifies this datastore.
+
+	based on a gist by jasand found randomly one day.
+	https://gist.github.com/jasand-pereza/84ecec7907f003564584
+	//*/
+
+		$Output = [];
+		$Result = NULL;
+		$Key = NULL;
+		$Val = NULL;
+
+		foreach($this->Data as $Key => $Val) {
+			$Result = $Func($Key,$Val,$this);
+
+			if(is_array($Result))
+			$Output[key($Result)] = current($Result);
+		}
+
+		$this->SetData($Output);
+
 		return $this;
 	}
 
