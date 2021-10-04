@@ -27,6 +27,9 @@ passed around in a single bundle later on.
 	public bool
 	$StrictInput = FALSE;
 
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	public function
 	__Construct(?array $Input, ?array $Defaults, int $Flags, array $Props) {
 	/*//
@@ -39,6 +42,70 @@ passed around in a single bundle later on.
 		$this->Properties = $Props;
 
 		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
+	DefaultHas(mixed $Key):
+	bool {
+
+		return (
+			is_array($this->Defaults)
+			&& isset($this->Defaults[$Key])
+		);
+	}
+
+	public function
+	DefaultExists(mixed $Key):
+	bool {
+
+		return (
+			is_array($this->Defaults)
+			&& array_key_exists($Key, $this->Defaults)
+		);
+	}
+
+	public function
+	DefaultGet(mixed $Key):
+	mixed {
+
+		if(!is_array($this->Defaults))
+		return NULL;
+
+		return $this->Defaults[$Key];
+	}
+
+	public function
+	InputHas(mixed $Key):
+	bool {
+
+		return (
+			is_array($this->Input)
+			&& isset($this->Input[$Key])
+		);
+	}
+
+	public function
+	InputExists(mixed $Key):
+	bool {
+
+		return (
+			is_array($this->Input)
+			&& array_key_exists($Key, $this->Input)
+		);
+	}
+
+	public function
+	InputGet(mixed $Key):
+	mixed {
+
+
+		if(!is_array($this->Input))
+		return NULL;
+
+		return $this->Input[$Key];
 	}
 
 }
