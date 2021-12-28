@@ -262,7 +262,16 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	@date 2015-12-02
 	//*/
 
+		// enables $Dataset[] = 'val';
+
+		if($Key === NULL)
+		$this->Data[] = $Value;
+
+		// enables $Dataset['key'] = 'val';
+
+		else
 		$this->Data[$Key] = $Value;
+
 		return;
 	}
 

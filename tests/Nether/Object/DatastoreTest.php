@@ -743,4 +743,20 @@ extends PHPUnit\Framework\TestCase {
 		return;
 	}
 
+	/** @test */
+	public function
+	TestTheThingWithEmptyArrayBrackets() {
+
+		$Data = new Nether\Object\Datastore;
+		$this->AssertEquals(0,$Data->Count());
+
+		$Data[] = 'one';
+		$this->AssertEquals(1,$Data->Count());
+
+		$Data[] = 'two';
+		$this->AssertEquals(2,$Data->Count());
+
+		return;
+	}
+
 }
