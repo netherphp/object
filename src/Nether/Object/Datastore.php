@@ -7,6 +7,7 @@ use Iterator;
 use ArrayAccess;
 use Countable;
 use JsonSerializable;
+use ReturnTypeWillChange;
 
 class Datastore
 implements Iterator, ArrayAccess, Countable, JsonSerializable {
@@ -299,6 +300,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		return key($this->Data);
 	}
 
+	#[ReturnTypeWillChange]
 	public function
 	Next():
 	mixed {
@@ -309,6 +311,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		return next($this->Data);
 	}
 
+	#[ReturnTypeWillChange]
 	public function
 	Rewind():
 	mixed {
