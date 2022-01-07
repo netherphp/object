@@ -464,7 +464,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	boolean false.
 	//*/
 
-		return array_search($Val,$this->Data,$Strict);
+		return array_search($Val, $this->Data, $Strict) !== FALSE;
 	}
 
 	public function
