@@ -77,7 +77,8 @@ impact i can find while packing in as many features as possible.
 				// check if the value needs to be typecast.
 
 				if($Properties[$Src]->Castable)
-				settype($Val,$Properties[$Src]->Type);
+				if($Val !== NULL || !$Properties[$Src]->Nullable)
+				settype($Val, $Properties[$Src]->Type);
 			}
 
 			// if StrictInput then do not assign any properties that

@@ -30,6 +30,9 @@ the prototype system will want to know about.
 	public bool
 	$Static;
 
+	public bool
+	$Nullable;
+
 	public ?PropertyObjectify
 	$Objectify = NULL;
 
@@ -56,6 +59,7 @@ the prototype system will want to know about.
 		$this->Name = $this->Origin = $Prop->GetName();
 		$this->Type = $StrType;
 		$this->Static = $Prop->IsStatic();
+		$this->Nullable = $Type->AllowsNull();
 
 		// determine if it can be progamatically typecast.
 
