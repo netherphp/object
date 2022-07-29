@@ -572,6 +572,19 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	Join(string $Delimiter=' '):
+	string {
+	/*//
+	@date 2022-07-29
+	join and return the dataset together with the specified delimiter.
+	note you should probably map or remap it to values that you know will
+	actually be joinable prior.
+	//*/
+
+		return join($Delimiter, $this->Data);
+	}
+
+	public function
 	Map(callable $FilterFunc):
 	Datastore {
 	/*//
@@ -784,13 +797,22 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	the defined sorter.
 	//*/
 
+		if($Function === NULL) {
+			asort($this->Data);
+
+			if(!$Presort)
+			return $this;
+		}
+
 		if(is_callable($Function)) {
-			uasort($this->Data,$Function);
-			if(!$Presort) return $this;
+			uasort($this->Data, $Function);
+
+			if(!$Presort)
+			return $this;
 		}
 
 		if(is_callable($this->Sorter)) {
-			uasort($this->Data,$this->Sorter);
+			uasort($this->Data, $this->Sorter);
 			return $this;
 		}
 
