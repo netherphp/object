@@ -1,10 +1,9 @@
 <?php
 
-use Nether\Object\Package\MethodInfoPackage;
 use Nether\Object\Prototype\MethodInfo;
-use Nether\Object\Prototype\MethodInfoInterface;
 use Nether\Object\Prototype\MethodInfoCache;
-
+use Nether\Object\Prototype\MethodInfoInterface;
+use Nether\Object\Package\MethodInfoPackage;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,7 +16,7 @@ implements MethodInfoInterface {
 	$DidMethodInfo = FALSE;
 
 	public function
-	OnMethodInfo(MethodInfo $Info, ReflectionMethod $Method, ReflectionAttribute $Attrib):
+	OnMethodInfo(MethodInfo $MI, ReflectionMethod $RM, ReflectionAttribute $RA):
 	void {
 
 		$this->DidMethodInfo = TRUE;

@@ -103,7 +103,8 @@ trait MethodInfoPackage {
 
 		return array_filter(
 			$MethodMap,
-			function(MethodInfo $Method) use($AttribName) {
+			function(MethodInfo $Method) use($AttribName):
+			bool {
 				$Inst = NULL;
 
 				foreach($Method->Attributes as $Inst) {

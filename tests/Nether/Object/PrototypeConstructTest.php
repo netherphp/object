@@ -15,6 +15,16 @@ extends Object\Prototype {
 
 }
 
+class LocalTest3
+extends Object\Prototype {
+
+	#[Object\Meta\PropertyOrigin('number_one')]
+	public int $One;
+
+	public int $Two;
+
+}
+
 class PrototypeConstructTest
 extends PHPUnit\Framework\TestCase {
 
@@ -259,6 +269,13 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertObjectHasAttribute('One',$Test2);
 		$this->AssertObjectHasAttribute('Two',$Test2);
 		$this->AssertObjectHasAttribute('Three',$Test2);
+
+		return;
+	}
+
+	/** @ttest */
+	public function
+	TestThatAllowNullOnNullCallLogicFail() {
 
 		return;
 	}

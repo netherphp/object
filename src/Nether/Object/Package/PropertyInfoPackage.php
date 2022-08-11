@@ -64,14 +64,15 @@ trait PropertyInfoPackage {
 		$RefClass = new ReflectionClass(static::class);
 		$RefProp = NULL;
 		$RefAttrib = NULL;
+		$Info = NULL;
 		$Output = [];
 
 		foreach($RefClass->GetProperties() as $RefProp) {
 			foreach($RefProp->GetAttributes() as $RefAttrib) {
-				if($RefAttrib->GetName() === $AttribName)
-				$Output[$RefProp->GetName()] = new PropertyInfo(
-					$RefProp
-				);
+				if($RefAttrib->GetName() === $AttribName) {
+					$Info = new PropertyInfo($RefProp);
+					$Output[$Info->Name] = $Info;
+				}
 			}
 		}
 
@@ -103,7 +104,8 @@ trait PropertyInfoPackage {
 
 		return array_filter(
 			$PropertyMap,
-			function(PropertyInfo $Property) use($AttribName) {
+			function(PropertyInfo $Property) use($AttribName):
+			bool {
 				$Inst = NULL;
 
 				foreach($Property->Attributes as $Inst) {
@@ -125,7 +127,7 @@ trait PropertyInfoPackage {
 	/*//
 	@date 2021-08-16
 	returns an assoc array keyed with a data source name and values of the
-	data destination name skipping static properties.
+	data destination name. does not include static properties.
 	//*/
 
 		$Output = array_map(
@@ -145,7 +147,7 @@ trait PropertyInfoPackage {
 	/*//
 	@date 2022-08-06
 	returns a datastore object keyed with a data source name and values of the
-	data destination name skipping static properties
+	data destination name. does not include static properties.
 	//*/
 
 		return new Datastore(static::GetPropertyMap());

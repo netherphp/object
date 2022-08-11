@@ -1,14 +1,29 @@
 <?php
 
-use Nether\Object\Package\PropertyInfoPackage;
-use Nether\Object\Prototype\PropertyInfoCache;
 use Nether\Object\Prototype\PropertyInfo;
+use Nether\Object\Prototype\PropertyInfoCache;
+use Nether\Object\Prototype\PropertyInfoInterface;
+use Nether\Object\Package\PropertyInfoPackage;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class LocalPropAttrib1 { }
+class LocalPropAttrib1
+implements PropertyInfoInterface {
+
+	public bool
+	$DidPropertyInfo = FALSE;
+
+	public function
+	OnPropertyInfo(PropertyInfo $PI, ReflectionProperty $RP, ReflectionAttribute $RA):
+	void {
+
+		$this->DidPropertyInfo = TRUE;
+		return;
+	}
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -130,7 +145,7 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestPropertyIndexFetchMethodInfoAttribs() {
+	TestPropertyIndexFetchPropertyAttribs() {
 
 		$Props = LocalAttributedPropClass::FetchPropertyIndex();
 		$AttribYep = $Props['PropWithAttrib'];
@@ -154,24 +169,18 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestMethodIndexCacheMethodInfoAttribs() {
+	TestPropertyInfoInterface() {
 
-		$Props = LocalAttributedPropClass::GetPropertyIndex();
-		$AttribYep = $Props['PropWithAttrib'];
-		$AttribNope = $Props['PropNoAttrib'];
+		$Props = LocalAttributedPropClass::FetchPropertyIndex();
+		$Prop = $Props['PropWithAttrib'];
+		$Attrib = $Prop->GetAttribute(LocalPropAttrib1::class);
 
-		$this->AssertEquals(count($AttribYep->Attributes), 1);
-		$this->AssertEquals(count($AttribNope->Attributes), 0);
+		// test that the attribute implemeneted the prop info interface
+		// and that the attribute executed the self learning.
 
-		$this->AssertArrayHasKey(
-			LocalPropAttrib1::class,
-			$AttribYep->Attributes
-		);
-
-		$this->AssertInstanceOf(
-			LocalPropAttrib1::class,
-			$AttribYep->Attributes[LocalPropAttrib1::class]
-		);
+		$this->AssertTrue($Attrib instanceof LocalPropAttrib1);
+		$this->AssertTrue($Attrib instanceof PropertyInfoInterface);
+		$this->AssertTrue($Attrib->DidPropertyInfo);
 
 		return;
 	}

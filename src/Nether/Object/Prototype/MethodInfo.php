@@ -43,8 +43,9 @@ class MethodInfo {
 
 		// get some various info.
 
-		if($Type instanceof ReflectionNamedType)
-		$StrType = $Type->GetName();
+		if($Type instanceof ReflectionNamedType) {
+			$StrType = $Type->GetName();
+		}
 
 		$this->Class = $Method->GetDeclaringClass()->GetName();
 		$this->Name = $Method->GetName();
@@ -93,4 +94,5 @@ class MethodInfo {
 
 		return NULL;
 	}
+
 }

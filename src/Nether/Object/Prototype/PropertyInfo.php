@@ -66,12 +66,12 @@ the prototype system will want to know about.
 			$Nullable = $Type->AllowsNull();
 		}
 
+		$this->Class = $Prop->GetDeclaringClass()->GetName();
 		$this->Name = $Prop->GetName();
 		$this->Type = $StrType;
 		$this->Nullable = $Nullable;
 		$this->Origin = $this->Name;
 		$this->Static = $Prop->IsStatic();
-		$this->Class = $Prop->GetDeclaringClass()->GetName();
 
 		// determine if it can be progamatically typecast.
 
@@ -105,6 +105,23 @@ the prototype system will want to know about.
 		}
 
 		return;
+	}
+
+	public function
+	HasAttribute(string $Type):
+	bool {
+
+		return isset($this->Attributes[$Type]);
+	}
+
+	public function
+	GetAttribute(string $Type):
+	mixed {
+
+		if(isset($this->Attributes[$Type]))
+		return $this->Attributes[$Type];
+
+		return NULL;
 	}
 
 }
