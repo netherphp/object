@@ -1,14 +1,30 @@
 <?php
 
 use Nether\Object\Package\MethodAttributePackage;
-use Nether\Object\Prototype\MethodInfoCache;
 use Nether\Object\Prototype\MethodInfo;
+use Nether\Object\Prototype\MethodInfoInterface;
+use Nether\Object\Prototype\MethodInfoCache;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class LocalTestAttrib1 { }
+class LocalTestAttrib1
+implements MethodInfoInterface {
+
+	public bool
+	$DidMethodInfo = FALSE;
+
+	public function
+	OnMethodInfo(MethodInfo $Info, ReflectionMethod $Method, ReflectionAttribute $Attrib):
+	void {
+
+		$this->DidMethodInfo = TRUE;
+		return;
+	}
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +156,7 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestMethodIndexFetchMethodInfoAttribs() {
+	TestMethodIndexFetchMethodAttribs() {
 
 		$Methods = LocalAttributedClass::FetchMethodIndex();
 		$AttribYep = $Methods['MethodWithAttrib'];
@@ -164,24 +180,18 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestMethodIndexCacheMethodInfoAttribs() {
+	TestMethodInfoInterface() {
 
-		$Methods = LocalAttributedClass::GetMethodIndex();
-		$AttribYep = $Methods['MethodWithAttrib'];
-		$AttribNope = $Methods['MethodNoAttrib'];
+		$Methods = LocalAttributedClass::FetchMethodIndex();
+		$Method = $Methods['MethodWithAttrib'];
+		$Attrib = $Method->GetAttribute(LocalTestAttrib1::class);
 
-		$this->AssertEquals(count($AttribYep->Attributes), 1);
-		$this->AssertEquals(count($AttribNope->Attributes), 0);
+		// test that the attribute implemeneted the method info interface
+		// and that the attribute executed the self learning.
 
-		$this->AssertArrayHasKey(
-			LocalTestAttrib1::class,
-			$AttribYep->Attributes
-		);
-
-		$this->AssertInstanceOf(
-			LocalTestAttrib1::class,
-			$AttribYep->Attributes[LocalTestAttrib1::class]
-		);
+		$this->AssertTrue($Attrib instanceof LocalTestAttrib1);
+		$this->AssertTrue($Attrib instanceof MethodInfoInterface);
+		$this->AssertTrue($Attrib->DidMethodInfo);
 
 		return;
 	}
