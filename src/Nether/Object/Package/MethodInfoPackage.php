@@ -2,10 +2,9 @@
 
 namespace Nether\Object\Package;
 
-use ReflectionClass;
-use Nether\Object\Prototype\SmartAttribute;
 use Nether\Object\Prototype\MethodInfo;
 use Nether\Object\Prototype\MethodInfoCache;
+use ReflectionClass;
 
 trait MethodInfoPackage {
 

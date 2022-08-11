@@ -2,9 +2,9 @@
 
 namespace Nether\Object\Package;
 
-use Nether\Object\Prototype\PropertyInfoCache;
-use Nether\Object\Prototype\PropertyInfo;
 use Nether\Object\Datastore;
+use Nether\Object\Prototype\PropertyInfo;
+use Nether\Object\Prototype\PropertyInfoCache;
 use ReflectionClass;
 
 trait PropertyInfoPackage {

@@ -33,7 +33,8 @@ manipulated with chainable methods.
 
 This trait can be bolted into any class to apply static methods for fetching
 a list of all the methods it has as well as process their attributes to perform
-metaprogramming tasks.
+metaprogramming tasks. Classes extending Nether\Object\Prototype already have
+this trait applied.
 
 * `{Class}::FetchMethodIndex(): array`
 
@@ -55,5 +56,5 @@ metaprogramming tasks.
 * `{Class}::GetMethodsWithAttribute(string Name): array`
 
   The same as `FetchMethodsWithAttribute()` except using the inline cache
-  mentioned above. Again this is the preferred way to get the method list
+  mentioned above. This is the preferred way to get the method list
   from userspace.
