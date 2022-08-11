@@ -2,8 +2,7 @@
 
 namespace Nether\Object\Package;
 
-use Nether\Object\Prototype\PropertyCache;
-use Nether\Object\Prototype\PropertyAttributes;
+use Nether\Object\Prototype\PropertyInfoCache;
 use Nether\Object\Prototype\PropertyInfo;
 use Nether\Object\Datastore;
 use ReflectionClass;
@@ -20,10 +19,13 @@ trait PropertyAttributePackage {
 
 		$RefClass = new ReflectionClass(static::class);
 		$RefProp = NULL;
+		$Info = NULL;
 		$Output = [];
 
-		foreach($RefClass->GetProperties() as $RefProp)
-		$Output[$RefProp->GetName()] = new PropertyInfo($RefProp);
+		foreach($RefClass->GetProperties() as $RefProp) {
+			$Info = new PropertyInfo($RefProp);
+			$Output[$Info->Origin] = $Info;
+		}
 
 		return $Output;
 	}
@@ -38,10 +40,10 @@ trait PropertyAttributePackage {
 	this is the preferred method to use in your userland code.
 	//*/
 
-		if(PropertyCache::Has(static::class))
-		return PropertyCache::Get(static::class);
+		if(PropertyInfoCache::Has(static::class))
+		return PropertyInfoCache::Get(static::class);
 
-		return PropertyCache::Set(
+		return PropertyInfoCache::Set(
 			static::class,
 			static::FetchPropertyIndex()
 		);
@@ -91,8 +93,8 @@ trait PropertyAttributePackage {
 
 		////////
 
-		if(PropertyCache::Has(static::class))
-		$PropertyMap = PropertyCache::Get(static::class);
+		if(PropertyInfoCache::Has(static::class))
+		$PropertyMap = PropertyInfoCache::Get(static::class);
 
 		else
 		$PropertyMap = static::GetMethodIndex();
@@ -116,77 +118,6 @@ trait PropertyAttributePackage {
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
-	static public function
-	FetchPropertyAttributes(?string $Property=NULL, bool $Init=TRUE):
-	array {
-	/*//
-	@date 2021-08-24
-	if a property is specified returns a list of the attributes upon it.
-	else it returns a list of all the properties on this class each
-	containing their list of attributes.
-	//*/
-
-		$RefClass = new ReflectionClass(static::class);
-		$RefProp = NULL;
-		$Name = NULL;
-		$Attrib = NULL;
-		$Output = [];
-
-		// return a list of the attributes for the specified property.
-
-		if($Property !== NULL) {
-			if($RefProp = $RefClass->GetProperty($Property))
-			foreach($RefProp->GetAttributes() as $Attrib)
-			$Output[] = $Init ? $Attrib->NewInstance() : $Attrib;
-
-			return $Output;
-		}
-
-		// else return a list of all the properties in this class and
-		// their attributes.
-
-		foreach($RefClass->GetProperties() as $RefProp) {
-			$Output[($Name = $RefProp->GetName())] = [];
-
-			foreach($RefProp->GetAttributes() as $Attrib)
-			$Output[$Name][] = $Init ? $Attrib->NewInstance() : $Attrib;
-		}
-
-		return $Output;
-	}
-
-	static public function
-	GetPropertyAttributes():
-	array {
-	/*//
-	@date 2021-08-05
-	@mopt isset, direct read, direct write.
-	returns an array of all the properties on this class keyed to their
-	data origin name.
-	//*/
-
-		if(isset(PropertyCache::$Cache[static::class]))
-		return PropertyCache::$Cache[static::class];
-
-		$Output = [];
-		$RefClass = NULL;
-		$Prop = NULL;
-		$Attrib = NULL;
-
-		////////
-
-		$RefClass = new ReflectionClass(static::class);
-
-		foreach($RefClass->GetProperties() as $Prop) {
-			$Attrib = new PropertyAttributes($Prop);
-			$Output[$Attrib->Origin] = $Attrib;
-		}
-
-		return PropertyCache::$Cache[static::class] = $Output;
-	}
 
 	static public function
 	GetPropertyMap():
@@ -194,13 +125,13 @@ trait PropertyAttributePackage {
 	/*//
 	@date 2021-08-16
 	returns an assoc array keyed with a data source name and values of the
-	data destination name.
+	data destination name skipping static properties.
 	//*/
 
 		$Output = array_map(
 			(fn($Val)=> $Val->Name),
 			array_filter(
-				static::GetPropertyAttributes(),
+				static::GetPropertyIndex(),
 				(fn($Val)=> !$Val->Static)
 			)
 		);
@@ -214,18 +145,10 @@ trait PropertyAttributePackage {
 	/*//
 	@date 2022-08-06
 	returns a datastore object keyed with a data source name and values of the
-	data destination name.
+	data destination name skipping static properties
 	//*/
 
-		$Output = array_map(
-			(fn($Val)=> $Val->Name),
-			array_filter(
-				static::GetPropertyAttributes(),
-				(fn($Val)=> !$Val->Static)
-			)
-		);
-
-		return new Datastore($Output);
+		return new Datastore(static::GetPropertyMap());
 	}
 
 }

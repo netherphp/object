@@ -2,10 +2,10 @@
 
 namespace Nether\Object\Prototype;
 
-class PropertyCache {
+class MethodInfoCache {
 /*//
 @date 2021-08-09
-provides a static cache for the prototype property attribute structures.
+provides a static cache for the prototype method attribute structures.
 //*/
 
 	static public array
@@ -37,14 +37,14 @@ provides a static cache for the prototype property attribute structures.
 	}
 
 	static public function
-	Set(string $ClassName, array $PropertyMap):
+	Set(string $ClassName, array $MethodMap):
 	array {
 	/*//
 	@date 2021-08-08
 	//*/
 
-		static::$Cache[$ClassName] = $PropertyMap;
-		return $PropertyMap;
+		static::$Cache[$ClassName] = $MethodMap;
+		return $MethodMap;
 	}
 
 	////////////////////////////////////////////////////////////////

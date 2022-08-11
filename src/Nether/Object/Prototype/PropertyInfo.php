@@ -6,7 +6,7 @@ use Attribute;
 use ReflectionProperty;
 use ReflectionNamedType;
 use Nether\Object\Meta\PropertyObjectify;
-use Nether\Object\Prototype\AttributeInterface;
+use Nether\Object\Prototype\PropertyInfoInterface;
 
 class PropertyInfo {
 /*//
@@ -16,13 +16,16 @@ the prototype system will want to know about.
 //*/
 
 	public string
+	$Class;
+
+	public string
 	$Name;
 
 	public string
-	$Origin;
+	$Type;
 
 	public string
-	$Type;
+	$Origin;
 
 	public bool
 	$Castable;
@@ -37,10 +40,7 @@ the prototype system will want to know about.
 	$Objectify = NULL;
 
 	public array
-	$Attributes;
-
-	public string
-	$Source;
+	$Attributes = [];
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -54,20 +54,24 @@ the prototype system will want to know about.
 
 		$Type = $Prop->GetType();
 		$Attrib = NULL;
+		$AttribName = NULL;
 		$Inst = NULL;
 		$StrType = 'mixed';
+		$Nullable = TRUE;
 
 		// get some various info.
 
-		if($Type !== NULL)
-		$StrType = $Type->GetName();
+		if($Type instanceof ReflectionNamedType) {
+			$StrType = $Type->GetName();
+			$Nullable = $Type->AllowsNull();
+		}
 
-		$this->Name = $this->Origin = $Prop->GetName();
+		$this->Name = $Prop->GetName();
 		$this->Type = $StrType;
+		$this->Nullable = $Nullable;
+		$this->Origin = $this->Name;
 		$this->Static = $Prop->IsStatic();
-		$this->Nullable = $Type->AllowsNull();
-		$this->Source = $Prop->GetDeclaringClass()->GetName();
-		$this->Attributes = [];
+		$this->Class = $Prop->GetDeclaringClass()->GetName();
 
 		// determine if it can be progamatically typecast.
 
@@ -78,12 +82,26 @@ the prototype system will want to know about.
 		);
 
 		foreach($Prop->GetAttributes() as $Attrib) {
+			$AttribName = $Attrib->GetName();
 			$Inst = $Attrib->NewInstance();
 
-			if($Inst instanceof AttributeInterface)
-			$Inst->OnPropertyAttributes($this);
+			////////
 
-			$this->Attributes[] = $Inst;
+			if($Inst instanceof PropertyInfoInterface)
+			$Inst->OnPropertyInfo($this, $Prop, $Attrib);
+
+			////////
+
+			if($Attrib->IsRepeated()) {
+				if(!isset($this->Attributes[$AttribName]))
+				$this->Attributes[$AttribName] = [];
+
+				$this->Attributes[$AttribName][] = $Inst;
+			}
+
+			else {
+				$this->Attributes[$AttribName] = $Inst;
+			}
 		}
 
 		return;

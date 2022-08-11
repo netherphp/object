@@ -5,7 +5,7 @@ namespace Nether\Object\Package;
 use ReflectionClass;
 use Nether\Object\Prototype\SmartAttribute;
 use Nether\Object\Prototype\MethodInfo;
-use Nether\Object\Prototype\MethodCache;
+use Nether\Object\Prototype\MethodInfoCache;
 
 trait MethodAttributePackage {
 
@@ -19,10 +19,13 @@ trait MethodAttributePackage {
 
 		$RefClass = new ReflectionClass(static::class);
 		$RefMethod = NULL;
+		$Info = NULL;
 		$Output = [];
 
-		foreach($RefClass->GetMethods() as $RefMethod)
-		$Output[$RefMethod->GetName()] = new MethodInfo($RefMethod);
+		foreach($RefClass->GetMethods() as $RefMethod) {
+			$Info = new MethodInfo($RefMethod);
+			$Output[$Info->Name] = $Info;
+		}
 
 		return $Output;
 	}
@@ -37,10 +40,10 @@ trait MethodAttributePackage {
 	this is the preferred method to use in your userland code.
 	//*/
 
-		if(MethodCache::Has(static::class))
-		return MethodCache::Get(static::class);
+		if(MethodInfoCache::Has(static::class))
+		return MethodInfoCache::Get(static::class);
 
-		return MethodCache::Set(
+		return MethodInfoCache::Set(
 			static::class,
 			static::FetchMethodIndex()
 		);
@@ -61,14 +64,15 @@ trait MethodAttributePackage {
 		$RefClass = new ReflectionClass(static::class);
 		$RefMethod = NULL;
 		$RefAttrib = NULL;
+		$Info = NULL;
 		$Output = [];
 
 		foreach($RefClass->GetMethods() as $RefMethod) {
 			foreach($RefMethod->GetAttributes() as $RefAttrib) {
-				if($RefAttrib->GetName() === $AttribName)
-				$Output[$RefMethod->GetName()] = new MethodInfo(
-					$RefMethod
-				);
+				if($RefAttrib->GetName() === $AttribName) {
+					$Info = new MethodInfo($RefMethod);
+					$Output[$Info->Name] = $Info;
+				}
 			}
 		}
 
@@ -90,8 +94,8 @@ trait MethodAttributePackage {
 
 		////////
 
-		if(MethodCache::Has(static::class))
-		$MethodMap = MethodCache::Get(static::class);
+		if(MethodInfoCache::Has(static::class))
+		$MethodMap = MethodInfoCache::Get(static::class);
 
 		else
 		$MethodMap = static::GetMethodIndex();

@@ -59,7 +59,7 @@ extends PHPUnit\Framework\TestCase {
 		$Old = NULL;
 		$Attrib = NULL;
 
-		foreach(PrototypeRegionTest::GetPropertyAttributes() as $Old => $Attrib) {
+		foreach(PrototypeRegionTest::GetPropertyIndex() as $Old => $Attrib) {
 			$this->AssertObjectNotHasAttribute($Old,$Object);
 			$this->AssertObjectHasAttribute($Attrib->Name,$Object);
 		}

@@ -1,7 +1,7 @@
 <?php
 
 use Nether\Object\Package\MethodAttributePackage;
-use Nether\Object\Prototype\MethodCache;
+use Nether\Object\Prototype\MethodInfoCache;
 use Nether\Object\Prototype\MethodInfo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,9 +69,9 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertTrue(isset($Methods['MethodNoAttrib']));
 		$this->AssertTrue(isset($Methods['MethodWithAttrib']));
 		$this->AssertTrue(isset($Methods['FetchMethodIndex']));
-		$this->AssertTrue(MethodCache::Has(LocalAttributedClass::class));
+		$this->AssertTrue(MethodInfoCache::Has(LocalAttributedClass::class));
 		$this->AssertEquals(
-			count(MethodCache::Get(LocalAttributedClass::class)),
+			count(MethodInfoCache::Get(LocalAttributedClass::class)),
 			count($Methods)
 		);
 
@@ -148,9 +148,15 @@ extends PHPUnit\Framework\TestCase {
 
 		$this->AssertEquals(count($AttribYep->Attributes), 1);
 		$this->AssertEquals(count($AttribNope->Attributes), 0);
+
+		$this->AssertArrayHasKey(
+			LocalTestAttrib1::class,
+			$AttribYep->Attributes
+		);
+
 		$this->AssertInstanceOf(
 			LocalTestAttrib1::class,
-			$AttribYep->Attributes[0]
+			$AttribYep->Attributes[LocalTestAttrib1::class]
 		);
 
 		return;
@@ -166,9 +172,15 @@ extends PHPUnit\Framework\TestCase {
 
 		$this->AssertEquals(count($AttribYep->Attributes), 1);
 		$this->AssertEquals(count($AttribNope->Attributes), 0);
+
+		$this->AssertArrayHasKey(
+			LocalTestAttrib1::class,
+			$AttribYep->Attributes
+		);
+
 		$this->AssertInstanceOf(
 			LocalTestAttrib1::class,
-			$AttribYep->Attributes[0]
+			$AttribYep->Attributes[LocalTestAttrib1::class]
 		);
 
 		return;

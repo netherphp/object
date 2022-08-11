@@ -46,7 +46,7 @@ impact i can find while packing in as many features as possible.
 
 		////////
 
-		$Properties = static::GetPropertyAttributes();
+		$Properties = static::GetPropertyIndex();
 		$StrictDefaults = ($Flags & Flags::StrictDefault) !== 0;
 		$CullUsingDefaults = ($Flags & Flags::CullUsingDefault) !== 0;
 		$StrictInput = ($Flags & Flags::StrictInput) !== 0;

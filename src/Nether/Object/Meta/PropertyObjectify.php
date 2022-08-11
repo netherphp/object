@@ -2,14 +2,16 @@
 
 namespace Nether\Object\Meta;
 
-use Attribute;
-use Nether\Object\Prototype\AttributeInterface;
-use Nether\Object\Prototype\PropertyAttributes;
 use Nether\Object\Prototype\PropertyInfo;
+use Nether\Object\Prototype\PropertyInfoInterface;
+
+use Attribute;
+use ReflectionProperty;
+use ReflectionAttribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class PropertyObjectify
-implements AttributeInterface {
+implements PropertyInfoInterface {
 /*//
 @date 2021-08-09
 @related Nether\Object\Prototype::__Construct
@@ -30,7 +32,7 @@ to the object being constructed for that property.
 	}
 
 	public function
-	OnPropertyAttributes(PropertyAttributes|PropertyInfo $Attrib):
+	OnPropertyInfo(PropertyInfo $Attrib, ReflectionProperty $RefProp, ReflectionAttribute $RefAttrib):
 	static {
 
 		$Attrib->Objectify = $this;

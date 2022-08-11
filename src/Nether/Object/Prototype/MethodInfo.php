@@ -2,18 +2,20 @@
 
 namespace Nether\Object\Prototype;
 
-use Attribute;
+use Nether\Object\Prototype\MethodInfoInterface;
 use ReflectionMethod;
 use ReflectionNamedType;
-use Nether\Object\Prototype\AttributeInterface;
 
 class MethodInfo {
+
+	public string
+	$Class;
 
 	public string
 	$Name;
 
 	public string
-	$ReturnType;
+	$Type;
 
 	public array
 	$Args;
@@ -22,10 +24,7 @@ class MethodInfo {
 	$Static;
 
 	public array
-	$Attributes;
-
-	public string
-	$Source;
+	$Attributes = [];
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -33,36 +32,65 @@ class MethodInfo {
 	public function
 	__Construct(ReflectionMethod $Method) {
 	/*//
-	@date 2021-08-09
-	@mopt busyunit, avoid-obj-prop-rw
+	@date 2022-08-10
 	//*/
 
 		$Type = $Method->GetReturnType();
 		$StrType = 'mixed';
 		$Attrib = NULL;
+		$AttribName = NULL;
 		$Inst = NULL;
 
 		// get some various info.
 
-		if($Type !== NULL)
+		if($Type instanceof ReflectionNamedType)
 		$StrType = $Type->GetName();
 
+		$this->Class = $Method->GetDeclaringClass()->GetName();
 		$this->Name = $Method->GetName();
 		$this->Type = $StrType;
 		$this->Static = $Method->IsStatic();
-		$this->Source = $Method->GetDeclaringClass()->GetName();
-		$this->Attributes = [];
 
 		foreach($Method->GetAttributes() as $Attrib) {
+			$AttribName = $Attrib->GetName();
 			$Inst = $Attrib->NewInstance();
 
-			//if($Inst instanceof AttributeInterface)
-			//$Inst->OnPropertyAttributes($this);
+			////////
 
-			$this->Attributes[] = $Inst;
+			if($Inst instanceof MethodInfoInterface)
+			$Inst->OnMethodInfo($this, $Method, $Attrib);
+
+			////////
+
+			if($Attrib->IsRepeated()) {
+				if(!isset($this->Attributes[$AttribName]))
+				$this->Attributes[$AttribName] = [];
+
+				$this->Attributes[$AttribName][] = $Inst;
+			}
+
+			else {
+				$this->Attributes[$AttribName] = $Inst;
+			}
 		}
 
 		return;
 	}
 
+	public function
+	HasAttribute(string $Type):
+	bool {
+
+		return isset($this->Attributes[$Type]);
+	}
+
+	public function
+	GetAttribute(string $Type):
+	mixed {
+
+		if(isset($this->Attributes[$Type]))
+		return $this->Attributes[$Type];
+
+		return NULL;
+	}
 }

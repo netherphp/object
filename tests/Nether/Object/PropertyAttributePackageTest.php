@@ -1,7 +1,7 @@
 <?php
 
 use Nether\Object\Package\PropertyAttributePackage;
-use Nether\Object\Prototype\PropertyCache;
+use Nether\Object\Prototype\PropertyInfoCache;
 use Nether\Object\Prototype\PropertyInfo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,9 +59,9 @@ extends PHPUnit\Framework\TestCase {
 		$Props = LocalAttributedPropClass::GetPropertyIndex();
 		$this->AssertTrue(isset($Props['PropNoAttrib']));
 		$this->AssertTrue(isset($Props['PropWithAttrib']));
-		$this->AssertTrue(PropertyCache::Has(LocalAttributedPropClass::class));
+		$this->AssertTrue(PropertyInfoCache::Has(LocalAttributedPropClass::class));
 		$this->AssertEquals(
-			count(PropertyCache::Get(LocalAttributedPropClass::class)),
+			count(PropertyInfoCache::Get(LocalAttributedPropClass::class)),
 			count($Props)
 		);
 
@@ -138,9 +138,15 @@ extends PHPUnit\Framework\TestCase {
 
 		$this->AssertEquals(count($AttribYep->Attributes), 1);
 		$this->AssertEquals(count($AttribNope->Attributes), 0);
+
+		$this->AssertArrayHasKey(
+			LocalPropAttrib1::class,
+			$AttribYep->Attributes
+		);
+
 		$this->AssertInstanceOf(
 			LocalPropAttrib1::class,
-			$AttribYep->Attributes[0]
+			$AttribYep->Attributes[LocalPropAttrib1::class]
 		);
 
 		return;
@@ -156,9 +162,15 @@ extends PHPUnit\Framework\TestCase {
 
 		$this->AssertEquals(count($AttribYep->Attributes), 1);
 		$this->AssertEquals(count($AttribNope->Attributes), 0);
+
+		$this->AssertArrayHasKey(
+			LocalPropAttrib1::class,
+			$AttribYep->Attributes
+		);
+
 		$this->AssertInstanceOf(
 			LocalPropAttrib1::class,
-			$AttribYep->Attributes[0]
+			$AttribYep->Attributes[LocalPropAttrib1::class]
 		);
 
 		return;
