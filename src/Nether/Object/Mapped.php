@@ -1,5 +1,11 @@
 <?php
 
+/*//
+this entire file is deprecated and should not be used in any new code.
+henceforthwithcoming everything is based on the Nether\Object\Prototype
+system.
+//*/
+
 namespace
 Nether\Object;
 

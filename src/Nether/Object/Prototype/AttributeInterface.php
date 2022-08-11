@@ -11,7 +11,7 @@ them interfaces and to check that after asking reflection for the list.
 //*/
 
 	public function
-	OnPropertyAttributes(PropertyAttributes $Attrib);
+	OnPropertyAttributes(PropertyAttributes|PropertyInfo $Attrib);
 	/*//
 	@date 2021-08-11
 	implement this method in your attribute to make it do something when

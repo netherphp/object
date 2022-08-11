@@ -5,6 +5,7 @@ namespace Nether\Object\Meta;
 use Attribute;
 use Nether\Object\Prototype\AttributeInterface;
 use Nether\Object\Prototype\PropertyAttributes;
+use Nether\Object\Prototype\PropertyInfo;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class PropertyObjectify
@@ -29,7 +30,7 @@ to the object being constructed for that property.
 	}
 
 	public function
-	OnPropertyAttributes(PropertyAttributes $Attrib):
+	OnPropertyAttributes(PropertyAttributes|PropertyInfo $Attrib):
 	static {
 
 		$Attrib->Objectify = $this;

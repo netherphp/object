@@ -2,10 +2,11 @@
 
 namespace Nether\Object;
 
-use ReflectionClass;
 use Nether\Object\Prototype\Flags;
 use Nether\Object\Prototype\ConstructArgs;
-use ReflectionProperty;
+use Nether\Object\Package\ClassAttributePackage;
+use Nether\Object\Package\PropertyAttributePackage;
+use Nether\Object\Package\MethodAttributePackage;
 
 class Prototype {
 /*//
@@ -15,6 +16,11 @@ properties you need will exist, prefilled with a default value if needed. this
 class and its supports have been micro-optimized to have the most minimal
 impact i can find while packing in as many features as possible.
 //*/
+
+	use
+	ClassAttributePackage,
+	PropertyAttributePackage,
+	MethodAttributePackage;
 
 	public function
 	__Construct(array|object|NULL $Raw=NULL, array|object|NULL $Defaults=NULL, int $Flags=0) {
@@ -137,116 +143,6 @@ impact i can find while packing in as many features as possible.
 	//*/
 
 		return;
-	}
-
-	////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-
-	static public function
-	FetchClassAttributes(bool $Init=TRUE):
-	array {
-	/*//
-	@date 2021-08-24
-	return a list of all the attributes on this class.
-	//*/
-
-		$RefClass = new ReflectionClass(static::class);
-		$Attrib = NULL;
-		$Output = [];
-
-		foreach($RefClass->GetAttributes() as $Attrib)
-		$Output[] = $Init ? $Attrib->NewInstance() : $Attrib;
-
-		return $Output;
-	}
-
-	static public function
-	FetchPropertyAttributes(?string $Property=NULL, bool $Init=TRUE):
-	array {
-	/*//
-	@date 2021-08-24
-	if a property is specified returns a list of the attributes upon it.
-	else it returns a list of all the properties on this class each
-	containing their list of attributes.
-	//*/
-
-		$RefClass = new ReflectionClass(static::class);
-		$RefProp = NULL;
-		$Name = NULL;
-		$Attrib = NULL;
-		$Output = [];
-
-		// return a list of the attributes for the specified property.
-
-		if($Property !== NULL) {
-			if($RefProp = $RefClass->GetProperty($Property))
-			foreach($RefProp->GetAttributes() as $Attrib)
-			$Output[] = $Init ? $Attrib->NewInstance() : $Attrib;
-
-			return $Output;
-		}
-
-		// else return a list of all the properties in this class and
-		// their attributes.
-
-		foreach($RefClass->GetProperties() as $RefProp) {
-			$Output[($Name = $RefProp->GetName())] = [];
-
-			foreach($RefProp->GetAttributes() as $Attrib)
-			$Output[$Name][] = $Init ? $Attrib->NewInstance() : $Attrib;
-		}
-
-		return $Output;
-	}
-
-	static public function
-	GetPropertyAttributes():
-	array {
-	/*//
-	@date 2021-08-05
-	@mopt isset, direct read, direct write.
-	returns an array of all the properties on this class keyed to their
-	data origin name.
-	//*/
-
-		if(isset(Prototype\PropertyCache::$Cache[static::class]))
-		return Prototype\PropertyCache::$Cache[static::class];
-
-		$Output = [];
-		$RefClass = NULL;
-		$Prop = NULL;
-		$Attrib = NULL;
-
-		////////
-
-		$RefClass = new ReflectionClass(static::class);
-
-		foreach($RefClass->GetProperties() as $Prop) {
-			$Attrib = new Prototype\PropertyAttributes($Prop);
-			$Output[$Attrib->Origin] = $Attrib;
-		}
-
-		return Prototype\PropertyCache::$Cache[static::class] = $Output;
-	}
-
-	static public function
-	GetPropertyMap():
-	array {
-	/*//
-	@date 2021-08-16
-	returns an assoc array keyed with a data source name and values of the
-	data destination name.
-	//*/
-
-		$Output = array_map(
-			(fn($Val)=> $Val->Name),
-			array_filter(
-				static::GetPropertyAttributes(),
-				(fn($Val)=> !$Val->Static)
-			)
-		);
-
-		return $Output;
 	}
 
 	////////////////////////////////////////////////////////////////

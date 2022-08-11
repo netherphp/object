@@ -5,6 +5,7 @@ namespace Nether\Object\Meta;
 use Attribute;
 use Nether\Object\Prototype\AttributeInterface;
 use Nether\Object\Prototype\PropertyAttributes;
+use Nether\Object\Prototype\PropertyInfo;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class PropertyOrigin
@@ -28,7 +29,7 @@ it into the property this is attached to.
 	}
 
 	public function
-	OnPropertyAttributes(PropertyAttributes $Attrib):
+	OnPropertyAttributes(PropertyAttributes|PropertyInfo $Attrib):
 	static {
 
 		$Attrib->Origin = $this->Name;
