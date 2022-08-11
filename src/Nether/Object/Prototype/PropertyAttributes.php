@@ -50,16 +50,20 @@ the prototype system will want to know about.
 		$Attrib = NULL;
 		$Inst = NULL;
 		$StrType = 'mixed';
+		$Nullable = TRUE;
 
 		// get some various info.
 
-		if($Type !== NULL)
-		$StrType = $Type->GetName();
+		if($Type !== NULL) {
+			$StrType = $Type->GetName();
+			$Nullable = $Type->AllowsNull();
+		}
+
 
 		$this->Name = $this->Origin = $Prop->GetName();
 		$this->Type = $StrType;
 		$this->Static = $Prop->IsStatic();
-		$this->Nullable = $Type->AllowsNull();
+		$this->Nullable = $Nullable;
 
 		// determine if it can be progamatically typecast.
 
