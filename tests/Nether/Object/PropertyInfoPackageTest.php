@@ -1,5 +1,14 @@
 <?php
 
+namespace NetherTestSuite;
+use PHPUnit;
+
+use Attribute;
+use ReflectionProperty;
+use ReflectionAttribute;
+use Throwable;
+
+use Nether\Object\Prototype;
 use Nether\Object\Prototype\PropertyInfo;
 use Nether\Object\Prototype\PropertyInfoCache;
 use Nether\Object\Prototype\PropertyInfoInterface;
@@ -9,7 +18,7 @@ use Nether\Object\Package\PropertyInfoPackage;
 ////////////////////////////////////////////////////////////////////////////////
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class LocalPropAttrib1
+class TestPropAttrib1
 implements PropertyInfoInterface {
 
 	public bool
@@ -25,10 +34,16 @@ implements PropertyInfoInterface {
 
 }
 
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class TestPropAttribThereCanBeOnlyOne { }
+
+#[Attribute(Attribute::TARGET_PROPERTY|Attribute::IS_REPEATABLE)]
+class TestPropAttribHousePartyProtocol { }
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-class LocalAttributedPropClass {
+class TestClassProp1 {
 
 	use
 	PropertyInfoPackage;
@@ -36,11 +51,41 @@ class LocalAttributedPropClass {
 	public string
 	$PropNoAttrib;
 
-	#[LocalPropAttrib1]
+	#[TestPropAttrib1]
 	public string
 	$PropWithAttrib;
 
 }
+
+class TestClassProp2
+extends Prototype {
+
+	#[TestPropAttribThereCanBeOnlyOne]
+	#[TestPropAttribHousePartyProtocol]
+	#[TestPropAttribHousePartyProtocol]
+	#[TestPropAttribHousePartyProtocol]
+	public int
+	$Prop;
+
+}
+
+class TestClassProp3
+extends Prototype {
+
+	// see TestPropertyInfoAttributeHandleMultifail
+
+	#[TestPropAttribThereCanBeOnlyOne]
+	#[TestPropAttribThereCanBeOnlyOne]
+	#[TestPropAttribHousePartyProtocol]
+	#[TestPropAttribHousePartyProtocol]
+	#[TestPropAttribHousePartyProtocol]
+	public int
+	$Prop;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 class PropertyInfoPackageTest
 extends PHPUnit\Framework\TestCase {
@@ -51,7 +96,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
-		$Props = LocalAttributedPropClass::FetchPropertyIndex();
+		$Props = TestClassProp1::FetchPropertyIndex();
 		$this->AssertTrue(isset($Props['PropNoAttrib']));
 		$this->AssertTrue(isset($Props['PropWithAttrib']));
 
@@ -71,19 +116,19 @@ extends PHPUnit\Framework\TestCase {
 
 		// test that the cache appeared to be working.
 
-		$Props = LocalAttributedPropClass::GetPropertyIndex();
+		$Props = TestClassProp1::GetPropertyIndex();
 		$this->AssertTrue(isset($Props['PropNoAttrib']));
 		$this->AssertTrue(isset($Props['PropWithAttrib']));
-		$this->AssertTrue(PropertyInfoCache::Has(LocalAttributedPropClass::class));
+		$this->AssertTrue(PropertyInfoCache::Has(TestClassProp1::class));
 		$this->AssertEquals(
-			count(PropertyInfoCache::Get(LocalAttributedPropClass::class)),
+			count(PropertyInfoCache::Get(TestClassProp1::class)),
 			count($Props)
 		);
 
 		// test that the cache actually works by confirming the info
 		// instances are the same copies.
 
-		$Cached = LocalAttributedPropClass::GetPropertyIndex();
+		$Cached = TestClassProp1::GetPropertyIndex();
 		$Key = NULL;
 		$Info = NULL;
 
@@ -104,7 +149,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
-		$Props = LocalAttributedPropClass::FetchPropertiesWithAttribute(LocalPropAttrib1::class);
+		$Props = TestClassProp1::FetchPropertiesWithAttribute(TestPropAttrib1::class);
 		$this->AssertFalse(isset($Props['PropNoAttrib']));
 		$this->AssertTrue(isset($Props['PropWithAttrib']));
 		$this->AssertEquals(count($Props), 1);
@@ -125,7 +170,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
-		$Props = LocalAttributedPropClass::GetPropertiesWithAttribute(LocalPropAttrib1::class);
+		$Props = TestClassProp1::GetPropertiesWithAttribute(TestPropAttrib1::class);
 		$this->AssertFalse(isset($Props['PropNoAttrib']));
 		$this->AssertTrue(isset($Props['PropWithAttrib']));
 		$this->AssertEquals(count($Props), 1);
@@ -145,9 +190,9 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestPropertyIndexFetchPropertyAttribs() {
+	TestPropertyInfoLoadingAttributes() {
 
-		$Props = LocalAttributedPropClass::FetchPropertyIndex();
+		$Props = TestClassProp1::FetchPropertyIndex();
 		$AttribYep = $Props['PropWithAttrib'];
 		$AttribNope = $Props['PropNoAttrib'];
 
@@ -155,13 +200,13 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertEquals(count($AttribNope->Attributes), 0);
 
 		$this->AssertArrayHasKey(
-			LocalPropAttrib1::class,
+			TestPropAttrib1::class,
 			$AttribYep->Attributes
 		);
 
 		$this->AssertInstanceOf(
-			LocalPropAttrib1::class,
-			$AttribYep->Attributes[LocalPropAttrib1::class]
+			TestPropAttrib1::class,
+			$AttribYep->Attributes[TestPropAttrib1::class]
 		);
 
 		return;
@@ -171,16 +216,76 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestPropertyInfoInterface() {
 
-		$Props = LocalAttributedPropClass::FetchPropertyIndex();
+		$Props = TestClassProp1::FetchPropertyIndex();
 		$Prop = $Props['PropWithAttrib'];
-		$Attrib = $Prop->GetAttribute(LocalPropAttrib1::class);
+		$Attrib = $Prop->GetAttribute(TestPropAttrib1::class);
 
 		// test that the attribute implemeneted the prop info interface
 		// and that the attribute executed the self learning.
 
-		$this->AssertTrue($Attrib instanceof LocalPropAttrib1);
+		$this->AssertTrue($Attrib instanceof TestPropAttrib1);
 		$this->AssertTrue($Attrib instanceof PropertyInfoInterface);
 		$this->AssertTrue($Attrib->DidPropertyInfo);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestPropertyInfoAttributeManageMulti() {
+
+		$Props = TestClassProp2::GetPropertyIndex();
+		$Prop = $Props['Prop'];
+		$A1 = TestPropAttribThereCanBeOnlyOne::class;
+		$A3 = TestPropAttribHousePartyProtocol::class;
+		$Attrib = NULL;
+
+		// check them raw.
+
+		$this->AssertCount(2, $Prop->Attributes);
+		$this->AssertInstanceOf($A1, $Prop->Attributes[$A1]);
+		$this->AssertIsArray($Prop->Attributes[$A3]);
+		$this->AssertCount(3, $Prop->Attributes[$A3]);
+
+		foreach($Prop->Attributes[$A3] as $Attrib)
+		$this->AssertInstanceOf($A3, $Attrib);
+
+		// check them from the api.
+
+		$this->AssertNull($Prop->GetAttribute('ThisDoesNotExist'));
+		$this->AssertInstanceOf($A1, $Prop->GetAttribute($A1));
+		$this->AssertIsArray($Prop->GetAttribute($A3));
+		$this->AssertCount(3, $Prop->GetAttribute($A3));
+
+		foreach($Prop->GetAttribute($A3) as $Attrib)
+		$this->AssertInstanceOf($A3, $Attrib);
+
+		return;
+	}
+
+	/** @test-if-php-unstupids-itself */
+	public function
+	TestPropertyInfoAttributeHandleMultiFail() {
+
+		// there is presently no point fleshing this feature out because
+		// php isn't giving us a specific exception type or even a specific
+		// error code to test how the attribute failed.
+
+		// string(5) "Error"
+		// int(0)
+		// string(71) "Attribute "Nether\TestPropAttribThereCanBeOnlyOne"
+		// must not be repeated"
+
+		try {
+			$Props = TestClassProp3::GetPropertyIndex();
+		}
+
+		catch(Throwable $Err) {
+			echo PHP_EOL;
+			var_dump($Err);
+			echo PHP_EOL;
+			$this->AssertFalse(TRUE);
+		}
 
 		return;
 	}

@@ -1,5 +1,13 @@
 <?php
 
+namespace NetherTestSuite;
+use PHPUnit;
+
+use Attribute;
+use ReflectionMethod;
+use ReflectionAttribute;
+
+use Nether\Object\Prototype;
 use Nether\Object\Prototype\MethodInfo;
 use Nether\Object\Prototype\MethodInfoCache;
 use Nether\Object\Prototype\MethodInfoInterface;
@@ -9,7 +17,7 @@ use Nether\Object\Package\MethodInfoPackage;
 ////////////////////////////////////////////////////////////////////////////////
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class LocalTestAttrib1
+class TestMethodAttrib1
 implements MethodInfoInterface {
 
 	public bool
@@ -25,10 +33,16 @@ implements MethodInfoInterface {
 
 }
 
+#[Attribute(Attribute::TARGET_METHOD)]
+class TestMethodAttribThereCanBeOnlyOne { }
+
+#[Attribute(Attribute::TARGET_METHOD|Attribute::IS_REPEATABLE)]
+class TestMethodAttribHousePartyProtocol { }
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-class LocalAttributedClass {
+class TestClassMethod1 {
 
 	use
 	MethodInfoPackage;
@@ -40,7 +54,7 @@ class LocalAttributedClass {
 		return;
 	}
 
-	#[LocalTestAttrib1]
+	#[TestMethodAttrib1]
 	public function
 	MethodWithAttrib():
 	void {
@@ -49,6 +63,25 @@ class LocalAttributedClass {
 	}
 
 }
+
+class TestClassMethod2
+extends Prototype {
+
+	#[TestMethodAttribThereCanBeOnlyOne]
+	#[TestMethodAttribHousePartyProtocol]
+	#[TestMethodAttribHousePartyProtocol]
+	#[TestMethodAttribHousePartyProtocol]
+	public function
+	Method():
+	void {
+
+		return;
+	}
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 class MethodInfoPackageTest
 extends PHPUnit\Framework\TestCase {
@@ -59,7 +92,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
-		$Methods = LocalAttributedClass::FetchMethodIndex();
+		$Methods = TestClassMethod1::FetchMethodIndex();
 		$this->AssertTrue(isset($Methods['MethodNoAttrib']));
 		$this->AssertTrue(isset($Methods['MethodWithAttrib']));
 		$this->AssertTrue(isset($Methods['FetchMethodIndex']));
@@ -80,20 +113,20 @@ extends PHPUnit\Framework\TestCase {
 
 		// test that the cache appeared to be working.
 
-		$Methods = LocalAttributedClass::GetMethodIndex();
+		$Methods = TestClassMethod1::GetMethodIndex();
 		$this->AssertTrue(isset($Methods['MethodNoAttrib']));
 		$this->AssertTrue(isset($Methods['MethodWithAttrib']));
 		$this->AssertTrue(isset($Methods['FetchMethodIndex']));
-		$this->AssertTrue(MethodInfoCache::Has(LocalAttributedClass::class));
+		$this->AssertTrue(MethodInfoCache::Has(TestClassMethod1::class));
 		$this->AssertEquals(
-			count(MethodInfoCache::Get(LocalAttributedClass::class)),
+			count(MethodInfoCache::Get(TestClassMethod1::class)),
 			count($Methods)
 		);
 
 		// test that the cache actually works by confirming the info
 		// instances are the same copies.
 
-		$Cached = LocalAttributedClass::GetMethodIndex();
+		$Cached = TestClassMethod1::GetMethodIndex();
 		$Key = NULL;
 		$Info = NULL;
 
@@ -114,7 +147,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
-		$Methods = LocalAttributedClass::FetchMethodsWithAttribute(LocalTestAttrib1::class);
+		$Methods = TestClassMethod1::FetchMethodsWithAttribute(TestMethodAttrib1::class);
 		$this->AssertFalse(isset($Methods['MethodNoAttrib']));
 		$this->AssertTrue(isset($Methods['MethodWithAttrib']));
 		$this->AssertEquals(count($Methods), 1);
@@ -135,7 +168,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
-		$Methods = LocalAttributedClass::GetMethodsWithAttribute(LocalTestAttrib1::class);
+		$Methods = TestClassMethod1::GetMethodsWithAttribute(TestMethodAttrib1::class);
 		$this->AssertFalse(isset($Methods['MethodNoAttrib']));
 		$this->AssertTrue(isset($Methods['MethodWithAttrib']));
 		$this->AssertEquals(count($Methods), 1);
@@ -157,7 +190,7 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestMethodIndexFetchMethodAttribs() {
 
-		$Methods = LocalAttributedClass::FetchMethodIndex();
+		$Methods = TestClassMethod1::FetchMethodIndex();
 		$AttribYep = $Methods['MethodWithAttrib'];
 		$AttribNope = $Methods['MethodNoAttrib'];
 
@@ -165,13 +198,13 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertEquals(count($AttribNope->Attributes), 0);
 
 		$this->AssertArrayHasKey(
-			LocalTestAttrib1::class,
+			TestMethodAttrib1::class,
 			$AttribYep->Attributes
 		);
 
 		$this->AssertInstanceOf(
-			LocalTestAttrib1::class,
-			$AttribYep->Attributes[LocalTestAttrib1::class]
+			TestMethodAttrib1::class,
+			$AttribYep->Attributes[TestMethodAttrib1::class]
 		);
 
 		return;
@@ -181,16 +214,49 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestMethodInfoInterface() {
 
-		$Methods = LocalAttributedClass::FetchMethodIndex();
+		$Methods = TestClassMethod1::FetchMethodIndex();
 		$Method = $Methods['MethodWithAttrib'];
-		$Attrib = $Method->GetAttribute(LocalTestAttrib1::class);
+		$Attrib = $Method->GetAttribute(TestMethodAttrib1::class);
 
 		// test that the attribute implemeneted the method info interface
 		// and that the attribute executed the self learning.
 
-		$this->AssertTrue($Attrib instanceof LocalTestAttrib1);
+		$this->AssertTrue($Attrib instanceof TestMethodAttrib1);
 		$this->AssertTrue($Attrib instanceof MethodInfoInterface);
 		$this->AssertTrue($Attrib->DidMethodInfo);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestPropertyInfoAttributeManageMulti() {
+
+		$Methods = TestClassMethod2::GetMethodIndex();
+		$Method = $Methods['Method'];
+		$A1 = TestMethodAttribThereCanBeOnlyOne::class;
+		$A3 = TestMethodAttribHousePartyProtocol::class;
+		$Attrib = NULL;
+
+		// check them raw.
+
+		$this->AssertCount(2, $Method->Attributes);
+		$this->AssertInstanceOf($A1, $Method->Attributes[$A1]);
+		$this->AssertIsArray($Method->Attributes[$A3]);
+		$this->AssertCount(3, $Method->Attributes[$A3]);
+
+		foreach($Method->Attributes[$A3] as $Attrib)
+		$this->AssertInstanceOf($A3, $Attrib);
+
+		// check them from the api.
+
+		$this->AssertNull($Method->GetAttribute('ThisDoesNotExist'));
+		$this->AssertInstanceOf($A1, $Method->GetAttribute($A1));
+		$this->AssertIsArray($Method->GetAttribute($A3));
+		$this->AssertCount(3, $Method->GetAttribute($A3));
+
+		foreach($Method->GetAttribute($A3) as $Attrib)
+		$this->AssertInstanceOf($A3, $Attrib);
 
 		return;
 	}

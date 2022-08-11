@@ -4,24 +4,44 @@ namespace Nether;
 
 use PHPUnit;
 
+use Nether\Object\Prototype\PropertyInfo;
+use Nether\Object\Prototype\MethodInfo;
+use Throwable;
+
 class LocalTest2
 extends Object\Prototype {
 
 	#[Object\Meta\PropertyOrigin('number_one')]
-	public int $One;
+	public int
+	$One;
 
 	#[Object\Meta\PropertyOrigin('number_two')]
-	public int $Two;
+	public int
+	$Two;
 
 }
 
 class LocalTest3
 extends Object\Prototype {
 
-	#[Object\Meta\PropertyOrigin('number_one')]
-	public int $One;
+	public int
+	$TypedProperty;
 
-	public int $Two;
+	public
+	$UntypedProperty;
+
+	public function
+	TypedMethod():
+	int {
+
+		return 1;
+	}
+
+	public function
+	UntypedMethod() {
+
+		return;
+	}
 
 }
 
@@ -273,9 +293,51 @@ extends PHPUnit\Framework\TestCase {
 		return;
 	}
 
-	/** @ttest */
+	/** @test */
 	public function
-	TestThatAllowNullOnNullCallLogicFail() {
+	TestThatAllowNullOnNullCallLogicFailWithUntypedProps() {
+
+		// tests a failure in my logic that went unnoticed for a while
+		// since i tend to strict type everything, that we ran into at
+		// work like a month after the release. it was calling a method
+		// a reflection type when there was no type defined gg.
+
+		try {
+			$Props = LocalTest3::GetPropertyIndex();
+			$Prop = $Props['UntypedProperty'];
+		}
+
+		catch(Throwable $E) {
+			$this->AssertFalse(TRUE, 'the problem exists.');
+		}
+
+		$this->AssertTrue($Prop instanceof PropertyInfo);
+		$this->AssertEquals($Prop->Type, 'mixed');
+		$this->AssertTrue($Prop->Nullable);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestThatAllowNullOnNullCallLogicFailWithUntypedMethods() {
+
+		// tests a failure in my logic that went unnoticed for a while
+		// since i tend to strict type everything, that we ran into at
+		// work like a month after the release. it was calling a method
+		// a reflection type when there was no type defined gg.
+
+		try {
+			$Methods = LocalTest3::GetMethodIndex();
+			$Method = $Methods['UntypedMethod'];
+		}
+
+		catch(Throwable $E) {
+			$this->AssertFalse(TRUE, 'the problem exists.');
+		}
+
+		$this->AssertTrue($Method instanceof MethodInfo);
+		$this->AssertEquals($Method->Type, 'mixed');
 
 		return;
 	}
