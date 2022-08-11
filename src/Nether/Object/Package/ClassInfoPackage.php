@@ -3,25 +3,37 @@
 namespace Nether\Object\Package;
 
 use ReflectionClass;
+use Nether\Object\Prototype\ClassInfo;
+use Nether\Object\Prototype\ClassInfoCache;
 
 trait ClassInfoPackage {
 
 	static public function
-	FetchClassAttributes(bool $Init=TRUE):
-	array {
+	FetchClassInfo(bool $Init=TRUE):
+	ClassInfo {
 	/*//
-	@date 2021-08-24
+	@date 2021-08-11
 	return a list of all the attributes on this class.
 	//*/
 
-		$RefClass = new ReflectionClass(static::class);
-		$Attrib = NULL;
-		$Output = [];
+		return new ClassInfo(new ReflectionClass(static::class));
+	}
 
-		foreach($RefClass->GetAttributes() as $Attrib)
-		$Output[] = $Init ? $Attrib->NewInstance() : $Attrib;
 
-		return $Output;
+	static public function
+	GetClassInfo():
+	ClassInfo {
+	/*//
+	@date 2022-08-11
+	//*/
+
+		if(ClassInfoCache::Has(static::class))
+		return ClassInfoCache::Get(static::class);
+
+		return ClassInfoCache::Set(
+			static::class,
+			static::FetchClassInfo()
+		);
 	}
 
 }
