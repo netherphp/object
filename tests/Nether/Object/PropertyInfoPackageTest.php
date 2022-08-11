@@ -1,6 +1,6 @@
 <?php
 
-use Nether\Object\Package\PropertyAttributePackage;
+use Nether\Object\Package\PropertyInfoPackage;
 use Nether\Object\Prototype\PropertyInfoCache;
 use Nether\Object\Prototype\PropertyInfo;
 
@@ -16,7 +16,7 @@ class LocalPropAttrib1 { }
 class LocalAttributedPropClass {
 
 	use
-	PropertyAttributePackage;
+	PropertyInfoPackage;
 
 	public string
 	$PropNoAttrib;
@@ -27,7 +27,7 @@ class LocalAttributedPropClass {
 
 }
 
-class PropertyAttributePackageTest
+class PropertyInfoPackageTest
 extends PHPUnit\Framework\TestCase {
 
 	/** @test */

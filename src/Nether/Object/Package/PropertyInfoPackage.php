@@ -7,7 +7,7 @@ use Nether\Object\Prototype\PropertyInfo;
 use Nether\Object\Datastore;
 use ReflectionClass;
 
-trait PropertyAttributePackage {
+trait PropertyInfoPackage {
 
 	static public function
 	FetchPropertyIndex():

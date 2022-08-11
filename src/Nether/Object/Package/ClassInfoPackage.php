@@ -4,7 +4,7 @@ namespace Nether\Object\Package;
 
 use ReflectionClass;
 
-trait ClassAttributePackage {
+trait ClassInfoPackage {
 
 	static public function
 	FetchClassAttributes(bool $Init=TRUE):

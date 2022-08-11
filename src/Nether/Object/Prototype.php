@@ -4,9 +4,9 @@ namespace Nether\Object;
 
 use Nether\Object\Prototype\Flags;
 use Nether\Object\Prototype\ConstructArgs;
-use Nether\Object\Package\ClassAttributePackage;
-use Nether\Object\Package\PropertyAttributePackage;
-use Nether\Object\Package\MethodAttributePackage;
+use Nether\Object\Package\ClassInfoPackage;
+use Nether\Object\Package\PropertyInfoPackage;
+use Nether\Object\Package\MethodInfoPackage;
 
 class Prototype {
 /*//
@@ -18,9 +18,9 @@ impact i can find while packing in as many features as possible.
 //*/
 
 	use
-	ClassAttributePackage,
-	PropertyAttributePackage,
-	MethodAttributePackage;
+	ClassInfoPackage,
+	PropertyInfoPackage,
+	MethodInfoPackage;
 
 	public function
 	__Construct(array|object|NULL $Raw=NULL, array|object|NULL $Defaults=NULL, int $Flags=0) {

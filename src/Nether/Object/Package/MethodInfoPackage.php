@@ -7,7 +7,7 @@ use Nether\Object\Prototype\SmartAttribute;
 use Nether\Object\Prototype\MethodInfo;
 use Nether\Object\Prototype\MethodInfoCache;
 
-trait MethodAttributePackage {
+trait MethodInfoPackage {
 
 	static public function
 	FetchMethodIndex():

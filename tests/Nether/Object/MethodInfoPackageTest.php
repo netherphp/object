@@ -1,6 +1,6 @@
 <?php
 
-use Nether\Object\Package\MethodAttributePackage;
+use Nether\Object\Package\MethodInfoPackage;
 use Nether\Object\Prototype\MethodInfo;
 use Nether\Object\Prototype\MethodInfoInterface;
 use Nether\Object\Prototype\MethodInfoCache;
@@ -32,7 +32,7 @@ implements MethodInfoInterface {
 class LocalAttributedClass {
 
 	use
-	MethodAttributePackage;
+	MethodInfoPackage;
 
 	public function
 	MethodNoAttrib():
@@ -51,7 +51,7 @@ class LocalAttributedClass {
 
 }
 
-class MethodAttributePackageTest
+class MethodInfoPackageTest
 extends PHPUnit\Framework\TestCase {
 
 	/** @test */
