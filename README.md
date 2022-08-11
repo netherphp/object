@@ -17,8 +17,6 @@ class as the parent enables the attribute based functionality all the way down.
 * Documentation
   https://github.com/netherphp/object/wiki/Class:-Nether%5CObject%5CPrototype
 
-
-
 ## Nether\Object\Datastore
 
 Provides an array-like object so that items can be stored like arrays but
@@ -29,15 +27,33 @@ manipulated with chainable methods.
 
 
 
-# **Deprecated**
+# **Trait Overview**
 
-These are old things that still exist but are no longer preferred to be used.
+## Nether\Object\Package\MethodInfoPackage
 
+This trait can be bolted into any class to apply static methods for fetching
+a list of all the methods it has as well as process their attributes to perform
+metaprogramming tasks.
 
-## Nether\Object\Mapped (deprecated)
+* `{Class}::FetchMethodIndex(): array`
 
-Replaced during PHP 8 the Mapped provides similiar functionality as Prototype
-in regards to filling properties and remapping schemas.
+  Returns an array of MethodInfo objects that describe the methods and their
+  attributes.
 
-* Documentation
-  https://github.com/netherphp/object/wiki/Class:-Nether%5CObject%5CMapped
+* `{Class}::FetchMethodsWithAttribute(string Name): array`
+
+  Returns an array of MethodInfo objects that were tagged with the specified
+  attribute.
+
+* `{Class}::GetMethodIndex(): array`
+
+  The same as `FetchMethodIndex()` except it uses an inline cache in case you
+  plan to be asking a lot of questions over time. This is the perferred way to
+  get the method list from userspace as it will only do the processing of
+  the methods and their attributes the first time you ask.
+
+* `{Class}::GetMethodsWithAttribute(string Name): array`
+
+  The same as `FetchMethodsWithAttribute()` except using the inline cache
+  mentioned above. Again this is the preferred way to get the method list
+  from userspace.
