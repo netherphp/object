@@ -960,8 +960,14 @@ extends PHPUnit\Framework\TestCase {
 		$Store['One'] = 'Won';
 		$this->AssertEquals('Won', $Store['One']);
 
+		// check unsetting via OffsetUnset
+
 		unset($Store['One']);
 		$this->AssertFalse($Store->HasKey('One'));
+
+		// check existing via OffsetExists
+
+		$this->AssertTrue(isset($Store[1]));
 		$this->AssertFalse(isset($Store['One']));
 
 		return;
