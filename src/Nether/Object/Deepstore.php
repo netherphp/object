@@ -60,11 +60,11 @@ extends Datastore {
 	of how bad i can be.
 	//*/
 
-		if(!array_key_exists($Key,$this->Data))
-		throw new Exception("{$Key} is not an existing callable.");
+		if(!array_key_exists($Key, $this->Data))
+		throw new Exception("{$Key} is not an existing callable.", 1);
 
 		if(!is_callable($this->Data[$Key]))
-		throw new Exception("{$Key} is not callable.");
+		throw new Exception("{$Key} is not callable.", 2);
 
 		return $this->Data[$Key]->Call($this,...$Args);
 	}

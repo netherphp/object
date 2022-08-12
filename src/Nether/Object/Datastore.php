@@ -949,7 +949,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		else $this->Filename = $Filename;
 
 		if(!$Filename)
-		throw new Exception('No filename specified.');
+		throw new Exception('No filename specified.', 1);
 
 		$Basename = basename($Filename);
 		$Ext = NULL;
@@ -961,25 +961,29 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		////////
 
 		if(!file_exists($Filename))
-		throw new Exception("File {$Basename} not found.",1);
+		throw new Exception("File {$Basename} not found.", 2);
 
 		if(!is_readable($Filename))
-		throw new Exception("File {$Basename} is not readable.",2);
+		throw new Exception("File {$Basename} is not readable.", 3);
 
 		////////
 		////////
+
+		$Data = NULL;
 
 		if($Ext === 'json' || $this->Format === static::FormatJSON)
-		$this->Data = json_decode(file_get_contents($Filename));
+		$Data = json_decode(file_get_contents($Filename));
 
 		elseif($Ext === 'phson' || $this->Format === static::FormatPHP)
-		$this->Data = unserialize(file_get_contents($Filename));
+		$Data = unserialize(file_get_contents($Filename));
 
 		////////
 		////////
 
-		if(is_object($this->Data))
-		$this->Data = (array)$this->Data;
+		if(!is_array($Data))
+		$Data = (array)$Data;
+
+		$this->Data = $Data;
 
 		return $this;
 	}
@@ -992,41 +996,41 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	write this datastructure to disk.
 	//*/
 
-		if($Filename === NULL)
-		$Filename = $this->Filename;
+		$Filename ??= $Filename ?? $this->Filename;
 
-		$Error = NULL;
+		if(!$Filename)
+		throw new Exception('no filename specified', 1);
+
+		////////
+
 		$Dirname = dirname($Filename);
 		$Basename = basename($Filename);
 		$Ext = NULL;
 
 		if(strpos($Basename,'.') !== FALSE)
-		$Ext = strtolower(explode('.',$Basename,2)[1]);
+		$Ext = strtolower(explode('.', $Basename, 2)[1]);
 
 		////////
 		////////
 
 		if(!file_exists($Filename)) {
-			if(!is_dir($Dirname) && !@mkdir($Dirname,0777,TRUE))
-			$Error = ["Unable to create directory ({$Dirname})",3];
+			if(!is_dir($Dirname) && !@mkdir($Dirname, 0777, TRUE))
+			throw new Exception("Unable to create directory ({$Dirname})", 4);
 
 			elseif(!is_writable($Dirname))
-			$Error = ["Unable to create file ({$Dirname}) not writable.",1];
+			throw new Exception("Unable to create file ({$Dirname}) not writable.", 2);
 		}
 
 		else {
 			if(!is_writable($Filename))
-			$Error = ["Unable to write to file ({$Basename}).",2];
+			throw new Exception("Unable to write to file ({$Basename}).", 3);
 		}
-
-		if($Error)
-		throw new Exception(...$Error);
 
 		////////
 		////////
 
 		if($Ext === 'json' || $this->Format === static::FormatJSON)
-		$Data = json_encode($this->Data,JSON_PRETTY_PRINT);
+		$Data = json_encode($this->Data, JSON_PRETTY_PRINT);
 
 		else
 		$Data = serialize($this->Data);

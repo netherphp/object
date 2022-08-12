@@ -78,6 +78,13 @@ extends PHPUnit\Framework\TestCase {
 		foreach($Store as $Key => $Value)
 		$this->AssertTrue($Value === ($Key + 1));
 
+		// mess with the shove method too.
+
+		$Store->Shove(1, 42);
+		$Store->Shove('FourtyTwo', 42);
+		$this->AssertEquals(42, $Store->Get(1));
+		$this->AssertEquals(42, $Store->Get('FourtyTwo'));
+
 		return;
 	}
 
@@ -175,12 +182,21 @@ extends PHPUnit\Framework\TestCase {
 		->Push(2)
 		->Push(3);
 
-		$this->AssertTrue($Store->Count() === 3);
+		// test shifting. which pops things off the front.
 
+		$this->AssertTrue($Store->Count() === 3);
 		$this->AssertTrue($Store->Shift() === 1);
 		$this->AssertTrue($Store->Shift() === 2);
 		$this->AssertTrue($Store->Shift() === 3);
 		$this->AssertTrue($Store->Count() === 0);
+
+		// test unshifting. which pushes things onto the front.
+
+		$Store->Unshift('one');
+		$Store->Unshift('two');
+		$this->AssertTrue($Store->Count() === 2);
+		$this->AssertTrue($Store->Shift() === 'two');
+
 		return;
 	}
 
@@ -502,7 +518,9 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestWriteToDisk() {
 
-		$Dataset = [1,2,3];
+		$Dataset = [ 1, 2, 3 ];
+		$Store = new Datastore;
+		$HadException = FALSE;
 		$Filename = sprintf(
 			'/tmp/nether-object-datastore-%s.phson',
 			md5(microtime(TRUE))
@@ -510,20 +528,62 @@ extends PHPUnit\Framework\TestCase {
 
 		// test that we could create a new file.
 
-		$Store = new Datastore;
 		$Store->SetData($Dataset);
+
+		// purposely fail without haivng specified a file.
+
+		try { $Store->Write(); }
+		catch(Throwable $Err) {
+			$this->AssertEquals(1, $Err->GetCode());
+		}
+
+		// purposely fail with directory error it should be pretty
+		// near rare to have this work for anybody lol.
+
+		try { $Store->Write('/banana/man/man/man/banana/man'); }
+		catch(Throwable $Err) {
+			$this->AssertEquals(4, $Err->GetCode());
+		}
+
+		// then write with a filename.
+
 		$Store->Write($Filename);
 		$this->AssertTrue(file_exists($Filename));
 
 		// test that we could overwrite it.
 
-		$Dataset = [3,2,1];
+		$Dataset = [ 3, 2, 1 ];
 		$Store->SetData($Dataset);
 		$Store->Write($Filename);
 		$this->AssertTrue(file_exists($Filename));
 
 		$Data = file_get_contents($Filename);
 		$this->AssertEquals($Data,serialize($Dataset));
+
+		// test that we could not overwrite it.
+		// rumor has it that php has some built in stuff with
+		// the chmod function so that it can toggle the read
+		// only flag if the user bit doesn't have read so just
+		// am trusting that this works on windows lol.
+
+		chmod($Filename, 0o000);
+		$HadException = FALSE;
+
+		try { $Store->Write($Filename); }
+		catch(Throwable $Err) {
+			$HadException = TRUE;
+			$this->AssertEquals(3, $Err->GetCode());
+		}
+
+		$this->AssertTrue(
+			$HadException,
+			'should have had an exception writing tbh'
+		);
+
+		// check that we can write to it again.
+
+		chmod($Filename, 0o666);
+		$Store->Write($Filename);
 
 		// test that we could write it in json.
 
@@ -541,11 +601,54 @@ extends PHPUnit\Framework\TestCase {
 	TestReadFromDisk() {
 
 		$Iter = NULL;
-
+		$HadException = FALSE;
 		$Dataset = [1,2,3];
 		$Filename = sprintf(
 			'/tmp/nether-object-datastore-%s.phson',
 			md5(microtime(TRUE))
+		);
+
+		$Jsonname = sprintf(
+			'/tmp/nether-object-datastore-%s.json',
+			md5(microtime(TRUE))
+		);
+
+		// try to fail reading a file without ever setting the name.
+
+		$HadException = FALSE;
+
+		try {
+			$Store = new Datastore;
+			$Store->Read();
+		}
+
+		catch(Throwable $Err) {
+			$HadException = TRUE;
+			$this->AssertEquals(1, $Err->GetCode());
+		}
+
+		$this->AssertTrue(
+			$HadException,
+			'we should have had a read exception (no filename)'
+		);
+
+		// try to fail reading a file that does not exist.
+
+		$HadException = FALSE;
+
+		try {
+			$Store = new Datastore;
+			$Store->Read('/quoth/the/raven/nevermore');
+		}
+
+		catch(Throwable $Err) {
+			$HadException = TRUE;
+			$this->AssertEquals(2, $Err->GetCode());
+		}
+
+		$this->AssertTrue(
+			$HadException,
+			'we should have had a read exception (doesnt exist)'
 		);
 
 		// write a file.
@@ -564,7 +667,44 @@ extends PHPUnit\Framework\TestCase {
 		for($Iter = 0; $Iter < count($Dataset); $Iter++)
 		$this->AssertTrue($Store->Get($Iter) === $Dataset[$Iter]);
 
-		unset($Filename);
+		// read a file again.
+
+		$Store = Datastore::GetFromFile($Filename);
+
+		for($Iter = 0; $Iter < count($Dataset); $Iter++)
+		$this->AssertTrue($Store->Get($Iter) === $Dataset[$Iter]);
+
+		// try to fail at reading a file due to permissions.
+
+		chmod($Filename, 0o000);
+		$HadException = FALSE;
+
+		try { $Store = Datastore::GetFromFile($Filename); }
+
+		catch(Throwable $Err) {
+			$HadException = TRUE;
+			$this->AssertEquals(3, $Err->GetCode());
+		}
+
+		$this->AssertTrue(
+			$HadException,
+			'we should have had a read exception (unreadable perms)'
+		);
+
+		// try to read and write the same thing but in json format.
+
+		$Store = new Datastore($Dataset);
+		$Store->SetFilename($Jsonname);
+		$Store->Write();
+
+		$Result = Datastore::GetFromFile($Jsonname);
+		$this->AssertEquals(3, $Result->Count());
+
+		// try to read a jsonfile that wasn't the format we expected.
+
+		file_put_contents($Jsonname, "{}");
+		$Result = Datastore::GetFromFile($Jsonname);
+
 		return;
 	}
 
@@ -995,6 +1135,10 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertEquals(1, $Values[0]);
 		$this->AssertEquals('Won', $Values[3]);
 
+		$Store->Revalue();
+		$this->AssertEquals(1, $Store[0]);
+		$this->AssertEquals('Won', $Store[3]);
+
 		return;
 	}
 
@@ -1023,6 +1167,81 @@ extends PHPUnit\Framework\TestCase {
 		$Result = $Store->Join('-');
 
 		$this->AssertEquals('1-2-3', $Result);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestMethodMapKeysRemapKeys():
+	void {
+
+		$Store = new Datastore([
+			'One'   => 1,
+			'Two'   => 2,
+			'Three' => 3
+		]);
+
+		$Remapper = function($Key, $Val, $Me) {
+			return [ "{$Key}{$Val}" => $Val ];
+		};
+
+		// remap the keys into a new store.
+
+		$Mapped = $Store->MapKeys($Remapper);
+
+		// check the new store looks right.
+
+		$this->AssertTrue($Mapped->HasKey('One1'));
+		$this->AssertEquals(1, $Mapped->Get('One1'));
+		$this->AssertFalse($Mapped->HasKey('One'));
+
+		// check the old store is unchanged.
+
+		$this->AssertTrue($Store->HasKey('One'));
+		$this->AssertEquals(1, $Store->Get('One'));
+		$this->AssertFalse($Store->HasKey('One1'));
+
+		// remap the current store.
+
+		$Store->RemapKeys($Remapper);
+
+		$this->AssertTrue($Store->HasKey('One1'));
+		$this->AssertEquals(1, $Store->Get('One1'));
+		$this->AssertFalse($Store->HasKey('One'));
+
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestMethodShuffle():
+	void {
+
+		$Store = new Datastore([ 1, 2, 3, 4, 5, 6 ]);
+		$OG = $Store->Join('');
+
+		$Store->Shuffle();
+
+		// test the shuffle making a provision just in case that
+		// somehow rng magically shuffled it into the same order
+		// roflmao.
+
+		$Attempt = 10;
+		$Different = 0;
+		$Line = NULL;
+
+		while($Attempt > 0) {
+			$Attempt--;
+
+			$Line = $Store->Join('');
+
+			if($Line !== $OG)
+			$Different++;
+		}
+
+		$this->AssertGreaterThan(0, $Different);
 
 		return;
 	}
