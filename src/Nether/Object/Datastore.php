@@ -993,49 +993,39 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		$Filename ??= $Filename ?? $this->Filename;
 
 		if(!$Filename)
-		throw new Exception('no filename specified', 1);
+		throw new Error\FileNotSpecified;
 
 		////////
 
-		$Dirname = dirname($Filename);
-		$Basename = basename($Filename);
-		$Ext = NULL;
+		$File = new SplFileInfo($Filename);
+		$Dirname = $File->GetPath();
+		$Ext = strtolower($File->GetExtension()) ?: NULL;
 
-		if(strpos($Basename,'.') !== FALSE)
-		$Ext = strtolower(explode('.', $Basename, 2)[1]);
-
-		////////
 		////////
 
 		if(!file_exists($Filename)) {
 			if(!is_dir($Dirname) && !@mkdir($Dirname, 0777, TRUE))
-			throw new Exception("Unable to create directory ({$Dirname})", 4);
+			throw new Error\DirUnwritable(dirname($Dirname));
 
 			elseif(!is_writable($Dirname))
-			throw new Exception("Unable to create file ({$Dirname}) not writable.", 2);
+			throw new Error\DirUnwritable($Dirname);
 		}
 
 		else {
 			if(!is_writable($Filename))
-			throw new Exception("Unable to write to file ({$Basename}).", 3);
+			throw new Error\FileUnwritable($Filename);
 		}
 
-		////////
 		////////
 
 		if($Ext === 'json' || $this->Format === static::FormatJSON)
 		$Data = json_encode($this->Data, JSON_PRETTY_PRINT);
-
 		else
 		$Data = serialize($this->Data);
 
 		////////
-		////////
 
-		file_put_contents($Filename,$Data);
-
-		////////
-		////////
+		file_put_contents($Filename, $Data);
 
 		return $this;
 	}

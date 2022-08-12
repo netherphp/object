@@ -5,8 +5,10 @@ use PHPUnit;
 
 use Nether\Object\Datastore;
 use Nether\Object\Error\FileUnreadable;
+use Nether\Object\Error\FileUnwritable;
 use Nether\Object\Error\FileNotFound;
 use Nether\Object\Error\FileNotSpecified;
+use Nether\Object\Error\DirUnwritable;
 
 use StdClass;
 use Throwable;
@@ -530,27 +532,39 @@ extends PHPUnit\Framework\TestCase {
 			md5(microtime(TRUE))
 		);
 
-		// test that we could create a new file.
+		// try to fail with no filename specified.
 
-		$Store->SetData($Dataset);
-
-		// purposely fail without haivng specified a file.
+		$HadException = FALSE;
 
 		try { $Store->Write(); }
 		catch(Throwable $Err) {
-			$this->AssertEquals(1, $Err->GetCode());
+			$HadException = TRUE;
+			$this->AssertInstanceOf(FileNotSpecified::class, $Err);
 		}
 
-		// purposely fail with directory error it should be pretty
-		// near rare to have this work for anybody lol.
+		$this->AssertTrue(
+			$HadException,
+			'should have had exception (no filename)'
+		);
+
+		// try to fail with a directory that can never be made.
+
+		$HadException = FALSE;
 
 		try { $Store->Write('/banana/man/man/man/banana/man'); }
 		catch(Throwable $Err) {
-			$this->AssertEquals(4, $Err->GetCode());
+			$HadException = TRUE;
+			$this->AssertInstanceOf(DirUnwritable::class, $Err);
 		}
+
+		$this->AssertTrue(
+			$HadException,
+			'should have had exception (unable to make dir)'
+		);
 
 		// then write with a filename.
 
+		$Store->SetData($Dataset);
 		$Store->Write($Filename);
 		$this->AssertTrue(file_exists($Filename));
 
@@ -576,12 +590,12 @@ extends PHPUnit\Framework\TestCase {
 		try { $Store->Write($Filename); }
 		catch(Throwable $Err) {
 			$HadException = TRUE;
-			$this->AssertEquals(3, $Err->GetCode());
+			$this->AssertInstanceOf(FileUnwritable::class, $Err);
 		}
 
 		$this->AssertTrue(
 			$HadException,
-			'should have had an exception writing tbh'
+			'should have had an exception (file unwritable)'
 		);
 
 		// check that we can write to it again.
