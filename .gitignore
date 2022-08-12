@@ -1,4 +1,5 @@
 # >_<
+/.vscode
 /.phpunit.cache
 /vendor
 /tests/_output

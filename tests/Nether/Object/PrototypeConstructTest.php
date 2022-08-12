@@ -1,24 +1,26 @@
 <?php
 
-namespace Nether;
-use Nether;
+namespace NetherTestSuite\PrototypeConstructTest;
 use PHPUnit;
 
+use Nether\Object\Datastore;
 use Nether\Object\Prototype;
 use Nether\Object\Prototype\Flags;
 use Nether\Object\Prototype\PropertyInfo;
 use Nether\Object\Prototype\MethodInfo;
 use Nether\Object\Prototype\ConstructArgs;
+use Nether\Object\Meta\PropertyOrigin;
+use Nether\Object\Meta\PropertyObjectify;
 use Throwable;
 
 class LocalTest2
 extends Prototype {
 
-	#[Object\Meta\PropertyOrigin('number_one')]
+	#[PropertyOrigin('number_one')]
 	public int
 	$One;
 
-	#[Object\Meta\PropertyOrigin('number_two')]
+	#[PropertyOrigin('number_two')]
 	public int
 	$Two;
 
@@ -361,8 +363,8 @@ extends PHPUnit\Framework\TestCase {
 	//*/
 
 		$Object = new class() extends Prototype {
-			#[Object\Meta\PropertyObjectify]
-			public Object\Datastore $Data;
+			#[PropertyObjectify]
+			public Datastore $Data;
 		};
 
 		$this->AssertInstanceOf(
