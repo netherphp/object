@@ -25,7 +25,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          coverage: none
+          coverage: xml
           extensions: mbstring, intl
           tools: phpunit
       - name: Run PHPUnit
@@ -34,3 +34,8 @@ jobs:
           phpunit tests --bootstrap vendor/autoload.php
           php tests/timed.php 1 100000
           php tests/timed.php 2 100000
+      - name: Push to Codecov Probably
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          verbose: true
