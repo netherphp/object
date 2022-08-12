@@ -26,6 +26,19 @@ provides a static cache for the prototype method attribute structures.
 	}
 
 	static public function
+	Drop(string $ClassName):
+	void {
+	/*//
+	@2022-08-12
+	//*/
+
+		if(array_key_exists($ClassName, static::$Cache))
+		unset(static::$Cache[$ClassName]);
+
+		return;
+	}
+
+	static public function
 	Has(string $ClassName):
 	bool {
 	/*//

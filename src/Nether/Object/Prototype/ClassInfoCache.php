@@ -4,19 +4,18 @@ namespace Nether\Object\Prototype;
 
 class ClassInfoCache {
 /*//
-@date 2021-08-09
+@date 2022-08-10
 provides a static cache for the prototype class info structures.
 //*/
 
-	static public array
+	static protected array
 	$Cache = [];
 
 	static public function
 	Get(string $ClassName):
 	?ClassInfo {
 	/*//
-	@date 2021-08-08
-	@mopt isset
+	@date 2022-08-10
 	//*/
 
 		if(!isset(static::$Cache[$ClassName]))
@@ -26,11 +25,23 @@ provides a static cache for the prototype class info structures.
 	}
 
 	static public function
+	Drop(string $ClassName):
+	void {
+	/*//
+	@2022-08-12
+	//*/
+
+		if(array_key_exists($ClassName, static::$Cache))
+		unset(static::$Cache[$ClassName]);
+
+		return;
+	}
+
+	static public function
 	Has(string $ClassName):
 	bool {
 	/*//
-	@date 2021-08-08
-	@mopt isset
+	@date 2022-08-10
 	//*/
 
 		return isset(static::$Cache[$ClassName]);
@@ -40,7 +51,7 @@ provides a static cache for the prototype class info structures.
 	Set(string $ClassName, ClassInfo $ClassInfo):
 	ClassInfo {
 	/*//
-	@date 2021-08-08
+	@date 2022-08-10
 	//*/
 
 		static::$Cache[$ClassName] = $ClassInfo;

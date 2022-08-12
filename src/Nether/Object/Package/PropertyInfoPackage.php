@@ -98,7 +98,7 @@ trait PropertyInfoPackage {
 		$PropertyMap = PropertyInfoCache::Get(static::class);
 
 		else
-		$PropertyMap = static::GetMethodIndex();
+		$PropertyMap = static::GetPropertyIndex();
 
 		////////
 
@@ -139,18 +139,6 @@ trait PropertyInfoPackage {
 		);
 
 		return $Output;
-	}
-
-	static public function
-	GetPropertyDatastore():
-	Datastore {
-	/*//
-	@date 2022-08-06
-	returns a datastore object keyed with a data source name and values of the
-	data destination name. does not include static properties.
-	//*/
-
-		return new Datastore(static::GetPropertyMap());
 	}
 
 }

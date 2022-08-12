@@ -14,10 +14,6 @@ provides a static cache for the prototype property attribute structures.
 	static public function
 	Get(string $ClassName):
 	?array {
-	/*//
-	@date 2021-08-08
-	@mopt isset
-	//*/
 
 		if(!isset(static::$Cache[$ClassName]))
 		return NULL;
@@ -26,12 +22,18 @@ provides a static cache for the prototype property attribute structures.
 	}
 
 	static public function
+	Drop(string $ClassName):
+	void {
+
+		if(array_key_exists($ClassName, static::$Cache))
+		unset(static::$Cache[$ClassName]);
+
+		return;
+	}
+
+	static public function
 	Has(string $ClassName):
 	bool {
-	/*//
-	@date 2021-08-08
-	@mopt isset
-	//*/
 
 		return isset(static::$Cache[$ClassName]);
 	}
@@ -39,9 +41,6 @@ provides a static cache for the prototype property attribute structures.
 	static public function
 	Set(string $ClassName, array $PropertyMap):
 	array {
-	/*//
-	@date 2021-08-08
-	//*/
 
 		static::$Cache[$ClassName] = $PropertyMap;
 		return $PropertyMap;

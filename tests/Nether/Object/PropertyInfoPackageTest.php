@@ -1,6 +1,6 @@
 <?php
 
-namespace NetherTestSuite;
+namespace NetherTestSuite\PropertyInfoPackageTest;
 use PHPUnit;
 
 use Attribute;
@@ -92,6 +92,16 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
+	TestPropertyInfoCacheBasics() {
+
+		$this->AssertFalse(PropertyInfoCache::Has('SomethingNeverCached'));
+		$this->AssertNull(PropertyInfoCache::Get('SomethingNeverCached'));
+
+		return;
+	}
+
+	/** @test */
+	public function
 	TestPropertyIndexFetch() {
 
 		// test fetching the index.
@@ -137,6 +147,12 @@ extends PHPUnit\Framework\TestCase {
 			$this->AssertTrue($Props[$Key] === $Info);
 		}
 
+		// check we can flush the cache.
+
+		$this->AssertTrue(PropertyInfoCache::Has(TestClassProp1::class));
+		PropertyInfoCache::Drop(TestClassProp1::class);
+		$this->AssertFalse(PropertyInfoCache::Has(TestClassProp1::class));
+
 		return;
 	}
 
@@ -170,6 +186,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
+		$Props = TestClassProp1::GetPropertiesWithAttribute(TestPropAttrib1::class);
 		$Props = TestClassProp1::GetPropertiesWithAttribute(TestPropAttrib1::class);
 		$this->AssertFalse(isset($Props['PropNoAttrib']));
 		$this->AssertTrue(isset($Props['PropWithAttrib']));
@@ -252,6 +269,8 @@ extends PHPUnit\Framework\TestCase {
 
 		// check them from the api.
 
+		$this->AssertTrue($Prop->HasAttribute($A1));
+		$this->AssertFalse($Prop->HasAttribute('ThisDoesNotExist'));
 		$this->AssertNull($Prop->GetAttribute('ThisDoesNotExist'));
 		$this->AssertInstanceOf($A1, $Prop->GetAttribute($A1));
 		$this->AssertIsArray($Prop->GetAttribute($A3));

@@ -88,6 +88,16 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
+	TestMethodInfoCacheBasics() {
+
+		$this->AssertFalse(MethodInfoCache::Has('SomethingNeverCached'));
+		$this->AssertNull(MethodInfoCache::Get('SomethingNeverCached'));
+
+		return;
+	}
+
+	/** @test */
+	public function
 	TestMethodIndexFetch() {
 
 		// test fetching the index.
@@ -135,6 +145,12 @@ extends PHPUnit\Framework\TestCase {
 			$this->AssertTrue($Methods[$Key] === $Info);
 		}
 
+		// check we can flush the cache.
+
+		$this->AssertTrue(MethodInfoCache::Has(TestClassMethod1::class));
+		MethodInfoCache::Drop(TestClassMethod1::class);
+		$this->AssertFalse(MethodInfoCache::Has(TestClassMethod1::class));
+
 		return;
 	}
 
@@ -168,6 +184,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test fetching the index.
 
+		$Methods = TestClassMethod1::GetMethodsWithAttribute(TestMethodAttrib1::class);
 		$Methods = TestClassMethod1::GetMethodsWithAttribute(TestMethodAttrib1::class);
 		$this->AssertFalse(isset($Methods['MethodNoAttrib']));
 		$this->AssertTrue(isset($Methods['MethodWithAttrib']));
@@ -250,6 +267,8 @@ extends PHPUnit\Framework\TestCase {
 
 		// check them from the api.
 
+		$this->AssertTrue($Method->HasAttribute($A1));
+		$this->AssertFalse($Method->HasAttribute('ThisDoesNotExist'));
 		$this->AssertNull($Method->GetAttribute('ThisDoesNotExist'));
 		$this->AssertInstanceOf($A1, $Method->GetAttribute($A1));
 		$this->AssertIsArray($Method->GetAttribute($A3));

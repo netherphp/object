@@ -1,3 +1,4 @@
 # >_<
-/vendor/
+/.phpunit.cache
+/vendor
 /tests/_output
