@@ -522,95 +522,75 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestWriteToDisk() {
+	TestReadWriteToDisk() {
 
 		$Dataset = [ 1, 2, 3 ];
-		$Store = new Datastore;
-		$HadException = FALSE;
+		$Store = new Datastore($Dataset);
+		$Failed = FALSE;
 		$Filename = sprintf(
-			'/tmp/nether-object-datastore-%s.phson',
+			'%s/nether-object-datastore-%s.phson',
+			sys_get_temp_dir(),
 			md5(microtime(TRUE))
 		);
 
-		// try to fail with no filename specified.
+		// fail because no filename specified.
 
-		$HadException = FALSE;
+		try {
+			$Failed = FALSE;
+			$Store->Write();
+		}
 
-		try { $Store->Write(); }
 		catch(Throwable $Err) {
-			$HadException = TRUE;
+			$Failed = TRUE;
 			$this->AssertInstanceOf(FileNotSpecified::class, $Err);
 		}
 
-		$this->AssertTrue(
-			$HadException,
-			'should have had exception (no filename)'
-		);
+		$this->AssertTrue($Failed, 'expected FileNotSpecified');
 
-		// try to fail with a directory that can never be made.
+		// fail because a directory cannot be made.
 
-		$HadException = FALSE;
+		try {
+			$Failed = FALSE;
+			$Store->Write('/quoth/the/raven/nevermore.lulz');
+		}
 
-		try { $Store->Write('/banana/man/man/man/banana/man'); }
 		catch(Throwable $Err) {
-			$HadException = TRUE;
+			$Failed = TRUE;
 			$this->AssertInstanceOf(DirUnwritable::class, $Err);
 		}
 
-		$this->AssertTrue(
-			$HadException,
-			'should have had exception (unable to make dir)'
-		);
+		$this->AssertTrue($Failed, 'expected DirUnwritable');
 
-		// then write with a filename.
+		// surely then it would be impossible to fail at writing
+		// by this point amirite.
 
-		$Store->SetData($Dataset);
 		$Store->Write($Filename);
 		$this->AssertTrue(file_exists($Filename));
+		$this->AssertTrue(filesize($Filename) > 0);
 
-		// test that we could overwrite it.
-
-		$Dataset = [ 3, 2, 1 ];
-		$Store->SetData($Dataset);
-		$Store->Write($Filename);
-		$this->AssertTrue(file_exists($Filename));
-
-		$Data = file_get_contents($Filename);
-		$this->AssertEquals($Data,serialize($Dataset));
-
-		// test that we could not overwrite it.
+		// fail because we are about to make that file unwritable.
 		// rumor has it that php has some built in stuff with
 		// the chmod function so that it can toggle the read
 		// only flag if the user bit doesn't have read so just
 		// am trusting that this works on windows lol.
 
 		chmod($Filename, 0000);
-		$HadException = FALSE;
 
-		try { $Store->Write($Filename); }
+		try {
+			$Failed = FALSE;
+			$Store->Write($Filename);
+		}
+
 		catch(Throwable $Err) {
-			$HadException = TRUE;
+			$Failed = TRUE;
 			$this->AssertInstanceOf(FileUnwritable::class, $Err);
 		}
 
-		$this->AssertTrue(
-			$HadException,
-			'should have had an exception (file unwritable)'
-		);
-
-		// check that we can write to it again.
+		$this->AssertTrue($Failed, 'expected FileUnwritable');
 
 		chmod($Filename, 0666);
-		$Store->Write($Filename);
-
-		// test that we could write it in json.
-
-		$Store->SetFormat($Store::FormatJSON);
-		$Store->Write($Filename);
-		$Data = file_get_contents($Filename);
-		$this->AssertEquals($Data,json_encode($Dataset,JSON_PRETTY_PRINT));
-
 		unlink($Filename);
+
 		return;
 	}
 
@@ -621,13 +601,16 @@ extends PHPUnit\Framework\TestCase {
 		$Iter = NULL;
 		$HadException = FALSE;
 		$Dataset = [1,2,3];
+
 		$Filename = sprintf(
-			'/tmp/nether-object-datastore-%s.phson',
+			'%s/nether-object-datastore-%s.phson',
+			sys_get_temp_dir(),
 			md5(microtime(TRUE))
 		);
 
 		$Jsonname = sprintf(
-			'/tmp/nether-object-datastore-%s.json',
+			'%s/nether-object-datastore-%s.json',
+			sys_get_temp_dir(),
 			md5(microtime(TRUE))
 		);
 
@@ -723,6 +706,8 @@ extends PHPUnit\Framework\TestCase {
 		file_put_contents($Jsonname, "{}");
 		$Result = Datastore::GetFromFile($Jsonname);
 
+		unlink($Filename);
+		unlink($Jsonname);
 		return;
 	}
 
@@ -730,19 +715,16 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestReadFromDisk_ThatOneFuckingPhpBugTheyRefuseToFix() {
 	/*//
-	serialise is the default for a reason but lets see if that one php bug
-	is going to fuck us. https://bugs.php.net/bug.php?id=45959
+	this test passing or failing does not mean anything in regards to the
+	library being broken or not. this is purely to test the existance of
+	that one json decode bug that can fuck you if you're unaware of the
+	content of your dataset. https://bugs.php.net/bug.php?id=45959
 	//*/
 
-		if(version_compare(phpversion(),'7.2.0-dev','>=')) {
-			// holy ballweasles this was fixed in 7.2.0.
-			$this->AssertTrue(TRUE);
-			return;
-		}
-
-		$Dataset = [1,'two'=>2,3];
+		$Dataset = [ 1, 'two'=>2, 3 ];
 		$Filename = sprintf(
-			'/tmp/nether-object-datastore-%s.json',
+			'%s/nether-object-datastore-%s.json',
+			sys_get_temp_dir(),
 			md5(microtime(TRUE))
 		);
 
@@ -759,13 +741,25 @@ extends PHPUnit\Framework\TestCase {
 		$Store = new Datastore;
 		$Store->Read($Filename);
 
-		// these three asserts passing means yes, the bug is gonna fuck us.
-		// we are going to have to make the library warn you about mixing
-		// assoc and non-assoc keys when using json.
-		$this->AssertTrue($Store->Get(0) === NULL);
-		$this->AssertTrue($Store->Get(2) === NULL);
-		$this->AssertTrue($Store->Get('two') === 2);
+		if(version_compare(phpversion(),'7.2.0-dev','>=')) {
+			// holy ballweasles this was fixed in 7.2.0.
+			// these three asserts passing means the bug will not fuck us
+			// because it has been fixed but im deatly afraid that this
+			// could have an accidental reversion one day.
+			$this->AssertTrue($Store->Get(0) === 1);
+			$this->AssertTrue($Store->Get(2) === NULL);
+			$this->AssertTrue($Store->Get('two') === 2);
 
+		} else {
+			// these three asserts passing means yes, the bug is gonna
+			// fuck us. we are going to have to make the library warn you
+			// about mixing assoc and non-assoc keys when using json.
+			$this->AssertTrue($Store->Get(0) === NULL);
+			$this->AssertTrue($Store->Get(2) === NULL);
+			$this->AssertTrue($Store->Get('two') === 2);
+		}
+
+		unlink($Filename);
 		return;
 	}
 
