@@ -566,7 +566,7 @@ extends PHPUnit\Framework\TestCase {
 		// only flag if the user bit doesn't have read so just
 		// am trusting that this works on windows lol.
 
-		chmod($Filename, 0o000);
+		chmod($Filename, 0000);
 		$HadException = FALSE;
 
 		try { $Store->Write($Filename); }
@@ -582,7 +582,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// check that we can write to it again.
 
-		chmod($Filename, 0o666);
+		chmod($Filename, 0666);
 		$Store->Write($Filename);
 
 		// test that we could write it in json.
@@ -676,7 +676,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// try to fail at reading a file due to permissions.
 
-		chmod($Filename, 0o000);
+		chmod($Filename, 0000);
 		$HadException = FALSE;
 
 		try { $Store = Datastore::GetFromFile($Filename); }
