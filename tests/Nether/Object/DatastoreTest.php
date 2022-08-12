@@ -4,6 +4,10 @@ namespace NetherTestSuite\Object\DatastoreTest;
 use PHPUnit;
 
 use Nether\Object\Datastore;
+use Nether\Object\Error\FileUnreadable;
+use Nether\Object\Error\FileNotFound;
+use Nether\Object\Error\FileNotSpecified;
+
 use StdClass;
 use Throwable;
 use Exception;
@@ -624,7 +628,7 @@ extends PHPUnit\Framework\TestCase {
 
 		catch(Throwable $Err) {
 			$HadException = TRUE;
-			$this->AssertEquals(1, $Err->GetCode());
+			$this->AssertInstanceOf(FileNotSpecified::class, $Err);
 		}
 
 		$this->AssertTrue(
@@ -643,7 +647,7 @@ extends PHPUnit\Framework\TestCase {
 
 		catch(Throwable $Err) {
 			$HadException = TRUE;
-			$this->AssertEquals(2, $Err->GetCode());
+			$this->AssertInstanceOf(FileNotFound::class, $Err);
 		}
 
 		$this->AssertTrue(
@@ -683,7 +687,7 @@ extends PHPUnit\Framework\TestCase {
 
 		catch(Throwable $Err) {
 			$HadException = TRUE;
-			$this->AssertEquals(3, $Err->GetCode());
+			$this->AssertInstanceOf(FileUnreadable::class, $Err);
 		}
 
 		$this->AssertTrue(

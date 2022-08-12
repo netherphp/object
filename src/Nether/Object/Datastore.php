@@ -8,6 +8,7 @@ use ArrayAccess;
 use Countable;
 use JsonSerializable;
 use ReturnTypeWillChange;
+use SplFileInfo;
 
 class Datastore
 implements Iterator, ArrayAccess, Countable, JsonSerializable {
@@ -945,43 +946,36 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	@date 2015-12-02
 	//*/
 
-		if($Filename === NULL) $Filename = $this->Filename;
-		else $this->Filename = $Filename;
+		$Filename ??= $Filename ?? $this->Filename;
 
 		if(!$Filename)
-		throw new Exception('No filename specified.', 1);
-
-		$Basename = basename($Filename);
-		$Ext = NULL;
-
-		if(strpos($Basename,'.') !== FALSE)
-		$Ext = strtolower(explode('.',$Basename,2)[1]);
+		throw new Error\FileNotSpecified;
 
 		////////
-		////////
+
+		$File = new SplFileInfo($Filename);
+		$Basename = $File->GetBasename();
+		$Ext = strtolower($File->GetExtension()) ?: NULL;
 
 		if(!file_exists($Filename))
-		throw new Exception("File {$Basename} not found.", 2);
+		throw new Error\FileNotFound($Basename);
 
-		if(!is_readable($Filename))
-		throw new Exception("File {$Basename} is not readable.", 3);
+		if(!$File->IsReadable())
+		throw new Error\FileUnreadable($Basename);
 
-		////////
 		////////
 
 		$Data = NULL;
 
 		if($Ext === 'json' || $this->Format === static::FormatJSON)
 		$Data = json_decode(file_get_contents($Filename));
-
-		elseif($Ext === 'phson' || $this->Format === static::FormatPHP)
+		else
 		$Data = unserialize(file_get_contents($Filename));
-
-		////////
-		////////
 
 		if(!is_array($Data))
 		$Data = (array)$Data;
+
+		////////
 
 		$this->Data = $Data;
 
