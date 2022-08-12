@@ -1,5 +1,13 @@
 <?php
 
+namespace NetherTestSuite\Object\DatastoreTest;
+use PHPUnit;
+
+use Nether\Object\Datastore;
+use StdClass;
+use Throwable;
+use Exception;
+
 class DatastoreTest
 extends PHPUnit\Framework\TestCase {
 
@@ -16,7 +24,7 @@ extends PHPUnit\Framework\TestCase {
 		$Key = NULL;
 		$Item = NULL;
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$this->AssertTrue($Store->Count() === 0);
 		$this->AssertTrue(count($Store->GetData()) === 0);
 
@@ -54,7 +62,7 @@ extends PHPUnit\Framework\TestCase {
 		$Key = NULL;
 		$Value = NULL;
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 
 		// test that we can add items one at a time.
 
@@ -83,7 +91,7 @@ extends PHPUnit\Framework\TestCase {
 
 		$Key = NULL;
 		$Value = NULL;
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 
 		// test that we can add items one at a time.
 
@@ -114,7 +122,7 @@ extends PHPUnit\Framework\TestCase {
 	preserving associative keys.
 	//*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData([
 			1,2,3,4,5,6,
 			'Donkey' => 'Kong',
@@ -143,7 +151,7 @@ extends PHPUnit\Framework\TestCase {
 	way that works as expected.
 	//*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 
 		$Store->Push(1);
 		$Store->Push(2);
@@ -162,7 +170,7 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestDataStorageShiftUnshift() {
 
-		$Store = (new Nether\Object\Datastore)
+		$Store = (new Datastore)
 		->Push(1)
 		->Push(2)
 		->Push(3);
@@ -184,7 +192,7 @@ extends PHPUnit\Framework\TestCase {
 	working as expected.
 	//*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData([1,2,3,4,5,6]);
 
 		$Loop = 1;
@@ -232,7 +240,7 @@ extends PHPUnit\Framework\TestCase {
 		)
 		*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
 
 		$Store->MergeRight([
@@ -293,7 +301,7 @@ extends PHPUnit\Framework\TestCase {
 		*/
 
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
 
 		$Store->MergeLeft([
@@ -353,7 +361,7 @@ extends PHPUnit\Framework\TestCase {
 		)
 		*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
 
 		$Store->BlendRight([
@@ -413,7 +421,7 @@ extends PHPUnit\Framework\TestCase {
 		)
 		*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData([1,2,3,'one'=>'one','two'=>'two','three'=>'three']);
 
 		$Store->BlendLeft([
@@ -455,7 +463,7 @@ extends PHPUnit\Framework\TestCase {
 	testing that we implemented clearing the dataset properly.
 	//*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData([1,2,3]);
 
 		$this->AssertTrue($Store->Count(FALSE) === 3);
@@ -476,7 +484,7 @@ extends PHPUnit\Framework\TestCase {
 	that an invalid value resulted in a sane default.
 	//*/
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 
 		$Store->SetFormat($Store::FormatJSON);
 		$this->AssertTrue($Store->GetFormat() === $Store::FormatJSON);
@@ -502,7 +510,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// test that we could create a new file.
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData($Dataset);
 		$Store->Write($Filename);
 		$this->AssertTrue(file_exists($Filename));
@@ -542,7 +550,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// write a file.
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData($Dataset);
 		$Store->Write($Filename);
 		$this->AssertTrue(file_exists($Filename));
@@ -550,7 +558,7 @@ extends PHPUnit\Framework\TestCase {
 		// read a file.
 
 		unset($Store);
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->Read($Filename);
 
 		for($Iter = 0; $Iter < count($Dataset); $Iter++)
@@ -582,7 +590,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// write a file.
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->SetData($Dataset);
 		$Store->Write($Filename);
 		$this->AssertTrue(file_exists($Filename));
@@ -590,7 +598,7 @@ extends PHPUnit\Framework\TestCase {
 		// read a file.
 
 		unset($Store);
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->Read($Filename);
 
 		// these three asserts passing means yes, the bug is gonna fuck us.
@@ -607,7 +615,7 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestMapAndRemap() {
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Store->Push('1')->Push('2')->Push('3');
 		$New = NULL;
 
@@ -654,7 +662,7 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestFilterAndDistill() {
 
-		$Store = new Nether\Object\Datastore;
+		$Store = new Datastore;
 		$Other = NULL;
 
 		$Store->Push(1)->Push(2)->Push(3);
@@ -685,7 +693,7 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestJsonise() {
 
-		$Object = new Nether\Object\Datastore([
+		$Object = new Datastore([
 			'one', 'two', 'three'
 		]);
 
@@ -706,9 +714,9 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
-	TestGetFirstLastKeys() {
+	TestGetFirstLastHasKeys() {
 
-		$Data = new Nether\Object\Datastore([
+		$Data = new Datastore([
 			'one',
 			'two',
 			'three'
@@ -717,6 +725,8 @@ extends PHPUnit\Framework\TestCase {
 		$Key = NULL;
 		$Val = NULL;
 
+		$this->AssertTrue($Data->HasKey(0));
+		$this->AssertFalse($Data->HasKey(-1));
 		$this->AssertEquals(0, $Data->GetFirstKey());
 		$this->AssertEquals(2, $Data->GetLastKey());
 
@@ -747,7 +757,7 @@ extends PHPUnit\Framework\TestCase {
 	public function
 	TestTheThingWithEmptyArrayBrackets() {
 
-		$Data = new Nether\Object\Datastore;
+		$Data = new Datastore;
 		$this->AssertEquals(0,$Data->Count());
 
 		$Data[] = 'one';
@@ -755,6 +765,258 @@ extends PHPUnit\Framework\TestCase {
 
 		$Data[] = 'two';
 		$this->AssertEquals(2,$Data->Count());
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetRef():
+	void {
+
+		$Data = [ 1, 2 ];
+		$Store = new Datastore($Data);
+
+		$this->AssertTrue($Store->Get(0) === 1);
+		$this->AssertTrue($Store->Get(1) === 2);
+		$this->AssertNull($Store->Get(3));
+
+		$Hack = &$Store->GetRef(0);
+		$Hack = 42;
+
+		$this->AssertTrue($Store->Get(0) === 42);
+		$this->AssertTrue($Store->Get(1) === 2);
+		$this->AssertNull($Store->Get(3));
+
+		////////
+
+		try { $Fail = &$Store->GetRef(3); }
+		catch(Throwable $Err) {
+			$this->AssertInstanceOf(
+				Exception::class,
+				$Err
+			);
+		}
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestFullDebug():
+	void {
+
+		$Store = new Datastore([1, 2, 3]);
+
+		$this->AssertFalse($Store->GetFullDebug());
+		$this->AssertIsArray($Store->__DebugInfo());
+		$this->AssertCount(3, $Store->__DebugInfo());
+
+		$Store->SetFullDebug(TRUE);
+		$this->AssertTrue($Store->GetFullDebug());
+		$this->AssertGreaterThan(3, count($Store->__DebugInfo()));
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestInvokeSyntax():
+	void {
+
+		$Store = new Datastore([1, 2, 3]);
+		$Result = $Store();
+
+		$this->AssertIsArray($Result);
+		$this->AssertCount(3, $Result);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetSetFilename():
+	void {
+
+		$Store = new Datastore([1, 2, 3]);
+
+		$this->AssertNull($Store->GetFilename());
+
+		$Store->SetFilename('output.json');
+		$this->AssertEquals('output.json', $Store->GetFilename());
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetSetFullJSON():
+	void {
+
+		$Store = new Datastore([1, 2, 3]);
+
+		$this->AssertFalse($Store->GetFullJSON());
+
+		$Result = json_decode(json_encode($Store));
+		$this->AssertIsArray($Result);
+		$this->AssertCount(3, $Result);
+
+		////////
+
+		$Store->SetFullJSON(TRUE);
+		$this->AssertTrue($Store->GetFullJSON());
+
+		$Result = json_decode(json_encode($Store));
+		$this->AssertIsObject($Result);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetSetTitle():
+	void {
+
+		$Store = new Datastore([1, 2, 3]);
+
+		$this->AssertNull($Store->GetTitle());
+
+		$Store->SetTitle('HerpDerp');
+		$this->AssertEquals('HerpDerp', $Store->GetTitle());
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetSetSorter():
+	void {
+
+		$Store = new Datastore([2, 1, 3]);
+		$Sorter = (fn($A, $B)=> $B <=> $A);
+
+		// check initial sort
+
+		$this->AssertNull($Store->GetSorter());
+		$this->AssertEquals(2, array_values($Store->GetData())[0]);
+
+		// check sort using default asort
+
+		$Store->Sort();
+		$this->AssertEquals(1, array_values($Store->GetData())[0]);
+
+		// check sort using custom sorter
+
+		$Store->SetSorter($Sorter);
+		$this->AssertTrue($Store->GetSorter() === $Sorter);
+
+		$Store->Sort();
+		$this->AssertEquals(3, array_values($Store->GetData())[0]);
+
+		// confirm asort but sorted
+
+		$Store->Rewind();
+		$this->AssertEquals(2, $Store->Key());
+		$this->AssertEquals(3, $Store->Current());
+
+		// confirm forced sort func.
+
+		$Store->SetSorter(NULL);
+		$Store->Sort();
+		$Store->Rewind();
+		$this->AssertEquals(1, $Store->Key());
+		$this->AssertEquals(1, $Store->Current());
+
+		$Store->Rewind();
+		$Store->Sort($Sorter);
+		$this->AssertEquals(2, $Store->Key());
+		$this->AssertEquals(3, $Store->Current());
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestArrayAccess():
+	void {
+
+		$Source = [1, 2, 3];
+		$Store = new Datastore($Source);
+		$Iter = 0;
+
+		// check reading via OffsetGet.
+
+		for($Iter = 0; $Iter < 3; $Iter++)
+		$this->AssertEquals($Source[$Iter], $Store[$Iter]);
+
+		// check writing via OffsetSet.
+
+		$Store[] = 9001;
+		$this->AssertEquals(9001, $Store[3]);
+
+		$Store[1] = 42;
+		$this->AssertEquals(42, $Store[1]);
+
+		$Store['One'] = 'Won';
+		$this->AssertEquals('Won', $Store['One']);
+
+		unset($Store['One']);
+		$this->AssertFalse($Store->HasKey('One'));
+		$this->AssertFalse(isset($Store['One']));
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestMethodKeysValues():
+	void {
+
+		$Store = new Datastore([
+			1, 2, 3,
+			'One' => 'Won'
+		]);
+
+		$Keys = $Store->Keys();
+		$this->AssertIsArray($Keys);
+		$this->AssertCount(4, $Keys);
+		$this->AssertArrayHasKey(0, $Keys);
+		$this->AssertContains('One', $Keys);
+
+		$Values = $Store->Values();
+		$this->AssertIsArray($Values);
+		$this->AssertCount(4, $Values);
+		$this->AssertEquals(1, $Values[0]);
+		$this->AssertEquals('Won', $Values[3]);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestMethodAccumulate():
+	void {
+
+		$Store = new Datastore([ 1, 2, 3 ]);
+		$Result = $Store->Accumulate(
+			9000,
+			(fn(int $Prev, int $Val)=> $Prev + $Val )
+		);
+
+		$this->AssertEquals(9006, $Result);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestMethodJoin():
+	void {
+
+		$Store = new Datastore([ 1, 2, 3 ]);
+		$Result = $Store->Join('-');
+
+		$this->AssertEquals('1-2-3', $Result);
 
 		return;
 	}

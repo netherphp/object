@@ -19,11 +19,11 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	FormatPHP  = 1,
 	FormatJSON = 2;
 
-	protected string
-	$Title = '';
+	protected ?string
+	$Title = NULL;
 
-	protected string
-	$Filename = '';
+	protected ?string
+	$Filename = NULL;
 
 	protected int
 	$Format = self::FormatPHP;
@@ -98,7 +98,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 	public function
 	GetFilename():
-	string {
+	?string {
 	/*//
 	@date 2015-12-02
 	//*/
@@ -192,7 +192,8 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	GetSorter() {
+	GetSorter():
+	mixed {
 	/*//
 	@date 2016-02-25
 	//*/
@@ -201,7 +202,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	SetSorter(callable $Function):
+	SetSorter(?callable $Function):
 	static {
 	/*//
 	@date 2016-02-25
@@ -213,7 +214,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 	public function
 	GetTitle():
-	string {
+	?string {
 	/*//
 	@date 2016-03-25
 	//*/
@@ -222,7 +223,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	SetTitle(string $Title=''):
+	SetTitle(?string $Title=''):
 	static {
 	/*//
 	@date 2016-03-25
@@ -240,6 +241,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	bool {
 	/*//
 	@date 2015-12-02
+	@implements ArrayAccess
 	//*/
 
 		return array_key_exists($Key,$this->Data);
@@ -250,6 +252,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	mixed {
 	/*//
 	@date 2015-12-02
+	@implements ArrayAccess
 	//*/
 
 		return $this->Data[$Key];
@@ -260,6 +263,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	void {
 	/*//
 	@date 2015-12-02
+	@implements ArrayAccess
 	//*/
 
 		// enables $Dataset[] = 'val';
@@ -280,6 +284,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	void {
 	/*//
 	@date 2015-12-02
+	@implements ArrayAccess
 	//*/
 
 		unset($this->Data[$Key]);
@@ -418,7 +423,11 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		if(array_key_exists($Key,$this->Data))
 		return $this->Data[$Key];
 
-		return NULL;
+		return throw new Exception(
+			'unable to give you a reference to data that does not exist '.
+			'in this case you really should be Has\'ing first if you '.
+			'insist on doing this silly hacky stuff.'
+		);
 	}
 
 	public function
@@ -786,35 +795,29 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	Sort(callable $Function=NULL, bool $Presort=FALSE):
+	Sort(callable $Function=NULL):
 	static {
 	/*//
 	@date 2015-12-02
-	sort the dataset by the function defined in this datastore's
-	sorter property. if a function is defined as an argument here
-	then we will use that instead of the sorter property. if presort
-	is enabled then the specified sort function will be used before
-	the defined sorter.
+	sort the dataset. if no custom function is supplied it will execute the
+	default sorter function. if there is no default sorter function it will
+	execute the php asort function.
 	//*/
 
 		if($Function === NULL) {
-			asort($this->Data);
-
-			if(!$Presort)
-			return $this;
-		}
-
-		if(is_callable($Function)) {
-			uasort($this->Data, $Function);
-
-			if(!$Presort)
-			return $this;
-		}
-
-		if(is_callable($this->Sorter)) {
+			if(is_callable($this->Sorter))
 			uasort($this->Data, $this->Sorter);
-			return $this;
+
+			else
+			asort($this->Data);
 		}
+
+		////////
+
+		if(is_callable($Function))
+		uasort($this->Data, $Function);
+
+		////////
 
 		return $this;
 	}
