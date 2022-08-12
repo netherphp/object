@@ -1,15 +1,18 @@
 <?php
 
 namespace Nether;
-
+use Nether;
 use PHPUnit;
 
+use Nether\Object\Prototype;
+use Nether\Object\Prototype\Flags;
 use Nether\Object\Prototype\PropertyInfo;
 use Nether\Object\Prototype\MethodInfo;
+use Nether\Object\Prototype\ConstructArgs;
 use Throwable;
 
 class LocalTest2
-extends Object\Prototype {
+extends Prototype {
 
 	#[Object\Meta\PropertyOrigin('number_one')]
 	public int
@@ -22,7 +25,7 @@ extends Object\Prototype {
 }
 
 class LocalTest3
-extends Object\Prototype {
+extends Prototype {
 
 	public int
 	$TypedProperty;
@@ -45,6 +48,22 @@ extends Object\Prototype {
 
 }
 
+class LocalTest4
+extends Prototype {
+
+	public ConstructArgs
+	$Args;
+
+	protected function
+	OnReady(ConstructArgs $Args):
+	void {
+
+		$this->Args = $Args;
+		return;
+	}
+
+}
+
 class PrototypeConstructTest
 extends PHPUnit\Framework\TestCase {
 
@@ -56,7 +75,7 @@ extends PHPUnit\Framework\TestCase {
 	an object which has no properties.
 	//*/
 
-		$Obj = new Object\Prototype;
+		$Obj = new Prototype;
 		$this->AssertTrue(count(get_object_vars($Obj)) === 0);
 
 		return;
@@ -78,7 +97,7 @@ extends PHPUnit\Framework\TestCase {
 			'PropertyTwo' => 2
 		];
 
-		$Object = new Object\Prototype($Input);
+		$Object = new Prototype($Input);
 
 		foreach($Input as $Key => $Value) {
 			$this->AssertObjectHasAttribute($Key,$Object);
@@ -112,11 +131,46 @@ extends PHPUnit\Framework\TestCase {
 
 		$Result = $Input + $Default;
 
-		$Object = new Object\Prototype($Input,$Default);
+		$Object = new Prototype($Input,$Default);
 		foreach($Result as $Key => $Value) {
 			$this->AssertObjectHasAttribute($Key,$Object);
 			$this->AssertEquals($Object->{$Key},$Value);
 		}
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestDefaultsStrict() {
+	/*//
+	check that any properties missing from the input get set to the specified
+	default values.
+	//*/
+
+		$Key = NULL;
+		$Value = NULL;
+
+		$Input = [
+			'One' => 1,
+			'Two' => 2
+		];
+
+		$Default = [
+			'One'   => -1,
+			'Three' => 3
+		];
+
+		$Result = $Input + $Default;
+
+		$Object = new LocalTest2($Input, $Default, Flags::StrictDefault);
+		$this->AssertObjectHasAttribute('One', $Object);
+		$this->AssertObjectHasAttribute('Two', $Object);
+		$this->AssertObjectNotHasAttribute('Three', $Object);
+
+		$this->AssertEquals($Object->One, 1);
+		$this->AssertEquals($Object->Two, 2);
+
 
 		return;
 	}
@@ -148,10 +202,10 @@ extends PHPUnit\Framework\TestCase {
 		$Result = $Input + $Default;
 		unset($Result['PropertyOne']);
 
-		$Object = new Object\Prototype(
+		$Object = new Prototype(
 			$Input,
 			$Default,
-			Object\Prototype\Flags::CullUsingDefault
+			Prototype\Flags::CullUsingDefault
 		);
 
 		foreach($Result as $Key => $Value) {
@@ -163,6 +217,75 @@ extends PHPUnit\Framework\TestCase {
 		// culled by not having a key in the default array.
 
 		$this->AssertFalse(property_exists($Object,'PropertyOne'));
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestObjectInputs() {
+	/*//
+	check that any properties missing from the input get set to the specified
+	default values.
+	//*/
+
+		$Key = NULL;
+		$Value = NULL;
+
+		$Input = [
+			'PropertyOne' => 1,
+			'PropertyTwo' => 2
+		];
+
+		$Default = [
+			'PropertyOne'   => -1,
+			'PropertyTwo'   => -2,
+			'PropertyThree' => -3
+		];
+
+		$Result = $Input + $Default;
+
+		$Object = new Prototype((object)$Input, (object)$Default);
+		foreach($Result as $Key => $Value) {
+			$this->AssertObjectHasAttribute($Key,$Object);
+			$this->AssertEquals($Object->{$Key},$Value);
+		}
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestConstructArgsThings() {
+
+		$Input = [
+			'PropertyOne' => 1
+		];
+
+		$Defaults = [
+			'PropertyOne' => -1
+		];
+
+		$O1 = new LocalTest4($Input);
+		$O2 = new LocalTest4($Input, $Defaults);
+
+		$this->AssertTrue($O1->Args->InputHas('PropertyOne'));
+		$this->AssertTrue($O1->Args->InputExists('PropertyOne'));
+		$this->AssertTrue($O1->Args->InputGet('PropertyOne') === 1);
+		$this->AssertFalse($O1->Args->InputHas('Nope'));
+		$this->AssertFalse($O1->Args->InputExists('Nope'));
+		$this->AssertNull($O1->Args->InputGet('Nope'));
+
+		$this->AssertFalse($O1->Args->DefaultHas('PropertyOne'));
+		$this->AssertFalse($O1->Args->DefaultExists('PropertyOne'));
+		$this->AssertNull($O1->Args->DefaultGet('PropertyOne'));
+		$this->AssertFalse($O1->Args->DefaultHas('Nope'));
+		$this->AssertFalse($O1->Args->DefaultExists('Nope'));
+		$this->AssertNull($O1->Args->DefaultGet('Nope'));
+
+		$this->AssertTrue($O2->Args->DefaultHas('PropertyOne'));
+		$this->AssertTrue($O2->Args->DefaultExists('PropertyOne'));
+		$this->AssertTrue($O2->Args->DefaultGet('PropertyOne') === -1);
 
 		return;
 	}
@@ -184,7 +307,7 @@ extends PHPUnit\Framework\TestCase {
 			'PropertyWhat'   => '42.42'
 		];
 
-		$Object = new class($Input) extends Object\Prototype {
+		$Object = new class($Input) extends Prototype {
 			public int $PropertyInt;
 			public float $PropertyFloat;
 			public string $PropertyString;
@@ -196,7 +319,7 @@ extends PHPUnit\Framework\TestCase {
 
 		//var_dump($Object::GetPropertyMap());
 
-		//$Object = new Object\Prototype($Input);
+		//$Object = new Prototype($Input);
 		$this->AssertTrue($Object->PropertyInt === 1);
 		$this->AssertTrue($Object->PropertyFloat === 1.234);
 		$this->AssertTrue($Object->PropertyString === '42');
@@ -220,7 +343,7 @@ extends PHPUnit\Framework\TestCase {
 			'PropertyFloat' => '9000.1'
 		];
 
-		$Object = new class($Input,$Default) extends Object\Prototype {
+		$Object = new class($Input,$Default) extends Prototype {
 			public float $PropertyFloat;
 		};
 
@@ -237,7 +360,7 @@ extends PHPUnit\Framework\TestCase {
 	where wanted.
 	//*/
 
-		$Object = new class() extends Object\Prototype {
+		$Object = new class() extends Prototype {
 			#[Object\Meta\PropertyObjectify]
 			public Object\Datastore $Data;
 		};

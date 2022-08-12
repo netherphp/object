@@ -71,7 +71,7 @@ passed around in a single bundle later on.
 	DefaultGet(mixed $Key):
 	mixed {
 
-		if(!is_array($this->Defaults))
+		if(!$this->DefaultHas($Key))
 		return NULL;
 
 		return $this->Defaults[$Key];
@@ -102,7 +102,7 @@ passed around in a single bundle later on.
 	mixed {
 
 
-		if(!is_array($this->Input))
+		if(!$this->InputHas($Key))
 		return NULL;
 
 		return $this->Input[$Key];
