@@ -35,6 +35,7 @@ jobs:
           php tests/timed.php 1 100000
           php tests/timed.php 2 100000
       - name: Push to Codecov Probably
+        if: ${{ matrix.php-versions == '8.1' && matrix.operating-system == 'windows-latest' }}
         uses: codecov/codecov-action@v3
         with:
           files: coverage.xml
