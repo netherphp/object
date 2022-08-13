@@ -1234,8 +1234,6 @@ extends PHPUnit\Framework\TestCase {
 		$Store = new Datastore([ 1, 2, 3, 4, 5, 6 ]);
 		$OG = $Store->Join('');
 
-		$Store->Shuffle();
-
 		// test the shuffle making a provision just in case that
 		// somehow rng magically shuffled it into the same order
 		// roflmao.
@@ -1247,6 +1245,7 @@ extends PHPUnit\Framework\TestCase {
 		while($Attempt > 0) {
 			$Attempt--;
 
+			$Store->Shuffle();
 			$Line = $Store->Join('');
 
 			if($Line !== $OG)
