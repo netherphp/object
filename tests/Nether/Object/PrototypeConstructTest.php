@@ -306,6 +306,8 @@ extends PHPUnit\Framework\TestCase {
 			'PropertyBool1'  => 0,
 			'PropertyBool2'  => 1,
 			'PropertyBool3'  => 'five',
+			'PropertyNullableString' => 'asdf',
+			'PropertyNullableNulled' => NULL,
 			'PropertyWhat'   => '42.42'
 		];
 
@@ -316,6 +318,8 @@ extends PHPUnit\Framework\TestCase {
 			public bool $PropertyBool1;
 			public bool $PropertyBool2;
 			public bool $PropertyBool3;
+			public ?string $PropertyNullableString;
+			public ?string $PropertyNullableNulled;
 			public mixed $PropertyWhat;
 		};
 
@@ -328,6 +332,8 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertTrue($Object->PropertyBool1 === FALSE);
 		$this->AssertTrue($Object->PropertyBool2 === TRUE);
 		$this->AssertTrue($Object->PropertyBool3 === TRUE);
+		$this->AssertTrue($Object->PropertyNullableString === 'asdf');
+		$this->AssertTrue($Object->PropertyNullableNulled === NULL);
 		$this->AssertTrue($Object->PropertyWhat === '42.42');
 
 		return;
