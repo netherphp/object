@@ -306,9 +306,9 @@ extends PHPUnit\Framework\TestCase {
 			'PropertyBool1'  => 0,
 			'PropertyBool2'  => 1,
 			'PropertyBool3'  => 'five',
+			'PropertyWhat'   => '42.42',
 			'PropertyNullableString' => 'asdf',
-			'PropertyNullableNulled' => NULL,
-			'PropertyWhat'   => '42.42'
+			'PropertyNullableNulled' => NULL
 		];
 
 		$Object = new class($Input) extends Prototype {
@@ -318,9 +318,9 @@ extends PHPUnit\Framework\TestCase {
 			public bool $PropertyBool1;
 			public bool $PropertyBool2;
 			public bool $PropertyBool3;
+			public mixed $PropertyWhat;
 			public ?string $PropertyNullableString;
 			public ?string $PropertyNullableNulled;
-			public mixed $PropertyWhat;
 		};
 
 		//var_dump($Object::GetPropertyMap());
@@ -332,9 +332,9 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertTrue($Object->PropertyBool1 === FALSE);
 		$this->AssertTrue($Object->PropertyBool2 === TRUE);
 		$this->AssertTrue($Object->PropertyBool3 === TRUE);
+		$this->AssertTrue($Object->PropertyWhat === '42.42');
 		$this->AssertTrue($Object->PropertyNullableString === 'asdf');
 		$this->AssertTrue($Object->PropertyNullableNulled === NULL);
-		$this->AssertTrue($Object->PropertyWhat === '42.42');
 
 		return;
 	}
