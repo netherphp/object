@@ -245,7 +245,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	@implements ArrayAccess
 	//*/
 
-		return array_key_exists($Key,$this->Data);
+		return array_key_exists($Key, $this->Data);
 	}
 
 	public function
@@ -256,7 +256,10 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	@implements ArrayAccess
 	//*/
 
+		if(array_key_exists($Key, $this->Data))
 		return $this->Data[$Key];
+
+		return NULL;
 	}
 
 	public function
