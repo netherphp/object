@@ -92,6 +92,34 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
+	TestPropertyInfoFetchGet():
+	void {
+
+		// check that raw reading works as expected.
+
+		$Info1 = TestClassProp1::FetchPropertyInfo('PropWithAttrib');
+		$Info2 = TestClassProp1::FetchPropertyInfo('PropWithAttrib');
+		$Null = TestClassProp1::FetchPropertyInfo('DoesNotExist');
+
+		$this->AssertInstanceOf(PropertyInfo::class, $Info1);
+		$this->AssertTrue($Info1 !== $Info2);
+		$this->AssertNull($Null);
+
+		// check that cached reading worked as expected.
+
+		$Info1 = TestClassProp1::GetPropertyInfo('PropWithAttrib');
+		$Info2 = TestClassProp1::GetPropertyInfo('PropWithAttrib');
+		$Null = TestClassProp1::GetPropertyInfo('DoesNotExist');
+
+		$this->AssertInstanceOf(PropertyInfo::class, $Info1);
+		$this->AssertTrue($Info1 === $Info2);
+		$this->AssertNull($Null);
+
+		return;
+	}
+
+	/** @test */
+	public function
 	TestPropertyInfoCacheBasics() {
 
 		$this->AssertFalse(PropertyInfoCache::Has('SomethingNeverCached'));

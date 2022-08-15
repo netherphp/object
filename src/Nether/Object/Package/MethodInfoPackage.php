@@ -9,6 +9,33 @@ use ReflectionClass;
 trait MethodInfoPackage {
 
 	static public function
+	FetchMethodInfo(string $MethodName):
+	?MethodInfo {
+
+		$Methods = static::FetchMethodIndex();
+
+		if(isset($Methods[$MethodName]))
+		return $Methods[$MethodName];
+
+		return NULL;
+	}
+
+	static public function
+	GetMethodInfo(string $MethodName):
+	?MethodInfo {
+
+		$Methods = static::GetMethodIndex();
+
+		if(isset($Methods[$MethodName]))
+		return $Methods[$MethodName];
+
+		return NULL;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	static public function
 	FetchMethodIndex():
 	array {
 	/*//

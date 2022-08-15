@@ -88,6 +88,34 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
+	TestMethodInfoFetchGet():
+	void {
+
+		// check that raw reading works as expected.
+
+		$Info1 = TestClassMethod1::FetchMethodInfo('MethodWithAttrib');
+		$Info2 = TestClassMethod1::FetchMethodInfo('MethodWithAttrib');
+		$Null = TestClassMethod1::FetchMethodInfo('DoesNotExist');
+
+		$this->AssertInstanceOf(MethodInfo::class, $Info1);
+		$this->AssertTrue($Info1 !== $Info2);
+		$this->AssertNull($Null);
+
+		// check that cached reading worked as expected.
+
+		$Info1 = TestClassMethod1::GetMethodInfo('MethodWithAttrib');
+		$Info2 = TestClassMethod1::GetMethodInfo('MethodWithAttrib');
+		$Null = TestClassMethod1::GetMethodInfo('DoesNotExist');
+
+		$this->AssertInstanceOf(MethodInfo::class, $Info1);
+		$this->AssertTrue($Info1 === $Info2);
+		$this->AssertNull($Null);
+
+		return;
+	}
+
+	/** @test */
+	public function
 	TestMethodInfoCacheBasics() {
 
 		$this->AssertFalse(MethodInfoCache::Has('SomethingNeverCached'));

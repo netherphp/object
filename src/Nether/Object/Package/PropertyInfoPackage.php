@@ -10,6 +10,33 @@ use ReflectionClass;
 trait PropertyInfoPackage {
 
 	static public function
+	FetchPropertyInfo(string $PropertyName):
+	?PropertyInfo {
+
+		$Props = static::FetchPropertyIndex();
+
+		if(isset($Props[$PropertyName]))
+		return $Props[$PropertyName];
+
+		return NULL;
+	}
+
+	static public function
+	GetPropertyInfo(string $PropertyName):
+	?PropertyInfo {
+
+		$Props = static::GetPropertyIndex();
+
+		if(isset($Props[$PropertyName]))
+		return $Props[$PropertyName];
+
+		return NULL;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	static public function
 	FetchPropertyIndex():
 	array {
 	/*//
