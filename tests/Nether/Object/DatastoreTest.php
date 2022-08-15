@@ -713,6 +713,52 @@ extends PHPUnit\Framework\TestCase {
 
 	/** @test */
 	public function
+	TestReadWithAppend():
+	void {
+
+		$Dataset1 = [ 1, 2, 3 ];
+		$Dataset2 = [ 4, 5, 6 ];
+		$Store = new Datastore($Dataset1);
+
+		////////
+
+		$Filename = sprintf(
+			'%s/nether-object-datastore-%s.json',
+			sys_get_temp_dir(),
+			md5(microtime(TRUE))
+		);
+
+		file_put_contents($Filename, json_encode($Dataset2));
+
+		// edit and confirm data.
+
+		$this->AssertEquals(3, $Store->Count());
+		$Store[0] = 90;
+		$Store[1] = 91;
+		unset($Store[2]);
+		$this->AssertEquals(2, $Store->Count());
+
+		$this->AssertEquals(90, $Store[0]);
+		$this->AssertEquals(91, $Store[1]);
+		$this->AssertFalse($Store->HasKey(2));
+
+		// append and confirm filedata.
+
+		$Store->Read($Filename, TRUE);
+		$this->AssertEquals(5, $Store->Count());
+
+		$this->AssertEquals(90, $Store[0]);
+		$this->AssertEquals(91, $Store[1]);
+		$this->AssertEquals(4, $Store[2]);
+		$this->AssertEquals(5, $Store[3]);
+		$this->AssertEquals(6, $Store[4]);
+
+		unset($Filename);
+		return;
+	}
+
+	/** @test */
+	public function
 	TestReadFromDisk_ThatOneFuckingPhpBugTheyRefuseToFix() {
 	/*//
 	this test passing or failing does not mean anything in regards to the

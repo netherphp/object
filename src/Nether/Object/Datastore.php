@@ -940,7 +940,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	// File Operations /////////////////////////////////////////////
 
 	public function
-	Read(?string $Filename=NULL):
+	Read(?string $Filename=NULL, bool $Append=FALSE):
 	static {
 	/*//
 	@date 2015-12-02
@@ -977,7 +977,10 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 		////////
 
+		if(!$Append)
 		$this->Data = $Data;
+		else
+		$this->Data = array_merge($this->Data, $Data);
 
 		return $this;
 	}
