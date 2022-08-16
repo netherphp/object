@@ -166,6 +166,8 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	//*/
 
 		$this->Filename = $Filename;
+		$this->Format = $this->DetermineFormatByFilename($Filename);
+
 		return $this;
 	}
 
@@ -304,6 +306,27 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 		$this->Title = $Title;
 		return $this;
+	}
+
+	public function
+	DetermineFormatByFilename(string $Filename):
+	int {
+	/*//
+	@date 2022-08-15
+	if the filename matches these specific types it will return what we
+	think it should be. else it will return what it already is in the event
+	you just doing whatever you want.
+	//*/
+
+		$File = strtolower($Filename);
+
+		if(str_ends_with($File, '.json'))
+		return static::FormatJSON;
+
+		if(str_ends_with($File, '.phson'))
+		return static::FormatPHP;
+
+		return $this->Format;
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -1076,9 +1099,13 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		////////
 
 		$File = new SplFileInfo($Filename);
-		$Dirname = $File->GetPath();
-		$Ext = strtolower($File->GetExtension()) ?: NULL;
 		$Val = NULL;
+
+		$Dirname = $File->GetPath();
+		$Format = $this->Format;
+
+		if($Filename !== $this->Filename)
+		$Format = $this->DetermineFormatByFilename($Filename);
 
 		////////
 
@@ -1103,10 +1130,20 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 		////////
 
+		$Data = match(TRUE) {
+			($Format === static::FormatJSON)
+			=> json_encode($this->Data, JSON_PRETTY_PRINT),
+
+			default
+			=> serialize($this->Data)
+		};
+
+		/*
 		if($Ext === 'json' || $this->Format === static::FormatJSON)
 		$Data = json_encode($this->Data, JSON_PRETTY_PRINT);
 		else
 		$Data = serialize($this->Data);
+		*/
 
 		////////
 
@@ -1115,11 +1152,14 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		return $this;
 	}
 
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	public static function
-	GetFromFile(string $Filename):
+	NewFromFile(string $Filename):
 	static {
 	/*//
-	@date 2015-12-02
+	@date 2022-08-15
 	//*/
 
 		return (new static)->Read($Filename);

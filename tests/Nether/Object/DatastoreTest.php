@@ -566,7 +566,7 @@ extends PHPUnit\Framework\TestCase {
 		// by this point amirite.
 
 		$Store->Write($Filename);
-		$Result = Datastore::GetFromFile($Filename);
+		$Result = Datastore::NewFromFile($Filename);
 
 		$this->AssertTrue(file_exists($Filename));
 		$this->AssertTrue(filesize($Filename) > 0);
@@ -577,7 +577,7 @@ extends PHPUnit\Framework\TestCase {
 		$Store->Push(new Datastore([ 100, 200, 300 ]));
 		$Store->Write($Filename);
 
-		$Result = Datastore::GetFromFile($Filename);
+		$Result = Datastore::NewFromFile($Filename);
 		$this->AssertTrue(file_exists($Filename));
 		$this->AssertTrue(filesize($Filename) > 0);
 		$this->AssertEquals(4, $Result->Count());
@@ -684,7 +684,7 @@ extends PHPUnit\Framework\TestCase {
 
 		// read a file again.
 
-		$Store = Datastore::GetFromFile($Filename);
+		$Store = Datastore::NewFromFile($Filename);
 
 		for($Iter = 0; $Iter < count($Dataset); $Iter++)
 		$this->AssertTrue($Store->Get($Iter) === $Dataset[$Iter]);
@@ -694,7 +694,7 @@ extends PHPUnit\Framework\TestCase {
 		chmod($Filename, 0000);
 		$HadException = FALSE;
 
-		try { $Store = Datastore::GetFromFile($Filename); }
+		try { $Store = Datastore::NewFromFile($Filename); }
 
 		catch(Throwable $Err) {
 			$HadException = TRUE;
@@ -712,13 +712,13 @@ extends PHPUnit\Framework\TestCase {
 		$Store->SetFilename($Jsonname);
 		$Store->Write();
 
-		$Result = Datastore::GetFromFile($Jsonname);
+		$Result = Datastore::NewFromFile($Jsonname);
 		$this->AssertEquals(3, $Result->Count());
 
 		// try to read a jsonfile that wasn't the format we expected.
 
 		file_put_contents($Jsonname, "{}");
-		$Result = Datastore::GetFromFile($Jsonname);
+		$Result = Datastore::NewFromFile($Jsonname);
 
 		unlink($Filename);
 		unlink($Jsonname);
