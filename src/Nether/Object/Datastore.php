@@ -1,6 +1,7 @@
 <?php
 
 namespace Nether\Object;
+use Nether;
 
 use Exception;
 use Iterator;
@@ -34,6 +35,9 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 	protected bool
 	$FullDebug = FALSE;
+
+	protected bool
+	$FullSerialize = FALSE;
 
 	protected mixed
 	$Sorter = NULL;
@@ -71,6 +75,53 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	array {
 
 		return $this->Data;
+	}
+
+	public function
+	__Serialize():
+	array {
+
+		$Output = NULL;
+		$Value = NULL;
+
+		// bubble down the serialize setting to any substores.
+
+		foreach($this->Data as $Value)
+		if($Value instanceof self)
+		$Value->SetFullSerialize($this->FullSerialize);
+
+		// handle if we want a small serialize.
+
+		if(!$this->FullSerialize) {
+			$Output = [ 'Data' => $this->Data ];
+
+			if($this->Title)
+			$Output['Title'] = $this->Title;
+
+			if($this->Filename) {
+				$Output['Filename'] = $this->Filename;
+				$Output['Format'] = $this->Format;
+			}
+
+			return $Output;
+		}
+
+		// or the full serialize.
+
+		return (array)$this;
+	}
+
+	public function
+	__Unserialize(array $Input):
+	void {
+
+		$Key = NULL;
+		$Value = NULL;
+
+		foreach($Input as $Key => $Value)
+		$this->{ltrim($Key, "\0*\0")} = $Value;
+
+		return;
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -189,6 +240,27 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	//*/
 
 		$this->FullJSON = $Val;
+		return $this;
+	}
+
+	public function
+	GetFullSerialize():
+	bool {
+	/*//
+	@date 2021-08-18
+	//*/
+
+		return $this->FullSerialize;
+	}
+
+	public function
+	SetFullSerialize(bool $Val):
+	static {
+	/*//
+	@date 2021-08-18
+	//*/
+
+		$this->FullSerialize = $Val;
 		return $this;
 	}
 
@@ -1006,6 +1078,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		$File = new SplFileInfo($Filename);
 		$Dirname = $File->GetPath();
 		$Ext = strtolower($File->GetExtension()) ?: NULL;
+		$Val = NULL;
 
 		////////
 
@@ -1021,6 +1094,12 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 			if(!is_writable($Filename))
 			throw new Error\FileUnwritable($Filename);
 		}
+
+		////////
+
+		foreach($this->Data as $Val)
+		if($Val instanceof self)
+		$Val->SetFullSerialize($this->FullSerialize);
 
 		////////
 

@@ -118,6 +118,7 @@ extends PHPUnit\Framework\TestCase {
 		$Store->Push($Value,$Key);
 
 		$this->AssertTrue($Store->Count() === 3);
+		$this->AssertNull($Store['DoesNotExist']);
 
 		// test that we can get items one at time.
 
@@ -565,8 +566,21 @@ extends PHPUnit\Framework\TestCase {
 		// by this point amirite.
 
 		$Store->Write($Filename);
+		$Result = Datastore::GetFromFile($Filename);
+
 		$this->AssertTrue(file_exists($Filename));
 		$this->AssertTrue(filesize($Filename) > 0);
+		$this->AssertEquals(3, $Result->Count());
+
+		// try with a datastore in the datastore too.
+
+		$Store->Push(new Datastore([ 100, 200, 300 ]));
+		$Store->Write($Filename);
+
+		$Result = Datastore::GetFromFile($Filename);
+		$this->AssertTrue(file_exists($Filename));
+		$this->AssertTrue(filesize($Filename) > 0);
+		$this->AssertEquals(4, $Result->Count());
 
 		// fail because we are about to make that file unwritable.
 		// rumor has it that php has some built in stuff with
@@ -1066,6 +1080,90 @@ extends PHPUnit\Framework\TestCase {
 
 		$Result = json_decode(json_encode($Store));
 		$this->AssertIsObject($Result);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetSetFullSerialize():
+	void {
+
+		$Store = new Datastore([1, 2, 3]);
+		$Store->SetTitle('Dataset Title');
+		$this->AssertFalse($Store->GetFullSerialize());
+
+		// after a small serialize we expect to lose the debug settings
+		// while keeping relevant data fields.
+
+		$Store->SetFullSerialize(FALSE);
+		$Store->SetFullDebug(TRUE);
+
+		$Result = unserialize(serialize($Store));
+		$this->AssertEquals($Store->GetTitle(), $Result->GetTitle());
+		$this->AssertEquals($Store->Count(), $Result->Count());
+		$this->AssertFalse($Result->GetFullDebug());
+
+		// after a full serialize we expect to keep everything as it was
+		// when the entire thing is rehydrated.
+
+		$Store->SetFullSerialize(TRUE);
+		$Store->SetFullDebug(TRUE);
+
+		$Result = unserialize(serialize($Store));
+		$this->AssertEquals($Store->GetTitle(), $Result->GetTitle());
+		$this->AssertEquals($Store->Count(), $Result->Count());
+		$this->AssertTrue($Result->GetFullDebug());
+
+		////////
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestGetSetFullSerializeBubbleDown():
+	void {
+
+		$Store = new Datastore([
+			'First' => new Datastore([ 1, 2, 3 ]),
+			'Second' => new Datastore([ 4, 5, 6 ])
+		]);
+
+		$Store->SetFullDebug(TRUE);
+		$this->AssertFalse($Store['First']->GetFullDebug());
+		$this->AssertFalse($Store['Second']->GetFullDebug());
+
+		// with a full serialize we would expect to see the full debug
+		// property three times with this structure.
+
+		$Store->SetFullSerialize(TRUE);
+		$Data = serialize($Store);
+		$this->AssertEquals(3, substr_count($Data, 'FullDebug'));
+		$this->AssertEquals(3, substr_count($Data, 'Filename'));
+		$this->AssertEquals(3, substr_count($Data, 'Format'));
+
+
+		// with a small serialize we would expect to see none of the
+		// debug properties with this structure.
+
+		$Store->SetFullSerialize(FALSE);
+		$Data = serialize($Store);
+		$this->AssertEquals(0, substr_count($Data, 'FullDebug'));
+		$this->AssertEquals(0, substr_count($Data, 'Filename'));
+		$this->AssertEquals(0, substr_count($Data, 'Format'));
+
+		// with a small serialize we may get additional properties if they
+		// were actually defined.
+
+		$Store->SetFilename('test.phson');
+		$Store->SetTitle('Test Dataset');
+
+		$Store->SetFullSerialize(FALSE);
+		$Data = serialize($Store);
+		$this->AssertEquals(0, substr_count($Data, 'FullDebug'));
+		$this->AssertEquals(1, substr_count($Data, 'Filename'));
+		$this->AssertEquals(1, substr_count($Data, 'Format'));
 
 		return;
 	}
