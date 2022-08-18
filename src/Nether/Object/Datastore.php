@@ -43,6 +43,9 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	$Sorter = NULL;
 
 	protected array
+	$ProtectedKeys = [];
+
+	protected array
 	$Data = [];
 
 	////////////////////////////////////////////////////////////////
@@ -64,10 +67,44 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	__DebugInfo():
 	array {
 
-		if(!$this->FullDebug)
-		return $this->Data;
-
+		if($this->FullDebug)
 		return (array)$this;
+
+		////////
+
+		$Output = [];
+		$Key = NULL;
+		$Val = NULL;
+		$Type = NULL;
+
+		foreach($this->Data as $Key => $Val) {
+			if(array_key_exists($Key, $this->ProtectedKeys)) {
+
+				// TRUE = keep key obfus value
+				// FALSE = omit key completely.
+
+				if($this->ProtectedKeys[$Key] === FALSE)
+				continue;
+
+				////////
+
+				$Type = gettype($Val);
+				$Val = match($Type) {
+					'string'
+					=> sprintf(
+						'[protected %s len:%d]',
+						$Type, strlen($Val)
+					),
+
+					default
+					=> sprintf('[protected %s]', $Type)
+				};
+			}
+
+			$Output[$Key] = $Val;
+		}
+
+		return $Output;
 	}
 
 	public function
@@ -122,6 +159,57 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		$this->{ltrim($Key, "\0*\0")} = $Value;
 
 		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	// protected key api ///////////////////////////////////////////
+
+	// just a way to provide for not accidentally var_dumping all your
+	// database secrets or whatever. it only really has effect for the
+	// magic debug method info only, it will not stop you from straight up
+	// asking for and then echoing something you should not have.
+
+	public function
+	Protect(string|array $Key, bool $Omit=FALSE):
+	static {
+
+		if(is_array($Key)) {
+			$K = NULL;
+
+			foreach($Key as $K)
+			$this->ProtectedKeys[$K] = !$Omit;
+		}
+
+		else {
+			$this->ProtectedKeys[$Key] = !$Omit;
+		}
+
+		return $this;
+	}
+
+	public function
+	Expose(string|array|bool $Key):
+	static {
+
+		if(is_array($Key)) {
+			$K = NULL;
+
+			foreach($Key as $K)
+			if(array_key_exists($K, $this->ProtectedKeys))
+			unset($this->ProtectedKeys[$K]);
+		}
+
+		elseif(is_string($Key)) {
+			if(array_key_exists($Key, $this->ProtectedKeys))
+			unset($this->ProtectedKeys[$Key]);
+		}
+
+		elseif($Key === TRUE) {
+			unset($this->ProtectedKeys);
+			$this->ProtectedKeys = [];
+		}
+
+		return $this;
 	}
 
 	////////////////////////////////////////////////////////////////

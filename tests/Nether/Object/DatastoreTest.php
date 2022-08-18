@@ -1013,9 +1013,9 @@ extends PHPUnit\Framework\TestCase {
 		return;
 	}
 
-	/** @test */
+	/** @testt */
 	public function
-	TestFullDebug():
+	_TestFullDebug():
 	void {
 
 		$Store = new Datastore([1, 2, 3]);
@@ -1399,6 +1399,227 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertGreaterThan(0, $Different);
 
 		return;
+	}
+
+	/** @test */
+	public function
+	TestProtectExpose():
+	void {
+
+		$Data = [
+			'Public1'    => 'public value 1',
+			'Public2'    => 'public value 2',
+			'Private1'   => 'private value 1',
+			'Private2'   => 'private value 2',
+			'PrivateInt' => 69
+		];
+
+		$Store = new Datastore($Data);
+
+		// test that the store works like normal.
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertCount(5, $Result);
+		$this->AssertArrayHasKey('Public1', $Result);
+		$this->AssertArrayHasKey('Public2', $Result);
+		$this->AssertArrayHasKey('Private1', $Result);
+		$this->AssertArrayHasKey('Private2', $Result);
+		$this->AssertEquals($Result['Private1'], $Data['Private1']);
+		$this->AssertEquals($Result['Private2'], $Data['Private2']);
+
+		// test that we can protect sensitive data by replacing it
+		// giving it each key as a string.
+
+		$Store
+		->Protect('Private1')
+		->Protect('Private2')
+		->Protect('PrivateInt');
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertCount(5, $Result);
+		$this->AssertArrayHasKey('Public1', $Result);
+		$this->AssertArrayHasKey('Public2', $Result);
+		$this->AssertArrayHasKey('Private1', $Result);
+		$this->AssertArrayHasKey('Private2', $Result);
+		$this->AssertNotEquals($Result['Private1'], $Data['Private1']);
+		$this->AssertNotEquals($Result['Private2'], $Data['Private2']);
+		$this->AssertArrayHasKey('PrivateInt', $Result);
+		$this->AssertNotEquals($Result['PrivateInt'], $Data['PrivateInt']);
+
+		// test that we can remove the protected keys specifying them as
+		// individual strings.
+
+		$Store
+		->Expose('Private1')
+		->Expose('Private2');
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertCount(5, $Result);
+		$this->AssertArrayHasKey('Public1', $Result);
+		$this->AssertArrayHasKey('Public2', $Result);
+		$this->AssertArrayHasKey('Private1', $Result);
+		$this->AssertArrayHasKey('Private2', $Result);
+		$this->AssertEquals($Result['Private1'], $Data['Private1']);
+		$this->AssertEquals($Result['Private2'], $Data['Private2']);
+		$this->AssertArrayHasKey('PrivateInt', $Result);
+		$this->AssertNotEquals($Result['PrivateInt'], $Data['PrivateInt']);
+
+		// test that we can protect sensitive data by replacing it
+		// giving an arra of keys.
+
+		$Store->Protect([ 'Private1', 'Private2', 'PrivateInt' ]);
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertCount(5, $Result);
+		$this->AssertArrayHasKey('Public1', $Result);
+		$this->AssertArrayHasKey('Public2', $Result);
+		$this->AssertArrayHasKey('Private1', $Result);
+		$this->AssertArrayHasKey('Private2', $Result);
+		$this->AssertNotEquals($Result['Private1'], $Data['Private1']);
+		$this->AssertNotEquals($Result['Private2'], $Data['Private2']);
+		$this->AssertArrayHasKey('PrivateInt', $Result);
+		$this->AssertNotEquals($Result['PrivateInt'], $Data['PrivateInt']);
+
+		// test that we can remove the protected keys specifying them as
+		// an array of keys
+
+		$Store->Expose([ 'Private1', 'Private2' ]);
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertCount(5, $Result);
+		$this->AssertArrayHasKey('Public1', $Result);
+		$this->AssertArrayHasKey('Public2', $Result);
+		$this->AssertArrayHasKey('Private1', $Result);
+		$this->AssertArrayHasKey('Private2', $Result);
+		$this->AssertEquals($Result['Private1'], $Data['Private1']);
+		$this->AssertEquals($Result['Private2'], $Data['Private2']);
+		$this->AssertArrayHasKey('PrivateInt', $Result);
+		$this->AssertNotEquals($Result['PrivateInt'], $Data['PrivateInt']);
+
+		// test that we can completely omit sensitive keys if we dont even
+		// want a hint that a value with a name exists.
+
+		$Store
+		->Protect('Private1', TRUE)
+		->Protect('Private2', TRUE)
+		->Protect('PrivateInt', TRUE);
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertCount(2, $Result);
+		$this->AssertArrayHasKey('Public1', $Result);
+		$this->AssertArrayHasKey('Public2', $Result);
+		$this->AssertArrayNotHasKey('Private1', $Result);
+		$this->AssertArrayNotHasKey('Private2', $Result);
+		$this->AssertArrayNotHasKey('PrivateInt', $Result);
+
+		// test that we can flush all of the protected keys.
+
+
+		$Store->Expose(TRUE);
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertCount(5, $Result);
+		$this->AssertArrayHasKey('Public1', $Result);
+		$this->AssertArrayHasKey('Public2', $Result);
+		$this->AssertArrayHasKey('Private1', $Result);
+		$this->AssertArrayHasKey('Private2', $Result);
+		$this->AssertArrayHasKey('PrivateInt', $Result);
+		$this->AssertEquals($Result['Private1'], $Data['Private1']);
+		$this->AssertEquals($Result['Private2'], $Data['Private2']);
+		$this->AssertEquals($Result['PrivateInt'], $Data['PrivateInt']);
+
+		// test that full debug bypasses all of that.
+
+		$Store->Protect([ 'Private1', 'Private2', 'PrivateInt' ]);
+		$Store->SetFullDebug(TRUE);
+
+		$Result = $Store->__DebugInfo();
+		$this->AssertTrue(count($Result) > 5);
+		$this->AssertArrayHasKey('Private1', $Result["\0*\0Data"]);
+		$this->AssertArrayHasKey('Private2', $Result["\0*\0Data"]);
+		$this->AssertArrayHasKey('PrivateInt', $Result["\0*\0Data"]);
+		$this->AssertEquals($Result["\0*\0Data"]['Private1'], $Data['Private1']);
+		$this->AssertEquals($Result["\0*\0Data"]['Private2'], $Data['Private2']);
+		$this->AssertEquals($Result["\0*\0Data"]['PrivateInt'], $Data['PrivateInt']);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestProtectExposeAndThatTheLanguageRespectsItWhereExpected():
+	void {
+
+		$PrintR = function(Datastore $Input) {
+
+			ob_start();
+			print_r($Input);
+			return ob_get_clean();
+		};
+
+		$VarDump = function(Datastore $Input) {
+
+			ob_start();
+			var_dump($Input);
+			return ob_get_clean();
+		};
+
+		$Data = [
+			'Public1'  => 'public value 1',
+			'Public2'  => 'public value 2',
+			'Private1' => 'private value 1',
+			'Private2' => 'private value 2'
+		];
+
+		$Store = new Datastore($Data);
+
+		////////
+
+		// test that there was no protection.
+
+		$Result = $PrintR($Store);
+		$this->AssertStringContainsString('Private1', $Result);
+		$this->AssertStringContainsString('Private2', $Result);
+		$this->AssertStringContainsString($Data['Private1'], $Result);
+		$this->AssertStringContainsString($Data['Private2'], $Result);
+
+		$Result = $VarDump($Store);
+		$this->AssertStringContainsString('Private1', $Result);
+		$this->AssertStringContainsString('Private2', $Result);
+		$this->AssertStringContainsString($Data['Private1'], $Result);
+		$this->AssertStringContainsString($Data['Private2'], $Result);
+
+		// test that there was protection.
+
+		$Store->Protect(['Private1', 'Private2']);
+
+		$Result = $PrintR($Store);
+		$this->AssertStringContainsString('Private1', $Result);
+		$this->AssertStringContainsString('Private2', $Result);
+		$this->AssertStringNotContainsString($Data['Private1'], $Result);
+		$this->AssertStringNotContainsString($Data['Private2'], $Result);
+
+		$Result = $VarDump($Store);
+		$this->AssertStringContainsString('Private1', $Result);
+		$this->AssertStringContainsString('Private2', $Result);
+		$this->AssertStringNotContainsString($Data['Private1'], $Result);
+		$this->AssertStringNotContainsString($Data['Private2'], $Result);
+
+		// test that there was omission.
+
+		$Store->Protect(['Private1', 'Private2'], TRUE);
+
+		$Result = $PrintR($Store);
+		$this->AssertStringNotContainsString('Private1', $Result);
+		$this->AssertStringNotContainsString('Private2', $Result);
+		$this->AssertStringNotContainsString($Data['Private1'], $Result);
+		$this->AssertStringNotContainsString($Data['Private2'], $Result);
+
+		$Result = $VarDump($Store);
+		$this->AssertStringNotContainsString('Private1', $Result);
+		$this->AssertStringNotContainsString('Private2', $Result);
+		$this->AssertStringNotContainsString($Data['Private1'], $Result);
+		$this->AssertStringNotContainsString($Data['Private2'], $Result);
 	}
 
 }
