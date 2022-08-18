@@ -1138,13 +1138,6 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 			=> serialize($this->Data)
 		};
 
-		/*
-		if($Ext === 'json' || $this->Format === static::FormatJSON)
-		$Data = json_encode($this->Data, JSON_PRETTY_PRINT);
-		else
-		$Data = serialize($this->Data);
-		*/
-
 		////////
 
 		file_put_contents($Filename, $Data);
