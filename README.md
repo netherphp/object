@@ -84,15 +84,71 @@ the PHP 8 attributes, to aid in metaprogramming tasks. Classes which extend `Pro
 
 ### `Nether\Object\Package\ClassInfoPackage`
 
+*Simple Example:*
+```php
+class MyClass {
+
+	use
+	Nether\Object\Package\ClassInfoPackage;
+
+}
+
+$ClassInfo = MyClass::GetClassInfo();
+
+print_r($ClassInfo);
+```
+
 * Documentation:
   uri-to-wikipage
 
 ### `Nether\Object\Package\MethodInfoPackage`
 
+*Simple Example:*
+```php
+class MyClass {
+
+	use
+	Nether\Object\Package\MethodInfoPackage;
+
+	public function
+	GetID():
+	int {
+
+		return 0;
+	}
+
+}
+
+$Methods = MyClass::GetMethodIndex();
+
+foreach($Methods as $Method) {
+	print_r($Method);
+}
+```
+
 * Documentation:
   uri-to-wikipage
 
 ### `Nether\Object\Package\PropertyInfoPackage`
+
+*Simple Example:*
+```php
+class MyClass {
+
+	use
+	Nether\Object\Package\PropertyInfoPackage;
+
+	public int
+	$ID = 0;
+
+}
+
+$Props = MyClass::GetPropertyIndex();
+
+foreach($Props as $Prop) {
+	print_r($Prop);
+}
+```
 
 * Documentation:
   uri-to-wikipage
