@@ -30,6 +30,9 @@ the prototype system will want to know about.
 	public bool
 	$Castable;
 
+	public string
+	$Access;
+
 	public bool
 	$Static;
 
@@ -72,6 +75,16 @@ the prototype system will want to know about.
 		$this->Nullable = $Nullable;
 		$this->Origin = $this->Name;
 		$this->Static = $Prop->IsStatic();
+		$this->Access = match(TRUE) {
+			($Prop->IsProtected())
+			=> 'protected',
+
+			($Prop->IsPrivate())
+			=> 'private',
+
+			default
+			=> 'public'
+		};
 
 		// determine if it can be progamatically typecast.
 

@@ -80,6 +80,32 @@ extends Prototype {
 
 }
 
+class TestClassMethod4
+extends Prototype {
+
+	public function
+	PublicMethod():
+	void {
+
+		return;
+	}
+
+	protected function
+	ProtectedMethod():
+	void {
+
+		return;
+	}
+
+	private function
+	PrivateMethod():
+	void {
+
+		return;
+	}
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -304,6 +330,27 @@ extends PHPUnit\Framework\TestCase {
 
 		foreach($Method->GetAttribute($A3) as $Attrib)
 		$this->AssertInstanceOf($A3, $Attrib);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestMethodInfoAccess() {
+
+		$Methods = TestClassMethod4::GetMethodIndex();
+		$Method = NULL;
+
+		foreach($Methods as $Method) {
+			if($Method->Name === 'PublicMethod')
+			$this->AssertEquals('public', $Method->Access);
+
+			if($Method->Name === 'ProtectedMethod')
+			$this->AssertEquals('protected', $Method->Access);
+
+			if($Method->Name === 'PrivateMethod')
+			$this->AssertEquals('private', $Method->Access);
+		}
 
 		return;
 	}

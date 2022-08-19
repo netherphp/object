@@ -20,6 +20,9 @@ class MethodInfo {
 	public array
 	$Args;
 
+	public string
+	$Access;
+
 	public bool
 	$Static;
 
@@ -51,6 +54,16 @@ class MethodInfo {
 		$this->Name = $Method->GetName();
 		$this->Type = $StrType;
 		$this->Static = $Method->IsStatic();
+		$this->Access = match(TRUE) {
+			($Method->IsProtected())
+			=> 'protected',
+
+			($Method->IsPrivate())
+			=> 'private',
+
+			default
+			=> 'public'
+		};
 
 		foreach($Method->GetAttributes() as $Attrib) {
 			$AttribName = $Attrib->GetName();

@@ -84,6 +84,20 @@ extends Prototype {
 
 }
 
+class TestClassProp4
+extends Prototype {
+
+	public int
+	$PublicVal;
+
+	protected float
+	$ProtectedVal;
+
+	private bool
+	$PrivateVal;
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -332,6 +346,27 @@ extends PHPUnit\Framework\TestCase {
 			var_dump($Err);
 			echo PHP_EOL;
 			$this->AssertFalse(TRUE);
+		}
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestPropertyInfoAccess() {
+
+		$Props = TestClassProp4::GetPropertyIndex();
+		$Prop = NULL;
+
+		foreach($Props as $Prop) {
+			if($Prop->Name === 'PublicVal')
+			$this->AssertEquals('public', $Prop->Access);
+
+			if($Prop->Name === 'ProtectedVal')
+			$this->AssertEquals('protected', $Prop->Access);
+
+			if($Prop->Name === 'PrivateVal')
+			$this->AssertEquals('private', $Prop->Access);
 		}
 
 		return;
