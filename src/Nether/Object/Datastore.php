@@ -982,7 +982,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	Sort(callable $Function=NULL):
+	Sort(?callable $Function=NULL):
 	static {
 	/*//
 	@date 2015-12-02
