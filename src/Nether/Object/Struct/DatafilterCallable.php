@@ -28,14 +28,4 @@ class DatafilterCallable {
 		return ($this->Func)($Val, $Key, $Input, ...($this->Argv ?? []));
 	}
 
-	public function
-	__DebugInfo():
-	array {
-
-		return [
-			'Func' => is_callable($this->Func),
-			'Argv' => $this->Argv
-		];
-	}
-
 }
