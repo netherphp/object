@@ -108,6 +108,18 @@ implements ArrayAccess, Countable, IteratorAggregate {
 		return $this;
 	}
 
+	public function
+	__DebugInfo():
+	array {
+
+		$Output = [
+			'Filters' => $this->__Filters,
+			'Data' => $this->__Data
+		];
+
+		return $Output;
+	}
+
 	////////////////////////////////////////////////////////////////
 	// implements ArrayAccess //////////////////////////////////////
 

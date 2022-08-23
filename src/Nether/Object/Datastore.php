@@ -576,8 +576,8 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		$Key = NULL;
 		$Value = NULL;
 
-		foreach($this->Data as $Key => &$Value)
-		$Function($Value,$Key,$this,...($Argv??[]));
+		foreach($this->Data as $Key => $Value)
+		$Function($Value, $Key, $this, ...($Argv??[]));
 
 		return $this;
 	}

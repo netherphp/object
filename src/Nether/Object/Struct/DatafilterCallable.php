@@ -3,6 +3,7 @@
 namespace Nether\Object\Struct;
 
 use Nether\Object\Datafilter;
+use Nether\Object\Struct\DatafilterItem;
 
 class DatafilterCallable {
 
@@ -25,7 +26,24 @@ class DatafilterCallable {
 	__Invoke(mixed $Val, string $Key, Datafilter $Input):
 	mixed {
 
-		return ($this->Func)($Val, $Key, $Input, ...($this->Argv ?? []));
+		return ($this->Func)(
+			new DatafilterItem($Val, $Key, $Input),
+			...($this->Argv ?? [])
+		);
+	}
+
+	public function
+	__DebugInfo():
+	array {
+
+		$Output = [];
+
+		if(is_callable($this->Func)) {
+			$Output['Func'] = gettype($this->Func);
+			$Output['Argv'] = $this->Argv;
+		}
+
+		return $Output;
 	}
 
 }

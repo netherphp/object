@@ -5,6 +5,7 @@ namespace NetherTestSuite\Object\Datafilter;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Nether\Object\Datafilter;
+use Nether\Object\Struct\DatafilterItem;
 
 class DatafilterTest
 extends TestCase {
@@ -34,7 +35,7 @@ extends TestCase {
 		// test cache clear on write.
 
 		$Filter['Three'] = 3;
-		$Filter->Three(fn($Val)=> (float)$Val);
+		$Filter->Three(fn($Item)=> (float)$Item->Value);
 		$this->AssertIsFloat($Filter->Three);
 		$this->AssertEquals(3, $Filter->Three);
 		$this->AssertTrue($Filter->CacheHas('Three'));
@@ -63,9 +64,9 @@ extends TestCase {
 		$Filter = new Datafilter($Data);
 
 		$Filter
-		->Zero(fn($Val): bool => TRUE)
-		->One(fn($Val): string => (string)$Val)
-		->Two(fn($Val): float => (float)$Val);
+		->Zero(fn(DatafilterItem $Item): bool => TRUE)
+		->One(fn(DatafilterItem $Item): string => (string)$Item->Value)
+		->Two(fn(DatafilterItem $Item): float => (float)$Item->Value);
 
 		$this->AssertIsString($Filter->One);
 		$this->AssertTrue($Filter->One === '1');
@@ -74,6 +75,10 @@ extends TestCase {
 		$this->AssertTrue($Filter->Two === 2.0);
 
 		$this->AssertNull($Filter->Zero);
+
+		ob_start();
+		var_dump($Filter);
+		$Buffer = ob_get_clean();
 
 		return;
 	}
@@ -139,14 +144,14 @@ extends TestCase {
 		$Filter = new Datafilter($Data);
 		$Key = NULL;
 		$Val = NULL;
-		$MinMax = function($Val, $Key, $Input, int $Min, int $Max) {
-			if($Val < $Min)
+		$MinMax = function(DatafilterItem $Item, int $Min, int $Max) {
+			if($Item->Value < $Min)
 			return $Min;
 
-			if($Val > $Max)
+			if($Item->Value > $Max)
 			return $Max;
 
-			return $Val;
+			return $Item->Value;
 		};
 
 		$Filter->One($MinMax, 2, 3);
