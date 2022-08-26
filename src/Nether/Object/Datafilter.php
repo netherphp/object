@@ -43,50 +43,14 @@ implements ArrayAccess, Countable, IteratorAggregate {
 	__Get(string $Key):
 	mixed {
 
-		$Key = $this->PrepareKey($Key);
-		$Output = NULL;
-
-		////////
-
-		if(isset($this->__Cache) && array_key_exists($Key, $this->__Cache))
-		return $this->__Cache[$Key];
-
-		////////
-
-		if(array_key_exists($Key, $this->__Data)) {
-			$Output = $this->__Data[$Key];
-
-			if(array_key_exists($Key, $this->__Filters))
-			if(is_callable($this->__Filters[$Key]))
-			$Output = ($this->__Filters[$Key])($Output, $Key, $this);
-		}
-
-		if(isset($this->__Cache))
-		$this->__Cache[$Key] = $Output;
-
-		return $Output;
-
-		////////
-
-		return NULL;
+		return $this->Get($Key);
 	}
 
 	public function
 	__Set(string $Key, mixed $Value):
 	void {
 
-		$Key = $this->PrepareKey($Key);
-
-		////////
-
-		$this->__Data[$Key] = $Value;
-
-		////////
-
-		if(isset($this->__Cache))
-		if(array_key_exists($Key, $this->__Cache))
-		unset($this->__Cache[$Key]);
-
+		$this->Set($Key, $Value);
 		return;
 	}
 
@@ -94,18 +58,7 @@ implements ArrayAccess, Countable, IteratorAggregate {
 	__Call(string $Key, array $Argv):
 	static {
 
-		$Key = $this->PrepareKey($Key);
-
-		if(count($Argv) < 1 || !is_callable($Argv[0]))
-		throw new Exception('first arg must be callable');
-
-		$this->__Filters[$Key] = new DatafilterCallable($Argv[0], (
-			(count($Argv) > 1)
-			? array_slice($Argv, 1, NULL)
-			: NULL
-		));
-
-		return $this;
+		return $this->SetFilter($Key, ...$Argv);
 	}
 
 	public function
@@ -228,6 +181,60 @@ implements ArrayAccess, Countable, IteratorAggregate {
 	////////////////////////////////////////////////////////////////
 
 	public function
+	Get(string $Key):
+	mixed {
+
+		$Key = $this->PrepareKey($Key);
+		$Output = NULL;
+
+		////////
+
+		if(isset($this->__Cache) && array_key_exists($Key, $this->__Cache))
+		return $this->__Cache[$Key];
+
+		////////
+
+		if(array_key_exists($Key, $this->__Data)) {
+			$Output = $this->__Data[$Key];
+
+			if(array_key_exists($Key, $this->__Filters))
+			if(is_callable($this->__Filters[$Key]))
+			$Output = ($this->__Filters[$Key])($Output, $Key, $this);
+		}
+
+		if(isset($this->__Cache))
+		$this->__Cache[$Key] = $Output;
+
+		return $Output;
+
+		////////
+
+		return NULL;
+	}
+
+	public function
+	Set(string $Key, mixed $Value):
+	static {
+
+		$Key = $this->PrepareKey($Key);
+
+		////////
+
+		$this->__Data[$Key] = $Value;
+
+		////////
+
+		if(isset($this->__Cache))
+		if(array_key_exists($Key, $this->__Cache))
+		unset($this->__Cache[$Key]);
+
+		return $this;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
 	SetCaseSensitive(bool $Use):
 	static {
 
@@ -281,6 +288,23 @@ implements ArrayAccess, Countable, IteratorAggregate {
 
 		return $this;
 	}
+
+	public function
+	SetFilter(string $Key, callable|string $Func, ...$Argv):
+	static {
+
+		$Key = $this->PrepareKey($Key);
+
+		if(!is_callable($Func))
+		throw new Exception('supplied filter is not callable.');
+
+		$this->__Filters[$Key] = new DatafilterCallable($Func, $Argv);
+
+		return $this;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
 
 	public function
 	PrepareKey(string $Key):
