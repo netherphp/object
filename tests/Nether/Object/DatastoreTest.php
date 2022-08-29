@@ -1635,6 +1635,9 @@ extends PHPUnit\Framework\TestCase {
 		$Store->Define('Green', 'Pea');
 		$this->AssertEquals('Bean', $Store['Green']);
 
+		$Store->Set('Green', 'Machine');
+		$this->AssertEquals('Machine', $Store['Green']);
+
 		return;
 	}
 

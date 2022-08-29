@@ -958,6 +958,18 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	Set(mixed $Key, mixed $Value):
+	static {
+	/*//
+	@date 2022-08-29
+	alias for shove. the two methods may eventually flip flop with one of them
+	becoming deprecated idk yet. shove makes sense in some contexts.
+	//*/
+
+		return $this->Shove($Key, $Value);
+	}
+
+	public function
 	Shove(mixed $Key, mixed $Value):
 	static {
 	/*//
