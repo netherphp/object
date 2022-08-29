@@ -1622,4 +1622,20 @@ extends PHPUnit\Framework\TestCase {
 		$this->AssertStringNotContainsString($Data['Private2'], $Result);
 	}
 
+	/** @test */
+	public function
+	TestDefine():
+	void {
+
+		$Store = new Datastore;
+
+		$Store->Define('Green', 'Bean');
+		$this->AssertEquals('Bean', $Store['Green']);
+
+		$Store->Define('Green', 'Pea');
+		$this->AssertEquals('Bean', $Store['Green']);
+
+		return;
+	}
+
 }

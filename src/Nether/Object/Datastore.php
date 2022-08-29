@@ -742,6 +742,21 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	Define(string $Key, mixed $Val):
+	static {
+	/*//
+	@date 2022-08-29
+	add this data under this key, but only if it does not already exist.
+	the "do not overwrite" version of Shove.
+	//*/
+
+		if(!array_key_exists($Key, $this->Data))
+		$this->Data[$Key] = $Val;
+
+		return $this;
+	}
+
+	public function
 	Distill(callable $FilterFunc):
 	Datastore {
 	/*//
