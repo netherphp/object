@@ -706,6 +706,100 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		return array_values($this->Data);
 	}
 
+	public function
+	IsTrue(string $Key, bool $NullIsTrue=FALSE):
+	bool {
+	/*//
+	@date 2022-08-31
+	check if the data is true or trueable, and handle if undefined values
+	should be treated as true or not.
+	//*/
+
+		$Val = $this->Get($Key);
+
+		// if the value was null in the context of a configuration file
+		// you may want undefined keys to be treated as true or false
+		// depending on your desired default behaviours.
+
+		if($Val === NULL)
+		$Val = $NullIsTrue ? TRUE : FALSE;
+
+		// if the value was a string we will only accept true and TRUE
+		// as truth. everything else will be false to avoid php being
+		// flippity floppy based on the first character.
+
+		if(is_string($Val))
+		$Val = match($Val) {
+			'true', 'TRUE'
+			=> TRUE,
+
+			default
+			=> FALSE
+		};
+
+		////////
+
+		$Val = (bool)$Val;
+
+		return $Val;
+	}
+
+	public function
+	IsTrueEnough(string $Key):
+	bool {
+	/*//
+	@date 2022-08-31
+	check if data is true and consider undefined keys as true.
+	//*/
+
+		return $this->IsTrue($Key, TRUE);
+	}
+
+	public function
+	IsFalse(string $Key, bool $NullIsTrue=FALSE):
+	bool {
+	/*//
+	@date 2022-08-31
+	inversion of IsTrue lmao.
+	//*/
+
+		return !$this->IsTrue($Key, $NullIsTrue);
+	}
+
+	public function
+	IsFalseEnough(string $Key):
+	bool {
+	/*//
+	@date 2022-08-31
+	check if data is false and consider undefined keys as false.
+	//*/
+
+		return !$this->IsTrue($Key, FALSE);
+	}
+
+	public function
+	IsNull(string $Key):
+	bool {
+	/*//
+	@date 2022-08-31
+	check if data is null or nullable. this could be either a literal null
+	or undefined. if you need to know if it legit exists or not there is
+	the HasKey method.
+	//*/
+
+		$Val = $this->Get($Key);
+
+		////////
+
+		if(is_string($Val))
+		if($Val === 'null' || $Val === 'NULL')
+		$Val = NULL;
+
+		////////
+
+		return ($Val === NULL);
+	}
+
 	////////////////////////////////////////////////////////////////
 	// Manipulation API ////////////////////////////////////////////
 

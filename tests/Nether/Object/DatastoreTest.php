@@ -20,10 +20,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataStorageDataset() {
-	/*//
-	this tests that we can actually push and pull data out of the storage
-	glomping around the entire datastore array at once.
-	//*/
 
 		// testing right out of the box.
 
@@ -59,10 +55,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataStorageItemsNormal() {
-	/*//
-	tests that we can push and pull data out of the storage using the item
-	management api of the storage.
-	//*/
 
 		$X = NULL;
 		$Key = NULL;
@@ -97,10 +89,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataStorageItemsAssoc() {
-	/*//
-	test that we can push and pull data out of storage using the item
-	management api with associative keys.
-	//*/
 
 		$Key = NULL;
 		$Value = NULL;
@@ -131,10 +119,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataStorageRemoval() {
-	/*//
-	test that we can remove data from the set and reindex numeric keys while
-	preserving associative keys.
-	//*/
 
 		$Store = new Datastore;
 		$Store->SetData([
@@ -160,10 +144,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataStoragePushPop() {
-	/*//
-	this tests that we implemented the push and popping behaviour in a
-	way that works as expected.
-	//*/
 
 		$Store = new Datastore;
 
@@ -210,10 +190,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataIteration() {
-	/*//
-	this tests that the implememented Iterator interface appears to be
-	working as expected.
-	//*/
 
 		$Store = new Datastore;
 		$Store->SetData([1,2,3,4,5,6]);
@@ -240,10 +216,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataMergeRight() {
-	/*//
-	testing that we implemented merging new data onto the end of the array
-	correctly. (array_merge behaviour)
-	//*/
 
 		/*
 		this is what we want to see.
@@ -300,10 +272,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataMergeLeft() {
-	/*//
-	testing that we implemented merging new data onto the start of the array
-	correctly. (array_merge behaviour)
-	//*/
 
 		/*
 		this is what we want to see.
@@ -361,10 +329,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataBlendRight() {
-	/*//
-	testing that we implemented blending new data into the end of the array,
-	where original data wins any assoc conflicts. (sorta array_merge)
-	//*/
 
 		/*
 		this is what we want to see.
@@ -421,10 +385,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataBlendLeft() {
-	/*//
-	testing that we implemented blending new data into the the start of the
-	array, where original data wins any assoc conflicts. (sorta array_merge)
-	//*/
 
 		/*
 		this is what we want to see.
@@ -482,9 +442,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestDataClear() {
-	/*//
-	testing that we implemented clearing the dataset properly.
-	//*/
 
 		$Store = new Datastore;
 		$Store->SetData([1,2,3]);
@@ -502,10 +459,6 @@ extends PHPUnit\Framework\TestCase {
 	/** @test */
 	public function
 	TestWriteFormat() {
-	/*//
-	testing that we were able to tell it what format to write to disk as, and
-	that an invalid value resulted in a sane default.
-	//*/
 
 		$Store = new Datastore;
 
@@ -1637,6 +1590,56 @@ extends PHPUnit\Framework\TestCase {
 
 		$Store->Set('Green', 'Machine');
 		$this->AssertEquals('Machine', $Store['Green']);
+
+		return;
+	}
+
+	/** @test */
+	public function
+	TestIsTrueFalseNull():
+	void {
+
+		$Store = new Datastore;
+
+		$Store['True'] = TRUE;
+		$Store['Trueish'] = 'true';
+		$Store['False'] = FALSE;
+		$Store['Falseish'] = 'false';
+		$Store['Null'] = NULL;
+		$Store['Nullish'] = 'null';
+
+		// test normal cases.
+
+		$this->AssertTrue($Store->IsTrue('True'));
+		$this->AssertTrue($Store->IsTrue('Trueish'));
+		$this->AssertFalse($Store->IsFalse('True'));
+		$this->AssertFalse($Store->IsFalse('Trueish'));
+
+		$this->AssertTrue($Store->IsFalse('False'));
+		$this->AssertTrue($Store->IsFalse('Falseish'));
+		$this->AssertFalse($Store->IsTrue('False'));
+		$this->AssertFalse($Store->IsTrue('Falseish'));
+
+		$this->AssertTrue($Store->IsNull('Null'));
+		$this->AssertTrue($Store->IsNull('Nullish'));
+		$this->AssertFalse($Store->IsNull('True'));
+		$this->AssertFalse($Store->IsNull('Trueish'));
+		$this->AssertFalse($Store->IsNull('False'));
+		$this->AssertFalse($Store->IsNull('Falseish'));
+
+		// test undefined cases.
+
+		$this->AssertFalse($Store->IsTrue('TrueUndef'));
+		$this->AssertTrue($Store->IsFalse('TrueUndef'));
+
+		$this->AssertFalse($Store->IsTrue('FalseUndef'));
+		$this->AssertTrue($Store->IsFalse('FalseUndef'));
+
+		// test changing the meaning of null.
+
+		$this->AssertTrue($Store->IsTrueEnough('TrueUndef'));
+		$this->AssertTrue($Store->IsFalseEnough('FalseUndef'));
+
 
 		return;
 	}
