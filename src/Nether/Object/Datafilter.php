@@ -213,6 +213,20 @@ implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	public function
+	GetQueryString():
+	string {
+
+		$Key = NULL;
+		$Val = NULL;
+		$Output = [];
+
+		foreach($this->__Data as $Key => $Val)
+		$Output[] = sprintf('%s=%s', urlencode($Key), urlencode($Val));
+
+		return join('&', $Output);
+	}
+
+	public function
 	Set(string $Key, mixed $Value):
 	static {
 
