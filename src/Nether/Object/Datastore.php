@@ -1147,7 +1147,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	// Merging API /////////////////////////////////////////////////
 
 	public function
-	MergeRight(array $Input):
+	MergeRight(array|object $Input):
 	static {
 	/*//
 	@date 2016-03-18
@@ -1158,6 +1158,14 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	sequence position that it was already in.
 	//*/
 
+		if($Input instanceof static)
+		$Input = $Input->GetData();
+
+		elseif(is_object($Input))
+		$Input = (array)$Input;
+
+		////////
+
 		$this->Data = array_merge(
 			$this->Data,
 			$Input
@@ -1167,13 +1175,21 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	MergeLeft(array $Input):
+	MergeLeft(array|object $Input):
 	static {
 	/*//
 	@date 2016-03-18
 	works like MergeRight except it appears your data was added to the
 	beginning of the dataset.
 	//*/
+
+		if($Input instanceof static)
+		$Input = $Input->GetData();
+
+		elseif(is_object($Input))
+		$Input = (array)$Input;
+
+		////////
 
 		$this->Data = array_reverse(array_merge(
 			array_reverse($this->Data),
@@ -1184,7 +1200,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	BlendRight(array $Input):
+	BlendRight(array|object $Input):
 	static {
 	/*//
 	@date 2016-03-18
@@ -1197,6 +1213,16 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 		$Key = NULL;
 		$Val = NULL;
+
+		////////
+
+		if($Input instanceof static)
+		$Input = $Input->GetData();
+
+		elseif(is_object($Input))
+		$Input = (array)$Input;
+
+		////////
 
 		foreach($Input as $Key => $Val) {
 			if(is_int($Key)) {
@@ -1214,7 +1240,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
-	BlendLeft(array $Input):
+	BlendLeft(array|object $Input):
 	static {
 	/*//
 	@date 2016-03-18
@@ -1224,6 +1250,16 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 		$Key = NULL;
 		$Val = NULL;
+
+		////////
+
+		if($Input instanceof static)
+		$Input = $Input->GetData();
+
+		elseif(is_object($Input))
+		$Input = (array)$Input;
+
+		////////
 
 		$this->Data = array_reverse($this->Data);
 
