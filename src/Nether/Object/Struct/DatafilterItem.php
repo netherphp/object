@@ -25,4 +25,11 @@ class DatafilterItem {
 		return;
 	}
 
+	public function
+	__Invoke():
+	mixed {
+
+		return $this->Value;
+	}
+
 }
