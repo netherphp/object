@@ -227,6 +227,15 @@ implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	public function
+	Exists(mixed $Key):
+	bool {
+
+		$Key = $this->PrepareKey($Key);
+
+		return array_key_exists($Key, $this->__Data);
+	}
+
+	public function
 	Set(string $Key, mixed $Value):
 	static {
 
