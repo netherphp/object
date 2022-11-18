@@ -94,10 +94,12 @@ trait MethodInfoPackage {
 		$Output = [];
 
 		foreach($RefClass->GetMethods() as $RefMethod) {
-			foreach($RefMethod->GetAttributes() as $RefAttrib) {
-				if($RefAttrib->GetName() === $AttribName) {
-					$Info = new MethodInfo($RefMethod);
+			$Info = new MethodInfo($RefMethod);
+
+			foreach($Info->Attributes as $Inst) {
+				if($Inst instanceof $AttribName) {
 					$Output[$Info->Name] = $Info;
+					break;
 				}
 			}
 		}
@@ -116,14 +118,6 @@ trait MethodInfoPackage {
 	in userland code.
 	//*/
 
-		$MethodMap = NULL;
-
-		////////
-
-		if(MethodInfoCache::Has(static::class))
-		$MethodMap = MethodInfoCache::Get(static::class);
-
-		else
 		$MethodMap = static::GetMethodIndex();
 
 		////////
