@@ -127,10 +127,19 @@ trait MethodInfoPackage {
 			function(MethodInfo $Method) use($AttribName):
 			bool {
 				$Inst = NULL;
+				$IInst = NULL;
 
 				foreach($Method->Attributes as $Inst) {
-					if($Inst instanceof $AttribName)
-					return TRUE;
+					if(is_object($Inst)) {
+						if($Inst instanceof $AttribName)
+						return TRUE;
+					}
+
+					if(is_array($Inst)) {
+						foreach($Inst as $IInst)
+						if($IInst instanceof $AttribName)
+						return TRUE;
+					}
 				}
 
 				return FALSE;
