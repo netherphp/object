@@ -566,7 +566,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	alter the current dataset with the result of an array filter.
 	//*/
 
-		$this->Data = array_filter($this->Data,$FilterFunc);
+		$this->Data = array_filter($this->Data,$FilterFunc,ARRAY_FILTER_USE_BOTH);
 
 		return $this;
 	}
