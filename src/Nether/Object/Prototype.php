@@ -108,10 +108,22 @@ impact i can find while packing in as many features as possible.
 		// apply any follow up attribute demands.
 
 		foreach($Properties as $Src => $Val) {
-			if($Val->Objectify)
-			$this->{$Val->Name} = new ($Val->Type)(
-				...$Val->Objectify->Args
-			);
+			if($Val->Objectify instanceof Meta\PropertyObjectify) {
+				if($Val->Objectify instanceof Meta\PropertyFactory) {
+					if(class_exists($Properties[$Src]->Type))
+					if(is_callable("{$Properties[$Src]->Type}::{$Val->Objectify->Callable}"))
+					if(property_exists($this, $Val->Objectify->Source))
+					$this->{$Val->Name} = (
+						("{$Properties[$Src]->Type}::{$Val->Objectify->Callable}")
+						($this->{$Val->Objectify->Source}, ...$Val->Objectify->Args)
+					);
+				}
+
+				else
+				$this->{$Val->Name} = new ($Val->Type)(
+					...$Val->Objectify->Args
+				);
+			}
 		}
 
 		// as handy as it was to create this ConstructArgs first thing
