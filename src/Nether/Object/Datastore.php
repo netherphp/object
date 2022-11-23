@@ -86,6 +86,16 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	&GetDataRef():
+	array {
+	/*//
+	@date 2015-12-02
+	//*/
+
+		return $this->Data;
+	}
+
+	public function
 	SetData(array $Input):
 	static {
 	/*//
@@ -813,6 +823,35 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 
 		if(is_callable($this->Sorter)) {
 			uasort($this->Data, $this->Sorter);
+			return $this;
+		}
+
+		return $this;
+	}
+
+	public function
+	SortKeys(callable $Function=NULL, bool $Presort=FALSE):
+	static {
+	/*//
+	@date 2022-11-23
+	//*/
+
+		if($Function === NULL) {
+			ksort($this->Data);
+
+			if(!$Presort)
+			return $this;
+		}
+
+		if(is_callable($Function)) {
+			uksort($this->Data, $Function);
+
+			if(!$Presort)
+			return $this;
+		}
+
+		if(is_callable($this->Sorter)) {
+			uksort($this->Data, $this->Sorter);
 			return $this;
 		}
 
