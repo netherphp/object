@@ -226,6 +226,20 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	}
 
 	public function
+	&GetDataRef():
+	array {
+	/*//
+	@date 2022-11-23
+	return the dataset by reference. keep in mind that you need to do the
+	ampersand on the reciever end too, and that it only really works if
+	assigned to a variable first. dropping this on an array function for
+	example wont work.
+	//*/
+
+		return $this->Data;
+	}
+
+	public function
 	SetData(array $Input):
 	static {
 	/*//
@@ -1126,6 +1140,30 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 		uasort($this->Data, $Function);
 
 		////////
+
+		return $this;
+	}
+
+	public function
+	SortKeys(?callable $Function=NULL):
+	static {
+	/*//
+	@date 2022-11-23
+	behaves the same as Sort except against the keys.
+	//*/
+
+		if($Function === NULL) {
+			if(is_callable($this->Sorter))
+			uksort($this->Data, $this->Sorter);
+
+			else
+			ksort($this->Data);
+		}
+
+		////////
+
+		if(is_callable($Function))
+		uksort($this->Data, $Function);
 
 		return $this;
 	}
