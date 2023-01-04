@@ -137,4 +137,24 @@ the prototype system will want to know about.
 		return NULL;
 	}
 
+	public function
+	GetAttributes(?string $Type=NULL):
+	array {
+
+		if($Type === NULL)
+		return $this->Attributes;
+
+		////////
+
+		$Output = $this->GetAttribute($Type);
+
+		if(is_array($Output))
+		return $Output;
+
+		if($Output)
+		return [ $Output ];
+
+		return [ ];
+	}
+
 }
