@@ -1,6 +1,8 @@
 # **Nether Object (netherphp/object)**
 
-[![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Packagist](https://img.shields.io/packagist/dt/netherphp/object.svg)](https://packagist.org/packages/netherphp/object) [![Build Status](https://travis-ci.org/netherphp/object.svg?branch=master)](https://travis-ci.org/netherphp/object) [![codecov](https://codecov.io/gh/netherphp/object/branch/redux/graph/badge.svg?token=6OLA0S797J)](https://codecov.io/gh/netherphp/object)
+[![Packagist](https://img.shields.io/packagist/v/netherphp/object.svg?style=for-the-badge)](https://packagist.org/packages/netherphp/object)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/netherphp/object/phpunit.yml?style=for-the-badge)](https://github.com/netherphp/object/actions)
+[![codecov](https://img.shields.io/codecov/c/gh/netherphp/object?style=for-the-badge&token=VQC48XNBS2)](https://codecov.io/gh/netherphp/object)
 
 This package provides some utilities to aid with some low level work.
 
