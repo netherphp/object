@@ -52,13 +52,21 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	////////////////////////////////////////////////////////////////
 
 	public function
-	__Construct(?array $Input=NULL) {
+	__Construct(?iterable $Input=NULL) {
 	/*//
 	@date 2015-12-02
 	//*/
 
+		// fun fact:
+		// in 8.2.0 iterator_to_array can handle arrays without needing
+		// to check for ourselves.
+
 		if($Input !== NULL)
-		$this->SetData($Input);
+		$this->SetData(
+			is_array($Input)
+			? $Input
+			: iterator_to_array($Input, TRUE)
+		);
 
 		return;
 	}
@@ -518,23 +526,25 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	#[ReturnTypeWillChange]
 	public function
 	Next():
-	mixed {
+	void {
 	/*//
 	@date 2015-12-02
 	//*/
 
-		return next($this->Data);
+		next($this->Data);
+		return;
 	}
 
 	#[ReturnTypeWillChange]
 	public function
 	Rewind():
-	mixed {
+	void {
 	/*//
 	@date 2015-12-02
 	//*/
 
-		return reset($this->Data);
+		reset($this->Data);
+		return;
 	}
 
 	public function
@@ -1431,7 +1441,36 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
-	public static function
+	static public function
+	NewBlended(iterable $OG, ...$Adds):
+	static {
+
+		$Store = new static($OG);
+		$AddOn = NULL;
+
+		foreach($Adds as $AddOn)
+		$Store->BlendRight($AddOn);
+
+		return $Store;
+	}
+
+	static public function
+	NewMerged(iterable $OG, ...$Updates):
+	static {
+
+		$Store = new static($OG);
+		$Overwrite = NULL;
+
+		foreach($Updates as $Overwrite)
+		$Store->MergeRight($Overwrite);
+
+		return $Store;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	static public function
 	NewFromFile(string $Filename):
 	static {
 	/*//
