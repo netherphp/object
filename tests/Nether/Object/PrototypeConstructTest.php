@@ -370,11 +370,11 @@ extends PHPUnit\Framework\TestCase {
 
 		$Object = new class() extends Prototype {
 			#[PropertyObjectify]
-			public Datastore $Data;
+			public Prototype $Data;
 		};
 
 		$this->AssertInstanceOf(
-			'Nether\\Object\\Datastore',
+			'Nether\\Object\\Prototype',
 			$Object->Data
 		);
 
