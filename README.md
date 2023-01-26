@@ -8,6 +8,9 @@ This package provides some utilities to aid with some low level work.
 
 ---
 
+NOTE: ALL OF THIS LIBRARY HAS BEEN MERGED INTO `Nether\Common` and should no
+longer be used.
+
 ## **Class Overview**
 
 ### `Nether\Object\Prototype`
