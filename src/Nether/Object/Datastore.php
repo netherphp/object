@@ -564,7 +564,7 @@ implements Iterator, ArrayAccess, Countable, JsonSerializable {
 	//*/
 
 		return new static(
-			array_filter($this->Data,$FilterFunc)
+			array_filter($this->Data,$FilterFunc,ARRAY_FILTER_USE_BOTH)
 		);
 	}
 
